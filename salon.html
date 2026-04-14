@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salon Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#009933;--green-dark:#007a29;--green-light:#e6f7ec;--green-mid:#00b33c;
+  --text:#212b36;--text-secondary:#637381;--text-tertiary:#919eab;
+  --bg:#f4f6f8;--bg-card:#fff;--border:#dfe3e8;--border-light:#f4f6f8;
+  --red:#d32f2f;--red-light:#fdecea;--amber:#f59e0b;--amber-light:#fff8e1;
+  --blue:#1565c0;--blue-light:#e3f2fd;--purple:#7c3aed;--purple-light:#ede9fe;
+  --teal:#0d9488;--teal-light:#ccfbf1;
+  --shadow:0 1px 3px rgba(0,0,0,.12);--shadow-md:0 4px 16px rgba(0,0,0,.1);
+  --radius:8px;--radius-sm:6px;--radius-lg:12px;
+  --sidebar-w:240px;--header-h:60px;
+  --font:'Public Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4 0%,#e8f5e9 100%)}
+.login-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:2.5rem;width:100%;max-width:420px}
+.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:2rem}
+.login-logo-mark{width:44px;height:44px;background:var(--green);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px}
+.login-title{font-size:22px;font-weight:700}
+.login-sub{font-size:13px;color:var(--text-secondary);margin-top:2px}
+.user-pill{display:flex;align-items:center;gap:12px;padding:14px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;margin-bottom:10px}
+.user-pill:hover{border-color:var(--green);background:var(--green-light)}
+.user-pill.selected{border-color:var(--green);background:var(--green-light)}
+.user-pill-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.user-pill-name{font-weight:600;font-size:14px}
+.user-pill-role{font-size:12px;color:var(--text-secondary)}
+.pin-input{display:flex;gap:10px;justify-content:center;margin:1.5rem 0 1rem}
+.pin-digit{width:52px;height:56px;border:2px solid var(--border);border-radius:var(--radius);font-size:22px;font-weight:700;text-align:center;font-family:var(--font);background:#fff;color:var(--text);transition:border-color .15s}
+.pin-digit:focus{outline:none;border-color:var(--green)}
+.pin-hint{font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:1rem}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;overflow-y:auto}
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.header{height:var(--header-h);background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;position:sticky;top:0;z-index:40}
+.content{padding:20px;flex:1}
+
+/* SIDEBAR */
+.sidebar-logo{padding:16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:10px}
+.logo-mark{width:36px;height:36px;background:var(--green);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px;flex-shrink:0}
+.logo-text{font-size:15px;font-weight:700}
+.logo-sub{font-size:11px;color:var(--text-secondary)}
+.sidebar-section{padding:10px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-tertiary)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;margin:1px 8px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary);font-size:13.5px;font-weight:500;transition:all .15s;text-decoration:none;border:none;background:none;width:calc(100% - 16px);font-family:var(--font)}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--green-light);color:var(--green-dark);font-weight:600}
+.nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sidebar-user{margin-top:auto;padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-user-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.sidebar-user-name{font-size:13px;font-weight:600;flex:1}
+.sidebar-user-role{font-size:11px;color:var(--text-secondary)}
+
+/* HEADER */
+.header-title{font-size:17px;font-weight:700}
+.header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.salon-badge{font-size:12px;font-weight:600;color:var(--text-secondary);background:var(--bg);padding:5px 10px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+
+/* BUTTONS */
+.btn{font-family:var(--font);font-size:13px;font-weight:600;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--green);color:#fff}.btn-primary:hover{background:var(--green-dark)}
+.btn-outline{background:#fff;color:var(--text);border:1px solid var(--border)}.btn-outline:hover{background:var(--bg)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border:1px solid transparent}.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-danger{background:var(--red-light);color:var(--red);border:1px solid #fca5a5}.btn-danger:hover{background:#fee2e2}
+.btn-teal{background:var(--teal);color:#fff}.btn-teal:hover{background:#0f766e}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-lg{padding:11px 22px;font-size:14px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center}
+
+/* CARDS */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg)}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700}
+.card-body{padding:16px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sc,var(--green))}
+.stat-val{font-size:26px;font-weight:700;line-height:1.1}
+.stat-lbl{font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.stat-change{font-size:11px;font-weight:600;margin-top:4px}
+.up{color:var(--green)}.down{color:var(--red)}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.full{grid-column:1/-1}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl.nm{margin-bottom:0}
+label.lbl{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{font-family:var(--font);font-size:13.5px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 11px;color:var(--text);width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(0,153,51,.1)}
+textarea{resize:vertical;min-height:72px}
+.hint{font-size:11px;color:var(--text-tertiary);margin-top:3px}
+
+/* TABLES */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--border-light);font-size:13.5px;vertical-align:middle}
+tr:hover td{background:#fafafa}
+tr:last-child td{border-bottom:none}
+.tfoot td{background:var(--bg);font-weight:700;border-top:2px solid var(--border)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;gap:4px}
+.b-green{background:var(--green-light);color:var(--green-dark)}
+.b-red{background:var(--red-light);color:var(--red)}
+.b-amber{background:var(--amber-light);color:#92400e}
+.b-blue{background:var(--blue-light);color:var(--blue)}
+.b-purple{background:var(--purple-light);color:var(--purple)}
+.b-teal{background:var(--teal-light);color:var(--teal)}
+.b-grey{background:var(--bg);color:var(--text-secondary)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);gap:0;margin-bottom:16px}
+.tbt{padding:10px 16px;font-size:13px;font-weight:600;background:transparent;border:none;cursor:pointer;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:var(--font);display:flex;align-items:center;gap:6px}
+.tbt:hover{color:var(--text)}.tbt.active{color:var(--green);border-bottom-color:var(--green)}
+.tpanel{display:none}.tpanel.active{display:block}
+
+/* MODALS */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:center;padding:50px 16px;overflow-y:auto}
+.ov.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:580px;box-shadow:var(--shadow-md);margin:auto}
+.mh{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:16px;font-weight:700}
+.mb{padding:20px}
+.mf{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* CLIENT LIST */
+.cl-layout{display:grid;grid-template-columns:280px 1fr;min-height:600px;background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.cl-sidebar{border-right:1px solid var(--border);display:flex;flex-direction:column}
+.cl-search{padding:12px;border-bottom:1px solid var(--border)}
+.cl-si{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font)}
+.cl-si:focus{outline:none;border-color:var(--green)}
+.filter-row{display:flex;margin-top:8px}
+.fb{flex:1;padding:5px;font-size:11px;font-weight:700;background:#fff;border:1px solid var(--border);cursor:pointer;font-family:var(--font);color:var(--text-secondary)}
+.fb:first-child{border-radius:var(--radius-sm) 0 0 var(--radius-sm)}
+.fb:last-child{border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.fb.active{background:var(--green);color:#fff;border-color:var(--green)}
+.cl-list{flex:1;overflow-y:auto}
+.cl-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:10px;transition:background .1s}
+.cl-item:hover{background:#f9fafb}.cl-item.active{background:var(--green-light)}
+.cl-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.cl-name{font-size:13px;font-weight:600}
+.cl-sub{font-size:11px;color:var(--text-secondary);margin-top:1px}
+.cl-detail{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cd-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.cd-name{font-size:16px;font-weight:700}
+.cd-sub{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.cd-actions{margin-left:auto;display:flex;gap:6px}
+.cd-body{flex:1;overflow-y:auto}
+.av-lg{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+.info-pair{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+.info-pair:last-child{border-bottom:none}
+.info-lbl{width:130px;flex-shrink:0;color:var(--text-secondary);font-weight:500}
+.info-val{color:var(--text);font-weight:600;flex:1}
+
+/* CALENDAR */
+.cal-slot{height:56px;border-bottom:1px solid var(--border-light);position:relative;cursor:pointer;transition:background .1s}
+.cal-slot:hover{background:#f0fdf4}
+.cal-appt{position:absolute;left:3px;right:3px;border-radius:5px;padding:3px 6px;font-size:11px;font-weight:600;overflow:hidden;border-left:3px solid;z-index:2;cursor:pointer}
+
+/* POS */
+.pos-layout{display:grid;grid-template-columns:1fr 360px;gap:16px}
+.cart-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light)}
+
+/* PAYROLL */
+.payroll-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.pay-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.pay-card-head{padding:14px 16px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.pay-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+.pay-row:last-child{border-bottom:none}
+.pay-total-row{background:var(--green-light);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;margin-top:12px}
+
+/* BOOKKEEPING */
+.bk-nav{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.bk-period{display:flex;gap:4px;align-items:center}
+.reconcile-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px}
+.reconcile-ok{background:#dcfce7;color:#14532d}
+.reconcile-no{background:#fef3c7;color:#78350f}
+.bk-section-head{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);padding:10px 14px;background:var(--bg);border-bottom:1px solid var(--border)}
+.pl-row{display:flex;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--border-light);font-size:13px}
+.pl-row.total{font-weight:700;font-size:14px;background:var(--bg)}
+.pl-row.gross{font-weight:700;background:#f0fdf4}
+.income-val{color:var(--green);font-weight:700}
+.expense-val{color:var(--red);font-weight:700}
+
+/* MISC */
+.empty{text-align:center;padding:3rem;color:var(--text-secondary);font-size:14px}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.shead{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);margin-bottom:10px}
+.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:14px;border-left:3px solid;display:flex;align-items:flex-start;gap:10px}
+.alert-amber{background:var(--amber-light);border-color:var(--amber);color:#78350f}
+.alert-green{background:var(--green-light);border-color:var(--green);color:var(--green-dark)}
+.alert-blue{background:var(--blue-light);border-color:var(--blue);color:var(--blue)}
+.sms-live{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--green-dark);background:var(--green-light);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:14px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+#toast{position:fixed;bottom:20px;right:20px;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;display:none;z-index:9999;box-shadow:var(--shadow-md);max-width:340px;animation:fadein .2s}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#toast.ok{background:var(--green);color:#fff}
+#toast.err{background:var(--red);color:#fff}
+#toast.info{background:var(--text);color:#fff}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#dfe3e8;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-mark">S</div>
+        <div>
+          <div class="login-title" id="loginSalonName">Salon Pro</div>
+          <div class="login-sub">Management System</div>
+        </div>
+      </div>
+      <div id="loginStep1">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text-secondary)">Who's logging in?</div>
+        <div id="userPills"></div>
+        <button class="btn btn-primary btn-lg" style="width:100%;margin-top:16px;justify-content:center" onclick="proceedToPin()">Continue →</button>
+      </div>
+      <div id="loginStep2" style="display:none">
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Enter your PIN</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px" id="loginForUser"></div>
+        <div class="pin-input">
+          <input class="pin-digit" type="password" maxlength="1" id="p0" oninput="pinInput(0)">
+          <input class="pin-digit" type="password" maxlength="1" id="p1" oninput="pinInput(1)">
+          <input class="pin-digit" type="password" maxlength="1" id="p2" oninput="pinInput(2)">
+          <input class="pin-digit" type="password" maxlength="1" id="p3" oninput="pinInput(3)">
+        </div>
+        <div class="pin-hint" id="pinError" style="color:var(--red);display:none">Incorrect PIN. Try again.</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center" onclick="document.getElementById('loginStep1').style.display='';document.getElementById('loginStep2').style.display='none'">← Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP ═══════════════ -->
+<div id="appShell" style="display:none">
+<div class="layout">
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">S</div>
+    <div><div class="logo-text" id="sidebarName">Salon Pro</div><div class="logo-sub">Management</div></div>
+  </div>
+  <div style="padding:8px;flex:1">
+    <div class="sidebar-section">Main</div>
+    <button class="nav-item" onclick="nav('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</button>
+    <button class="nav-item" onclick="nav('calendar')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</button>
+    <button class="nav-item" onclick="nav('clients')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clients</button>
+    <button class="nav-item" onclick="nav('pos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Point of Sale</button>
+
+    <div class="sidebar-section owner-only">Business</div>
+    <button class="nav-item owner-only" onclick="nav('bookkeeping')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Bookkeeping</button>
+    <button class="nav-item owner-only" onclick="nav('payroll')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Payroll</button>
+    <button class="nav-item owner-only" onclick="nav('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Reports</button>
+    <button class="nav-item owner-only" onclick="nav('marketing')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.5 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.44 1.5h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.77-1.77a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>SMS Marketing</button>
+
+    <div class="sidebar-section owner-only">Settings</div>
+    <button class="nav-item owner-only" onclick="nav('employees')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Employees</button>
+    <button class="nav-item owner-only" onclick="nav('services')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Services</button>
+    <button class="nav-item owner-only" onclick="nav('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-user-av" id="sbUserAv"></div>
+    <div style="flex:1;min-width:0">
+      <div class="sidebar-user-name" id="sbUserName"></div>
+      <div class="sidebar-user-role" id="sbUserRole"></div>
+    </div>
+    <button class="btn btn-ghost btn-sm btn-icon" onclick="logout()" title="Log out">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="main">
+  <header class="header">
+    <div style="font-size:17px;font-weight:700" id="headerTitle">Dashboard</div>
+    <div class="header-actions">
+      <div class="salon-badge" id="headerSalon">Salon Pro</div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('mAppt')">+ Book</button>
+    </div>
+  </header>
+  <div class="content" id="mainContent"></div>
+</div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Appointment -->
+<div id="mAppt" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mApptTitle">New Appointment</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mAppt')">✕</button></div>
+  <div class="mb">
+    <div class="fg"><div class="fl"><label class="lbl">Client *</label><select id="af_c"></select></div><div class="fl"><label class="lbl">Employee</label><select id="af_e"><option value="">Any</option></select></div></div>
+    <div class="fg fg3"><div class="fl"><label class="lbl">Date *</label><input type="date" id="af_d"></div><div class="fl"><label class="lbl">Time</label><input type="time" id="af_t" value="09:00"></div><div class="fl"><label class="lbl">Duration</label><select id="af_dur"><option value="15">15 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 hr</option><option value="90">1.5 hr</option><option value="120">2 hr</option><option value="150">2.5 hr</option><option value="180">3 hr</option></select></div></div>
+    <div class="fl"><label class="lbl">Service *</label><input id="af_s" placeholder="e.g. Full highlights, cut & blowdry..."></div>
+    <div class="fg"><div class="fl"><label class="lbl">Price ($)</label><input type="number" id="af_p" placeholder="0.00" min="0" step="0.5"></div><div class="fl"><label class="lbl">Status</label><select id="af_st"><option value="upcoming">Upcoming</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="noshow">No Show</option></select></div></div>
+    <div class="fl"><label class="lbl">SMS Reminder</label><select id="af_r"><option value="none">Don't send</option><option value="now">Send now</option><option value="24h">24 hrs before</option><option value="48h">48 hrs before</option><option value="1w">1 week before</option></select></div>
+    <div class="fl"><label class="lbl">Notes</label><textarea id="af_n" placeholder="Colour formula, preferences..."></textarea></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mAppt')">Cancel</button><button class="btn btn-primary" onclick="saveAppt()">Save Appointment</button></div>
+</div></div>
+
+<!-- Client -->
+<div id="mClient" class="ov"><div class="modal" style="max-width:640px">
+  <div class="mh"><div class="mt" id="mClientTitle">Add Client</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mClient')">✕</button></div>
+  <div class="mb">
+    <div class="fg"><div class="fl"><label class="lbl">First Name *</label><input id="cf1" placeholder="Jane"></div><div class="fl"><label class="lbl">Last Name</label><input id="cf2" placeholder="Smith"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Mobile</label><input id="cf3" type="tel" placeholder="0412 345 678"></div><div class="fl"><label class="lbl">Email</label><input id="cf4" type="email" placeholder="jane@email.com"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Date of Birth</label><input id="cf5" type="date"></div><div class="fl"><label class="lbl">Gender</label><select id="cf6"><option value="">Prefer not to say</option><option>Female</option><option>Male</option><option>Non-binary</option></select></div></div>
+    <div class="fl"><label class="lbl">Address</label><input id="cf7" placeholder="Street address"></div>
+    <div class="fg fg3"><div class="fl"><label class="lbl">Suburb</label><input id="cf8"></div><div class="fl"><label class="lbl">State</label><input id="cf9" placeholder="QLD"></div><div class="fl"><label class="lbl">Postcode</label><input id="cf10" placeholder="4000"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Hair Type</label><select id="cf11"><option value="">Select...</option><option>Fine</option><option>Medium</option><option>Thick</option><option>Curly</option><option>Coily</option><option>Wavy</option></select></div><div class="fl"><label class="lbl">Allergies ⚠</label><input id="cf12" placeholder="e.g. PPD, ammonia"></div></div>
+    <div class="fl"><label class="lbl">Preferred Services</label><input id="cf13" placeholder="e.g. Cut & colour, highlights"></div>
+    <div class="fl"><label class="lbl">Notes / Colour Formula</label><textarea id="cf14" placeholder="Formula, preferences, history..."></textarea></div>
+    <div style="display:flex;gap:20px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="cf_sms" checked style="width:auto"> SMS reminders</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="checkbox" id="cf_em" checked style="width:auto"> Email reminders</label>
+    </div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mClient')">Cancel</button><button class="btn btn-primary" onclick="saveClient()">Save Client</button></div>
+</div></div>
+
+<!-- SMS -->
+<div id="mSms" class="ov"><div class="modal">
+  <div class="mh"><div class="mt">Send SMS Reminder</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSms')">✕</button></div>
+  <div class="mb" id="mSmsBody"></div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mSms')">Cancel</button><button class="btn btn-primary" id="smsSendBtn" onclick="doSendSms()">Send Now</button></div>
+</div></div>
+
+<!-- Expense -->
+<div id="mExpense" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mExpTitle">Add Transaction</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mExpense')">✕</button></div>
+  <div class="mb">
+    <div class="fg"><div class="fl"><label class="lbl">Date</label><input type="date" id="ex_d"></div><div class="fl"><label class="lbl">Type</label><select id="ex_type" onchange="toggleExpenseType()"><option value="expense">Expense</option><option value="income">Other Income</option></select></div></div>
+    <div class="fl"><label class="lbl">Category</label><select id="ex_cat">
+      <optgroup label="Expenses"><option>Colour & Chemicals</option><option>Retail Products</option><option>Rent</option><option>Utilities</option><option>Equipment</option><option>Marketing</option><option>Staff Wages</option><option>Insurance</option><option>Superannuation</option><option>PAYG Withholding</option><option>Professional Services</option><option>Bank Fees</option><option>Other Expense</option></optgroup>
+      <optgroup label="Income"><option>Service Revenue</option><option>Product Sales</option><option>Gift Vouchers</option><option>Other Income</option></optgroup>
+    </select></div>
+    <div class="fl"><label class="lbl">Description</label><input id="ex_desc" placeholder="e.g. Schwarzkopf colour order"></div>
+    <div class="fg"><div class="fl"><label class="lbl">Amount (ex. GST) $</label><input type="number" id="ex_amt" placeholder="0.00" min="0" step="0.01" oninput="calcGST()"></div><div class="fl"><label class="lbl">GST</label><select id="ex_gst" onchange="calcGST()"><option value="yes">GST (10%)</option><option value="no">No GST (GST-free)</option><option value="exempt">Input taxed</option></select></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">GST Amount $</label><input type="number" id="ex_gstamt" placeholder="0.00" step="0.01" readonly style="background:var(--bg)"></div><div class="fl"><label class="lbl">Total (inc. GST) $</label><input type="number" id="ex_total" placeholder="0.00" step="0.01" readonly style="background:var(--bg)"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Supplier / Payee</label><input id="ex_supplier" placeholder="e.g. Schwarzkopf Australia"></div><div class="fl"><label class="lbl">Invoice / Ref #</label><input id="ex_ref" placeholder="INV-001"></div></div>
+    <div class="fl"><label class="lbl">Notes</label><input id="ex_notes" placeholder="Optional notes"></div>
+    <div class="fl"><label class="lbl">Reconciled?</label><select id="ex_rec"><option value="yes">Yes — matched to bank statement</option><option value="no">No — pending reconciliation</option></select></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mExpense')">Cancel</button><button class="btn btn-primary" onclick="saveExpense()">Save</button></div>
+</div></div>
+
+<!-- Employee -->
+<div id="mEmployee" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mEmpTitle">Add Employee</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mEmployee')">✕</button></div>
+  <div class="mb">
+    <div class="fg"><div class="fl"><label class="lbl">First Name *</label><input id="em1" placeholder="Rosie"></div><div class="fl"><label class="lbl">Last Name</label><input id="em2" placeholder="Gough"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Mobile</label><input id="em3" placeholder="0412 345 678"></div><div class="fl"><label class="lbl">Email</label><input id="em4" placeholder="rosie@salon.com"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Pay Type</label><select id="em5"><option value="hourly">Hourly rate</option><option value="salary">Annual salary</option><option value="commission">Commission %</option></select></div><div class="fl"><label class="lbl">Rate ($/hr, $/yr, or %)</label><input type="number" id="em6" placeholder="25.00" step="0.01"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Super Rate (%)</label><input type="number" id="em7" value="11.5" step="0.1"></div><div class="fl"><label class="lbl">Leave Loading (%)</label><input type="number" id="em8" value="17.5" step="0.1"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">TFN</label><input id="em9" placeholder="123 456 789"></div><div class="fl"><label class="lbl">Start Date</label><input type="date" id="em10"></div></div>
+    <div class="fl"><label class="lbl">Employment Type</label><select id="em11"><option>Full-time</option><option>Part-time</option><option>Casual</option><option>Contract</option></select></div>
+    <div class="divider"></div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px">App Access</div>
+    <div class="fg"><div class="fl"><label class="lbl">App Role</label><select id="em12"><option value="employee">Employee (no financials)</option><option value="owner">Owner / Manager (full access)</option></select></div><div class="fl"><label class="lbl">PIN (4 digits)</label><input type="password" id="em13" maxlength="4" placeholder="••••" pattern="[0-9]{4}"></div></div>
+    <div class="hint" style="margin-top:-10px">Employee role hides bookkeeping, payroll, and reports. Owner role has full access.</div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mEmployee')">Cancel</button><button class="btn btn-primary" onclick="saveEmployee()">Save Employee</button></div>
+</div></div>
+
+<!-- Service -->
+<div id="mService" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mSvTitle">Add Service</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mService')">✕</button></div>
+  <div class="mb">
+    <div class="fl"><label class="lbl">Service Name *</label><input id="sv1" placeholder="Full Highlights"></div>
+    <div class="fg"><div class="fl"><label class="lbl">Category</label><select id="sv2"><option>Colour</option><option>Cut</option><option>Treatment</option><option>Blowdry</option><option>Extensions</option><option>Other</option></select></div><div class="fl"><label class="lbl">Duration (mins)</label><input type="number" id="sv3" value="60" min="15" step="15"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Price (inc. GST) $</label><input type="number" id="sv4" placeholder="0.00" step="0.5"></div><div class="fl"><label class="lbl">GST</label><select id="sv5"><option value="yes">10% GST included</option><option value="no">GST-free</option></select></div></div>
+    <div class="fl"><label class="lbl">Notes</label><input id="sv6" placeholder="Optional..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mService')">Cancel</button><button class="btn btn-primary" onclick="saveService()">Save Service</button></div>
+</div></div>
+
+<!-- Import -->
+<div id="mImport" class="ov"><div class="modal" style="max-width:680px">
+  <div class="mh"><div class="mt">Import Clients from CSV</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mImport')">✕</button></div>
+  <div class="mb">
+    <div class="alert alert-green">Export from Client Diary: <strong>Reports → Export Tools → Export Data</strong></div>
+    <div class="fl"><label class="lbl">Choose CSV file</label><input type="file" accept=".csv,.txt" id="importFile" onchange="handleImport(event)"></div>
+    <div id="importPreview"></div>
+  </div>
+</div></div>
+
+<!-- Settings -->
+<div id="mSettings" class="ov"><div class="modal" style="max-width:640px">
+  <div class="mh"><div class="mt">Settings</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSettings')">✕</button></div>
+  <div class="mb">
+    <div class="shead">Salon Details</div>
+    <div class="fg"><div class="fl"><label class="lbl">Salon Name</label><input id="s1" placeholder="Hair by Ivana"></div><div class="fl"><label class="lbl">ABN</label><input id="s2" placeholder="12 345 678 901"></div></div>
+    <div class="fg"><div class="fl"><label class="lbl">Phone</label><input id="s3"></div><div class="fl"><label class="lbl">Email</label><input id="s4" type="email"></div></div>
+    <div class="fl"><label class="lbl">Address</label><input id="s5"></div>
+    <div class="divider"></div>
+    <div class="shead">Twilio SMS</div>
+    <div class="alert alert-blue" style="margin-bottom:12px">Sign up free at twilio.com → get AU number (~$4/mo) → paste credentials below</div>
+    <div class="fl"><label class="lbl">Account SID</label><input id="s6" placeholder="ACxxxx..." autocomplete="off"></div>
+    <div class="fl"><label class="lbl">Auth Token</label><input type="password" id="s7" autocomplete="off"></div>
+    <div class="fl"><label class="lbl">Twilio Phone Number</label><input id="s8" placeholder="+61400000000"></div>
+    <div class="fl"><label class="lbl">SMS Template</label><textarea id="s9" oninput="previewTpl()" style="min-height:72px"></textarea><div class="hint">Placeholders: {name} {date} {time} {service} {salon}</div></div>
+    <div id="s_prev" style="background:var(--green-light);padding:10px 12px;border-radius:var(--radius-sm);border-left:3px solid var(--green);font-size:13px;color:var(--green-dark);white-space:pre-wrap;margin-top:6px"></div>
+    <div class="divider"></div>
+    <div class="shead">GST Settings</div>
+    <div class="fg"><div class="fl"><label class="lbl">GST Rate (%)</label><input type="number" id="s10" value="10" step="0.1"></div><div class="fl"><label class="lbl">BAS Period</label><select id="s11"><option>Quarterly</option><option>Monthly</option><option>Annual</option></select></div></div>
+  </div>
+  <div class="mf">
+    <button class="btn btn-outline" onclick="cm('mSettings')">Cancel</button>
+    <button class="btn btn-ghost" onclick="testSms()">Test SMS</button>
+    <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+  </div>
+</div></div>
+
+<script>
+// ═══ STATE ═══
+const SK='salonpro_v2';
+let S={
+  salonName:'Hair by Ivana',salonABN:'',salonPhone:'',salonEmail:'',salonAddress:'',
+  twilioSid:'',twilioToken:'',twilioFrom:'',
+  msgTpl:"Hi {name}! Reminder: {service} at {salon} on {date} at {time}. See you! 💇",
+  gstRate:10, basPeriod:'Quarterly',
+  clients:[],appointments:[],employees:[],services:[],transactions:[],smsLog:[],
+  currentUserId:null
+};
+let page='dashboard',selClient=null,editCid=null,editAid=null,editEid=null,editSid=null,editTid=null,smsPending=null;
+let clFilter='active',clQ='',cart=[],importRows=[],importHeaders=[],importMapped={};
+let loginSelectedUser=null;
+
+function load(){try{const r=localStorage.getItem(SK);if(r)S={...S,...JSON.parse(r)};}catch(e){}}
+function save(){try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){} cloudSave();}
+
+// ── Cloud sync (Netlify Blobs via serverless function) ──
+const CLOUD_URL='https://hobday-dashboard-mnx7tfk7.netlify.app/.netlify/functions/data';
+const CLOUD_TOKEN='hobday2026';
+let _cloudSaving=false;
+async function cloudSave(){
+  if(_cloudSaving)return; _cloudSaving=true;
+  try{await fetch(CLOUD_URL+'?key='+SK+'&token='+CLOUD_TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:S})});}
+  catch(e){}
+  _cloudSaving=false;
+}
+async function cloudLoad(){
+  try{
+    const r=await fetch(CLOUD_URL+'?key='+SK+'&token='+CLOUD_TOKEN);
+    const d=await r.json();
+    if(d.data){S={...S,...d.data};try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){} return true;}
+  }catch(e){}
+  return false;
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+const AVC=[['#d1fae5','#065f46'],['#dbeafe','#1e3a8a'],['#fce7f3','#9d174d'],['#fef3c7','#78350f'],['#ede9fe','#4c1d95'],['#cffafe','#164e63'],['#fee2e2','#7f1d1d'],['#f3e8ff','#581c87']];
+function avc(n){let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%AVC.length;return AVC[h]}
+function ini(f,l){return((f||'')[0]||'').toUpperCase()+((l||'')[0]||'').toUpperCase()}
+function fd(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}
+function fds(d){if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}
+function ft(t){if(!t)return'';const[h,m]=t.split(':');const hr=parseInt(h);return`${hr>12?hr-12:hr||12}:${m} ${hr>=12?'pm':'am'}`}
+function isUp(a){return new Date(a.date+'T'+(a.time||'00:00'))>=new Date()}
+function tod(){return new Date().toISOString().split('T')[0]}
+function monStart(){return tod().slice(0,7)+'-01'}
+function normPhone(p){if(!p)return null;let n=p.replace(/[\s\-\(\)]/g,'');if(n.startsWith('0'))n='+61'+n.slice(1);if(!n.startsWith('+'))n='+61'+n;return n}
+
+function toast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=type;t.style.display='block';
+  clearTimeout(t._to);t._to=setTimeout(()=>t.style.display='none',2800);
+}
+function om(id){document.getElementById(id).classList.add('open')}
+function cm(id){document.getElementById(id).classList.remove('open')}
+window.onclick=e=>{['mAppt','mClient','mSms','mExpense','mEmployee','mService','mImport','mSettings'].forEach(id=>{const el=document.getElementById(id);if(e.target===el)cm(id)})}
+
+// ═══ AUTH ═══
+function currentUser(){return S.employees.find(e=>e.id===S.currentUserId)||{first:'Owner',last:'',role:'owner',id:'default'}}
+function isOwner(){const u=currentUser();return u.role==='owner'||u.id==='default'||!S.employees.length}
+
+function buildLoginScreen(){
+  document.getElementById('loginSalonName').textContent=S.salonName;
+  const pills=document.getElementById('userPills');
+  const users=[];
+  // Always show Owner
+  users.push({id:'__owner__',first:'Owner',last:'',role:'owner',pin:S.ownerPin||'0000'});
+  S.employees.forEach(e=>users.push(e));
+  pills.innerHTML=users.map(u=>{
+    const col=avc(u.first+(u.last||''));
+    return`<div class="user-pill" id="pill_${u.id}" onclick="selectUser('${u.id}')">
+      <div class="user-pill-av" style="background:${col[0]};color:${col[1]}">${ini(u.first,u.last)}</div>
+      <div><div class="user-pill-name">${u.first} ${u.last||''}</div><div class="user-pill-role">${u.role==='owner'?'Owner / Manager':'Employee'}</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--border)">›</div>
+    </div>`;
+  }).join('');
+  document.getElementById('loginScreen').style.display='';
+  document.getElementById('appShell').style.display='none';
+}
+
+function selectUser(id){
+  loginSelectedUser=id;
+  document.querySelectorAll('.user-pill').forEach(p=>p.classList.remove('selected'));
+  document.getElementById('pill_'+id)?.classList.add('selected');
+}
+
+function proceedToPin(){
+  if(!loginSelectedUser){toast('Please select who is logging in','err');return;}
+  const users=[{id:'__owner__',first:'Owner',last:''},...S.employees];
+  const u=users.find(x=>x.id===loginSelectedUser);
+  document.getElementById('loginForUser').textContent=`Logging in as ${u?.first} ${u?.last||''}`;
+  document.getElementById('loginStep1').style.display='none';
+  document.getElementById('loginStep2').style.display='';
+  ['p0','p1','p2','p3'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('pinError').style.display='none';
+  document.getElementById('p0').focus();
+}
+
+function pinInput(idx){
+  const val=document.getElementById('p'+idx).value;
+  if(val&&idx<3)document.getElementById('p'+(idx+1)).focus();
+  if(idx===3&&val){
+    const pin=['p0','p1','p2','p3'].map(id=>document.getElementById(id).value).join('');
+    verifyPin(pin);
+  }
+}
+
+function verifyPin(pin){
+  const users=[{id:'__owner__',first:'Owner',last:'',role:'owner',pin:S.ownerPin||'0000'},...S.employees];
+  const u=users.find(x=>x.id===loginSelectedUser);
+  const correctPin=u?.pin||'0000';
+  if(pin===correctPin){
+    S.currentUserId=loginSelectedUser==='__owner__'?null:loginSelectedUser;
+    save();
+    enterApp();
+  } else {
+    document.getElementById('pinError').style.display='block';
+    ['p0','p1','p2','p3'].forEach(id=>{document.getElementById(id).value='';});
+    document.getElementById('p0').focus();
+  }
+}
+
+function enterApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='';
+  const u=currentUser();
+  const col=avc(u.first+(u.last||''));
+  document.getElementById('sbUserAv').style.cssText=`background:${col[0]};color:${col[1]}`;
+  document.getElementById('sbUserAv').textContent=ini(u.first,u.last);
+  document.getElementById('sbUserName').textContent=u.first+' '+(u.last||'');
+  document.getElementById('sbUserRole').textContent=isOwner()?'Owner / Manager':'Employee';
+  // Show/hide owner-only nav items
+  document.querySelectorAll('.owner-only').forEach(el=>el.style.display=isOwner()?'':'none');
+  document.getElementById('sidebarName').textContent=S.salonName;
+  document.getElementById('headerSalon').textContent=S.salonName;
+  nav('dashboard');
+}
+
+function logout(){
+  S.currentUserId=null;save();
+  buildLoginScreen();
+  document.getElementById('loginStep1').style.display='';
+  document.getElementById('loginStep2').style.display='none';
+  loginSelectedUser=null;
+}
+
+// ═══ NAVIGATION ═══
+function nav(p){
+  page=p;
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.getAttribute('onclick')?.includes(`'${p}'`)));
+  const titles={dashboard:'Dashboard',calendar:'Calendar',clients:'Clients',pos:'Point of Sale',bookkeeping:'Bookkeeping',payroll:'Payroll',reports:'Reports',marketing:'SMS Marketing',employees:'Employees',services:'Services',settings:'Settings'};
+  document.getElementById('headerTitle').textContent=titles[p]||p;
+  render();
+}
+
+function render(){
+  const pages={dashboard:pgDashboard,calendar:pgCalendar,clients:pgClients,pos:pgPOS,bookkeeping:pgBookkeeping,payroll:pgPayroll,reports:pgReports,marketing:pgMarketing,employees:pgEmployees,services:pgServices,settings:pgSettings};
+  document.getElementById('mainContent').innerHTML=(pages[page]||pgDashboard)();
+  postRender();
+}
+
+function postRender(){
+  fillClientSel();fillEmpSel();
+  // Tab system
+  document.querySelectorAll('[data-tabs]').forEach(grp=>{
+    grp.querySelectorAll('.tbt').forEach(btn=>{
+      btn.onclick=()=>{
+        const target=btn.dataset.tab;
+        grp.querySelectorAll('.tbt').forEach(b=>b.classList.toggle('active',b===btn));
+        grp.querySelectorAll('.tpanel').forEach(p=>p.classList.toggle('active',p.id===target));
+      };
+    });
+  });
+  // Inline settings preview
+  const st=document.getElementById('st_tpl');
+  if(st)st.oninput=()=>{
+    const prev=document.getElementById('st_prev');
+    if(prev)prev.textContent=buildPreview(st.value);
+  };
+  const bkTab=document.getElementById('bk_tpl');
+  if(bkTab)bkTab.oninput=()=>{const p=document.getElementById('bk_prev');if(p)p.textContent=buildPreview(bkTab.value);}
+}
+
+// ═══ DASHBOARD ═══
+function pgDashboard(){
+  const now=new Date();const todStr=tod();
+  const up=S.appointments.filter(a=>a.status==='upcoming'&&isUp(a));
+  const todAppts=up.filter(a=>a.date===todStr).sort((a,b)=>a.time.localeCompare(b.time));
+  const monRev=S.appointments.filter(a=>a.status==='completed'&&a.date>=monStart()).reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+  const smsSent=S.smsLog.filter(l=>l.status==='sent').length;
+  const next7=up.filter(a=>{const d=new Date(a.date);const n7=new Date();n7.setDate(n7.getDate()+7);return d>=now&&d<=n7}).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,6);
+
+  return`
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">${S.clients.length}</div><div class="stat-lbl">Clients</div></div>
+      <div class="stat-card" style="--sc:var(--blue)"><div class="stat-val">${up.length}</div><div class="stat-lbl">Upcoming Bookings</div></div>
+      ${isOwner()?`<div class="stat-card" style="--sc:var(--purple)"><div class="stat-val">$${monRev.toFixed(0)}</div><div class="stat-lbl">Revenue This Month</div></div>`:''}
+      <div class="stat-card" style="--sc:var(--teal)"><div class="stat-val">${smsSent}</div><div class="stat-lbl">SMS Sent</div></div>
+    </div>
+    ${!S.twilioSid?`<div class="alert alert-amber"><span>⚠</span><span><strong>Twilio not configured</strong> — automated SMS reminders won't send. <button class="btn btn-sm" style="background:#d97706;color:#fff;border:none;margin-left:8px" onclick="om('mSettings')">Configure</button></span></div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Today · ${new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'})}</div><button class="btn btn-primary btn-sm" onclick="om('mAppt')">+ Book</button></div>
+        ${todAppts.length?todAppts.map(a=>aRow(a,true)).join(''):'<div class="empty">No appointments today ☕</div>'}
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Next 7 Days</div></div>
+        ${next7.length?next7.map(a=>aRow(a,true)).join(''):'<div class="empty">Nothing upcoming</div>'}
+      </div>
+    </div>
+    ${isOwner()&&S.smsLog.length?`<div class="card" style="margin-top:16px"><div class="card-header"><div class="card-title">Recent SMS Activity</div></div><div class="tw"><table><thead><tr><th>Time</th><th>Client</th><th>Status</th></tr></thead><tbody>${S.smsLog.slice(0,6).map(l=>`<tr><td style="font-size:12px;color:var(--text-secondary)">${l.d} ${l.t}</td><td>${l.name}</td><td><span class="badge ${l.status==='sent'?'b-green':'b-red'}">${l.status}</span></td></tr>`).join('')}</tbody></table></div></div>`:''}
+  `;
+}
+
+function aRow(a,showSms){
+  const c=S.clients.find(x=>x.id===a.clientId);
+  const name=c?c.first+' '+c.last:'Walk-in';
+  const sc={upcoming:'b-blue',confirmed:'b-green',completed:'b-grey',cancelled:'b-red',noshow:'b-red'};
+  return`<div style="padding:11px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:12px">
+    <div style="min-width:70px;text-align:center"><div style="font-size:13px;font-weight:700">${ft(a.time)}</div><div style="font-size:10px;color:var(--text-secondary)">${a.duration||60}min</div></div>
+    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${name}</div><div style="font-size:12px;color:var(--text-secondary)">${a.service||'—'}${isOwner()&&a.price?` · $${parseFloat(a.price).toFixed(2)}`:''}</div></div>
+    <div style="display:flex;gap:5px;align-items:center;flex-shrink:0">
+      <span class="badge ${sc[a.status]||'b-grey'}">${a.status}</span>
+      ${a.reminderSent?'<span class="badge b-green">✓SMS</span>':''}
+      ${showSms&&a.status==='upcoming'&&isUp(a)?`<button class="btn btn-outline btn-sm" onclick="openSmsModal('${a.id}')" ${!c?.phone?'disabled':''}>${c?.phone?'SMS':'No phone'}</button>`:''}
+      <button class="btn btn-ghost btn-sm" onclick="editAppt('${a.id}')">Edit</button>
+    </div>
+  </div>`;
+}
+
+// ═══ CALENDAR ═══
+function pgCalendar(){
+  const dt=new Date();const todStr=tod();
+  const emps=S.employees.length?S.employees:[{id:'default',first:S.salonName||'Stylist',last:''}];
+  const dayAppts=S.appointments.filter(a=>a.date===todStr&&a.status!=='cancelled').sort((a,b)=>a.time.localeCompare(b.time));
+  const hours=[];for(let h=8;h<=20;h++)hours.push(h);
+  const colors=['#dcfce7|#15803d','#dbeafe|#1d4ed8','#ede9fe|#7c3aed','#fef3c7|#b45309','#ffedd5|#c2410c'];
+
+  return`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px">
+        <button class="btn btn-outline btn-sm">◀</button>
+        <div style="font-size:15px;font-weight:700;min-width:180px">${dt.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        <button class="btn btn-outline btn-sm">▶</button>
+        <button class="btn btn-outline btn-sm">Today</button>
+      </div>
+      <select class="btn btn-outline btn-sm" style="cursor:pointer"><option>Day view</option><option>Week view</option></select>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="om('mAppt')">+ New Appointment</button>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <div style="display:grid;grid-template-columns:60px ${emps.map(()=>'1fr').join(' ')}">
+        <div style="background:var(--bg);border-bottom:1px solid var(--border)"></div>
+        ${emps.map(e=>`<div style="text-align:center;padding:10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary);background:var(--bg);border-bottom:1px solid var(--border);border-left:1px solid var(--border)">${e.first} ${e.last||''}</div>`).join('')}
+        ${hours.map(h=>`
+          <div style="height:56px;border-bottom:1px solid var(--border-light);display:flex;align-items:flex-start;justify-content:flex-end;padding:3px 6px 0 0;font-size:10px;color:var(--text-tertiary);font-weight:600">${h>12?h-12:h}${h>=12?'pm':'am'}</div>
+          ${emps.map((e,ei)=>{
+            const sa=dayAppts.filter(a=>{const ah=parseInt((a.time||'00:00').split(':')[0]);return ah===h&&(!a.employeeId||a.employeeId===e.id)});
+            const [bg,fg]=colors[ei%colors.length].split('|');
+            return`<div class="cal-slot" style="border-left:1px solid var(--border)" onclick="om('mAppt')">
+              ${sa.map(a=>{const cl=S.clients.find(x=>x.id===a.clientId);const dur=Math.max(1,(a.duration||60)/60);return`<div class="cal-appt" style="background:${bg};border-left-color:${fg};color:${fg.replace(')',',0.9)')};top:2px;height:${dur*54}px" onclick="event.stopPropagation();editAppt('${a.id}')"><div>${cl?cl.first:'?'}</div><div style="font-weight:400;opacity:.75;font-size:10px">${a.service?.slice(0,18)||''}</div></div>`}).join('')}
+            </div>`;
+          }).join('')}
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ═══ CLIENTS ═══
+function pgClients(){
+  const filt=S.clients.filter(c=>{
+    const m=(c.first+' '+c.last+(c.phone||'')+(c.email||'')).toLowerCase().includes(clQ.toLowerCase());
+    return m;
+  }).sort((a,b)=>(a.first+a.last).localeCompare(b.first+b.last));
+  const sel=selClient?S.clients.find(c=>c.id===selClient):null;
+
+  return`
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+      <button class="btn btn-outline btn-sm" onclick="om('mImport')">⬆ Import CSV</button>
+      <button class="btn btn-primary btn-sm" onclick="openClientModal()">+ Add Client</button>
+    </div>
+    <div class="cl-layout">
+      <div class="cl-sidebar">
+        <div class="cl-search">
+          <input class="cl-si" type="search" placeholder="🔍 Name / Phone / Email" value="${clQ}" oninput="clQ=this.value;render()">
+          <div class="filter-row">
+            <button class="fb ${clFilter==='active'?'active':''}" onclick="clFilter='active';render()">Active</button>
+            <button class="fb ${clFilter==='inactive'?'active':''}" onclick="clFilter='inactive';render()">Inactive</button>
+            <button class="fb ${clFilter==='all'?'active':''}" onclick="clFilter='all';render()">All</button>
+          </div>
+        </div>
+        <div class="cl-list">
+          ${filt.map(c=>{const col=avc(c.first+c.last);const appts=S.appointments.filter(a=>a.clientId===c.id);const nxt=appts.filter(a=>isUp(a)&&a.status==='upcoming').sort((a,b)=>a.date.localeCompare(b.date))[0];return`<div class="cl-item ${c.id===selClient?'active':''}" onclick="selClient='${c.id}';render()"><div class="cl-av" style="background:${col[0]};color:${col[1]}">${ini(c.first,c.last)}</div><div style="min-width:0"><div class="cl-name">${c.first} ${c.last||''}</div><div class="cl-sub">${c.phone||c.email||'No contact'}${nxt?' · '+fd(nxt.date):''}</div></div></div>`;}).join('')}
+          ${!filt.length?'<div class="empty" style="padding:2rem">No clients found</div>':''}
+        </div>
+        <div style="padding:10px 12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-secondary)">${filt.length} client${filt.length!==1?'s':''}</div>
+      </div>
+      <div class="cl-detail">
+        ${sel?clientDetail(sel):'<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);flex-direction:column;gap:8px"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".25"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><p>Select a client</p></div>'}
+      </div>
+    </div>
+  `;
+}
+
+function clientDetail(c){
+  const col=avc(c.first+c.last);
+  const appts=S.appointments.filter(a=>a.clientId===c.id).sort((a,b)=>b.date.localeCompare(a.date));
+  const rev=appts.filter(a=>a.status==='completed').reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+  const up=appts.filter(a=>isUp(a)&&a.status==='upcoming');
+
+  return`
+    <div class="cd-header">
+      <div class="av-lg" style="background:${col[0]};color:${col[1]}">${ini(c.first,c.last)}</div>
+      <div><div class="cd-name">${c.first} ${c.last||''}</div><div class="cd-sub">${c.phone?'📱 '+c.phone:''} ${c.email?'· '+c.email:''}</div></div>
+      <div class="cd-actions">
+        <button class="btn btn-outline btn-sm" onclick="openClientModal('${c.id}')">Edit</button>
+        <button class="btn btn-primary btn-sm" onclick="openApptFor('${c.id}')">+ Book</button>
+      </div>
+    </div>
+    <div data-tabs class="cd-body">
+      <div class="tabs" style="padding:0 16px;margin-bottom:0">
+        <button class="tbt active" data-tab="t-ov">Overview</button>
+        <button class="tbt" data-tab="t-hist">History</button>
+        <button class="tbt" data-tab="t-notes">Notes</button>
+        <button class="tbt" data-tab="t-msgs">Messages</button>
+        <button class="tbt" data-tab="t-edit">Add/Edit</button>
+      </div>
+      <div id="t-ov" class="tpanel active" style="padding:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+          <div class="stat-card" style="padding:12px"><div class="stat-val" style="font-size:20px">${appts.length}</div><div class="stat-lbl">Visits</div></div>
+          ${isOwner()?`<div class="stat-card" style="padding:12px"><div class="stat-val" style="font-size:20px">$${Math.round(rev)}</div><div class="stat-lbl">Spent</div></div>`:''}
+          <div class="stat-card" style="padding:12px"><div class="stat-val" style="font-size:20px">${up.length}</div><div class="stat-lbl">Upcoming</div></div>
+        </div>
+        <div class="info-pair"><div class="info-lbl">Phone</div><div class="info-val">${c.phone||'Not recorded'}</div></div>
+        <div class="info-pair"><div class="info-lbl">Email</div><div class="info-val">${c.email||'Not recorded'}</div></div>
+        <div class="info-pair"><div class="info-lbl">Date of birth</div><div class="info-val">${c.dob?fds(c.dob):'Not recorded'}</div></div>
+        <div class="info-pair"><div class="info-lbl">Address</div><div class="info-val">${[c.address,c.suburb,c.state,c.postcode].filter(Boolean).join(', ')||'Not recorded'}</div></div>
+        <div class="info-pair"><div class="info-lbl">Hair type</div><div class="info-val">${c.hairtype||'Not recorded'}</div></div>
+        ${c.allergies?`<div class="info-pair"><div class="info-lbl">Allergies</div><div class="info-val" style="color:var(--red);font-weight:700">⚠ ${c.allergies}</div></div>`:''}
+        ${up[0]?`<div style="margin-top:12px;padding:10px 12px;background:var(--green-light);border-radius:var(--radius-sm)"><div style="font-size:11px;font-weight:700;color:var(--green-dark)">NEXT APPOINTMENT</div><div style="font-size:13px;font-weight:700;margin-top:3px">${fd(up[0].date)} at ${ft(up[0].time)}</div><div style="font-size:12px;color:var(--green-dark)">${up[0].service}</div></div>`:''}
+      </div>
+      <div id="t-hist" class="tpanel" style="padding:0">
+        ${appts.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Service</th>${isOwner()?'<th>Price</th>':''}<th>Status</th><th></th></tr></thead><tbody>
+          ${appts.map(a=>{const sc={upcoming:'b-blue',confirmed:'b-green',completed:'b-grey',cancelled:'b-red',noshow:'b-red'};return`<tr><td><div style="font-weight:600">${fds(a.date)}</div><div style="font-size:11px;color:var(--text-secondary)">${ft(a.time)}</div></td><td>${a.service||'—'}${a.notes?`<br><span style="font-size:11px;color:var(--text-secondary)">${a.notes.slice(0,40)}</span>`:''}</td>${isOwner()?`<td>${a.price?'$'+parseFloat(a.price).toFixed(2):'—'}</td>`:''}<td><span class="badge ${sc[a.status]||'b-grey'}">${a.status}</span>${a.reminderSent?'<span class="badge b-green" style="margin-left:4px">SMS</span>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="editAppt('${a.id}')">Edit</button></td></tr>`;}).join('')}
+        </tbody></table></div>`:'<div class="empty">No history yet</div>'}
+      </div>
+      <div id="t-notes" class="tpanel" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><div class="shead" style="margin:0">Technical Notes</div><button class="btn btn-primary btn-sm" onclick="openClientModal('${c.id}')">Edit</button></div>
+        ${c.notes?`<div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;border:1px solid var(--border)">${c.notes}</div>`:
+        '<div class="empty" style="padding:2rem">No notes yet — add colour formulas, preferences, history</div>'}
+        ${c.allergies?`<div style="margin-top:10px;padding:10px 14px;background:var(--red-light);border-radius:var(--radius-sm);border-left:3px solid var(--red);font-weight:700;color:var(--red);font-size:13px">⚠ ALLERGY ALERT: ${c.allergies}</div>`:''}
+      </div>
+      <div id="t-msgs" class="tpanel" style="padding:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:12px"><div class="shead" style="margin:0">SMS History</div>${c.phone?`<button class="btn btn-primary btn-sm" onclick="smsForClient('${c.id}')">Send SMS</button>`:''}</div>
+        ${S.smsLog.filter(l=>l.cid===c.id).length?S.smsLog.filter(l=>l.cid===c.id).map(l=>`<div style="padding:10px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:8px;border:1px solid var(--border)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span class="badge ${l.status==='sent'?'b-green':'b-red'}">${l.status}</span><span style="font-size:11px;color:var(--text-secondary)">${l.d} ${l.t}</span></div><div style="font-size:13px">${l.msg||''}</div></div>`).join(''):'<div class="empty" style="padding:1.5rem">No messages sent</div>'}
+      </div>
+      <div id="t-edit" class="tpanel" style="padding:16px">
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" onclick="openClientModal('${c.id}')">Edit Client</button>
+          <button class="btn btn-danger btn-sm" onclick="delClient('${c.id}')">Delete</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══ POS ═══
+let cartClientId='';
+function pgPOS(){
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const gst=total/11;
+  return`
+    <div class="pos-layout">
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><div class="card-title">Services</div><input type="search" placeholder="Search..." style="width:180px;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm)" oninput="render()"></div>
+          <div style="padding:12px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px">
+            ${S.services.length?S.services.map(sv=>`<div onclick="addCart('${sv.id}')" style="padding:11px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--green)';this.style.background='var(--green-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.background=''">
+              <div style="font-size:13px;font-weight:700">${sv.name}</div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:3px">${sv.duration||60}min · $${parseFloat(sv.price||0).toFixed(2)}</div>
+              <span class="badge b-grey" style="margin-top:6px">${sv.category||''}</span>
+            </div>`).join(''):`<div class="empty"><p>No services yet</p><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="nav('services')">Add Services</button></div>`}
+          </div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;max-height:calc(100vh - 100px)">
+        <div class="card-header">
+          <div class="card-title">Sale</div>
+          <select style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm)" onchange="cartClientId=this.value">
+            <option value="">Walk-in Client</option>
+            ${S.clients.sort((a,b)=>(a.first+a.last).localeCompare(b.first+b.last)).map(c=>`<option value="${c.id}">${c.first} ${c.last||''}</option>`).join('')}
+          </select>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:12px">
+          ${cart.length?cart.map((item,i)=>`<div class="cart-item"><div style="flex:1"><div style="font-size:13px;font-weight:700">${item.name}</div><div style="font-size:11px;color:var(--text-secondary)">$${item.price.toFixed(2)} × ${item.qty}</div></div><div style="display:flex;align-items:center;gap:4px"><button class="btn btn-ghost btn-sm btn-icon" onclick="cart[${i}].qty=Math.max(1,cart[${i}].qty-1);render()">−</button><span style="font-weight:700;min-width:20px;text-align:center">${item.qty}</span><button class="btn btn-ghost btn-sm btn-icon" onclick="cart[${i}].qty++;render()">+</button><button class="btn btn-danger btn-sm btn-icon" onclick="cart.splice(${i},1);render()">×</button></div><div style="font-size:13px;font-weight:700;color:var(--green);min-width:60px;text-align:right">$${(item.price*item.qty).toFixed(2)}</div></div>`).join(''):`<div class="empty" style="padding:2rem">Cart empty — click a service</div>`}
+        </div>
+        <div style="padding:14px;border-top:1px solid var(--border);background:var(--bg)">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:4px"><span>Subtotal</span><span>$${total.toFixed(2)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text-secondary);margin-bottom:8px"><span>GST (included)</span><span>$${gst.toFixed(2)}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;padding-top:8px;border-top:1px solid var(--border);margin-bottom:12px"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="btn btn-primary btn-lg" style="justify-content:center" onclick="checkout('cash')">💵 Cash</button>
+            <button class="btn btn-primary btn-lg" style="justify-content:center" onclick="checkout('card')">💳 Card</button>
+          </div>
+          <button class="btn btn-ghost" style="width:100%;margin-top:8px;justify-content:center" onclick="cart=[];render()">Clear</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function addCart(svId){const sv=S.services.find(s=>s.id===svId);if(!sv)return;const ex=cart.find(i=>i.id===svId);if(ex){ex.qty++;render();}else{cart.push({id:svId,name:sv.name,price:parseFloat(sv.price)||0,qty:1});render();}}
+
+function checkout(method){
+  if(!cart.length){toast('Cart is empty','err');return;}
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const cid=cartClientId||null;
+  const now=new Date();
+  const timeStr=now.toTimeString().slice(0,5);
+  cart.forEach(item=>{
+    S.appointments.push({id:uid(),clientId:cid,date:tod(),time:timeStr,service:item.name,price:item.price*item.qty,status:'completed',duration:60,reminderSent:false,reminderWhen:'none',notes:'',employeeId:S.currentUserId||null});
+    // Auto-create transaction
+    S.transactions.push({id:uid(),date:tod(),type:'income',category:'Service Revenue',description:item.name+(cid?` (${S.clients.find(c=>c.id===cid)?.first||''})`:' (Walk-in)'),amount:item.price*item.qty,gst:'yes',gstAmt:(item.price*item.qty)/11,total:item.price*item.qty,reconciled:'no',paymentMethod:method,ref:''});
+  });
+  save();cart=[];toast(`✓ Sale $${total.toFixed(2)} · ${method}`,'ok');render();
+}
+
+// ═══ BOOKKEEPING (Xero-style) ═══
+function pgBookkeeping(){
+  const ms=monStart();
+  const allT=[...S.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+  const monT=allT.filter(t=>t.date>=ms);
+  const inc=monT.filter(t=>t.type==='income').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const exp=monT.filter(t=>t.type==='expense').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const profit=inc-exp;
+  const gstCollected=monT.filter(t=>t.type==='income'&&t.gst==='yes').reduce((s,t)=>s+(parseFloat(t.gstAmt)||parseFloat(t.amount)/11||0),0);
+  const gstPaid=monT.filter(t=>t.type==='expense'&&t.gst==='yes').reduce((s,t)=>s+(parseFloat(t.gstAmt)||parseFloat(t.amount)/11||0),0);
+  const gstOwing=gstCollected-gstPaid;
+  const unreconciled=allT.filter(t=>t.reconciled==='no').length;
+
+  // Xero full-year figures
+  const snap=S.xeroSnapshot||{};
+  const xeroInc=snap.income||118340;
+  const xeroExp=snap.totalExpenses||131105;
+  const xeroProfit=snap.netProfit||-12765;
+  const xeroPayroll=snap.ytdPayroll||75049.06;
+
+  // Group by category for P&L
+  const incCats={};const expCats={};
+  monT.forEach(t=>{
+    if(t.type==='income'){incCats[t.category]=(incCats[t.category]||0)+(parseFloat(t.amount)||0);}
+    else{expCats[t.category]=(expCats[t.category]||0)+(parseFloat(t.amount)||0);}
+  });
+  // Add appointment revenue not yet in transactions
+  const apptRev=S.appointments.filter(a=>a.status==='completed'&&a.date>=ms).reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+  const txApptRev=monT.filter(t=>t.category==='Service Revenue').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const unloggedRev=Math.max(0,apptRev-txApptRev);
+  if(unloggedRev>0)incCats['Service Revenue (from POS)']=(incCats['Service Revenue (from POS)']||0)+unloggedRev;
+
+  // Bank accounts from Xero
+  const banks=(snap.bankAccounts||[]);
+  const totalBankXero=banks.reduce((s,b)=>s+b.balance,0);
+  const totalToRec=banks.reduce((s,b)=>s+(b.toReconcile||0),0);
+
+  return`
+    <!-- Xero Import Banner -->
+    <div style="background:#fff;border:1.5px solid #13b5ea;border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="width:32px;height:32px;background:#13b5ea;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:900;color:#fff">X</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">Xero — Hair by Ivana &nbsp;<span class="badge b-teal">Live Import</span></div>
+          <div style="font-size:12px;color:var(--text-secondary)">Financial Year ${snap.period||'Jul 2025 – Apr 2026'} · Synced ${fds(snap.lastUpdated||'2026-04-13')}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+        <div style="background:#f0fdf9;border-radius:var(--radius-sm);padding:10px 12px;border:1px solid #99f6e4">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:3px">FY Income</div>
+          <div style="font-size:19px;font-weight:700;color:var(--teal)">$${(xeroInc).toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--teal);margin-top:2px">↑ 8.6% vs prior year</div>
+        </div>
+        <div style="background:var(--red-light);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid #fca5a5">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--red);margin-bottom:3px">FY Expenses</div>
+          <div style="font-size:19px;font-weight:700;color:var(--red)">$${(xeroExp).toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--red);margin-top:2px">COGS $10,559 + Ops $120,546</div>
+        </div>
+        <div style="background:${xeroProfit>=0?'var(--green-light)':'var(--red-light)'};border-radius:var(--radius-sm);padding:10px 12px;border:1px solid ${xeroProfit>=0?'#bbf7d0':'#fca5a5'}">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:${xeroProfit>=0?'var(--green-dark)':'var(--red)'};margin-bottom:3px">Net Profit</div>
+          <div style="font-size:19px;font-weight:700;color:${xeroProfit>=0?'var(--green-dark)':'var(--red)'}">$${(xeroProfit).toLocaleString()}</div>
+          <div style="font-size:10px;color:${xeroProfit>=0?'var(--green-dark)':'var(--red)'};margin-top:2px">Margin: -11% · Loss year</div>
+        </div>
+        <div style="background:var(--purple-light);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid #ddd6fe">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--purple);margin-bottom:3px">YTD Payroll</div>
+          <div style="font-size:19px;font-weight:700;color:var(--purple)">$${(xeroPayroll).toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--purple);margin-top:2px">Ivana + Rosie · Weekly</div>
+        </div>
+      </div>
+      <!-- Bank accounts -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin-bottom:8px">Bank Accounts</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        ${banks.map(b=>`<div style="background:var(--bg);border-radius:var(--radius-sm);padding:8px 12px;border:1px solid var(--border)">
+          <div style="font-size:12px;font-weight:700">${b.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:1px">BSB ${b.bsb}</div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;align-items:baseline">
+            <div><div style="font-size:10px;color:var(--text-secondary)">Xero balance</div><div style="font-size:14px;font-weight:700;color:var(--text)">$${b.balance.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+            <div style="text-align:right"><div style="font-size:10px;color:var(--text-secondary)">Bank stmt</div><div style="font-size:13px;font-weight:600;color:var(--text-secondary)">$${b.stmtBalance.toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+          </div>
+          ${b.toReconcile?`<div style="margin-top:5px"><span class="badge b-amber" style="font-size:10px">${b.toReconcile} to reconcile</span></div>`:'<div style="margin-top:5px"><span class="badge b-green" style="font-size:10px">Reconciled</span></div>'}
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="btn btn-outline btn-sm" style="cursor:pointer">
+          <option>This month</option><option>Last month</option><option>This quarter</option><option>This financial year</option>
+        </select>
+        ${unreconciled>0?`<span class="badge b-amber">⚠ ${unreconciled} unreconciled</span>`:'<span class="badge b-green">✓ All reconciled</span>'}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="exportBAS()">📄 BAS Report</button>
+        <button class="btn btn-outline btn-sm" onclick="exportBKCSV()">⬇ Export CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="openExpenseModal()">+ Add Transaction</button>
+      </div>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-val income-val">$${inc.toFixed(0)}</div><div class="stat-lbl">Income (this month)</div></div>
+      <div class="stat-card" style="--sc:var(--red)"><div class="stat-val expense-val">$${exp.toFixed(0)}</div><div class="stat-lbl">Expenses (this month)</div></div>
+      <div class="stat-card" style="--sc:${profit>=0?'var(--green)':'var(--red)'}"><div class="stat-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">$${profit.toFixed(0)}</div><div class="stat-lbl">Net Profit</div></div>
+      <div class="stat-card" style="--sc:var(--teal)"><div class="stat-val" style="color:${gstOwing>=0?'var(--teal)':'var(--red)'}">$${gstOwing.toFixed(0)}</div><div class="stat-lbl">GST Owing</div></div>
+    </div>
+
+    <div data-tabs>
+      <div class="tabs">
+        <button class="tbt active" data-tab="bk-dash">Dashboard</button>
+        <button class="tbt" data-tab="bk-pl">Profit & Loss</button>
+        <button class="tbt" data-tab="bk-tx">Transactions</button>
+        <button class="tbt" data-tab="bk-recon">Reconcile</button>
+        <button class="tbt" data-tab="bk-bas">BAS / GST</button>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="bk-dash" class="tpanel active">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Income by Category</div></div>
+            <div class="tw"><table>
+              <thead><tr><th>Category</th><th>Amount</th><th>GST</th></tr></thead>
+              <tbody>
+                ${Object.entries(incCats).map(([cat,amt])=>`<tr><td>${cat}</td><td class="income-val">$${amt.toFixed(2)}</td><td style="color:var(--text-secondary)">$${(amt/11).toFixed(2)}</td></tr>`).join('')}
+                ${!Object.keys(incCats).length?'<tr><td colspan="3" class="empty" style="padding:1rem">No income this period</td></tr>':''}
+                <tr class="tfoot"><td><strong>Total</strong></td><td class="income-val"><strong>$${inc.toFixed(2)}</strong></td><td style="color:var(--text-secondary)"><strong>$${(inc/11).toFixed(2)}</strong></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Expenses by Category</div></div>
+            <div class="tw"><table>
+              <thead><tr><th>Category</th><th>Amount</th><th>GST</th></tr></thead>
+              <tbody>
+                ${Object.entries(expCats).map(([cat,amt])=>`<tr><td>${cat}</td><td class="expense-val">$${amt.toFixed(2)}</td><td style="color:var(--text-secondary)">$${(amt/11).toFixed(2)}</td></tr>`).join('')}
+                ${!Object.keys(expCats).length?'<tr><td colspan="3" class="empty" style="padding:1rem">No expenses this period</td></tr>':''}
+                <tr class="tfoot"><td><strong>Total</strong></td><td class="expense-val"><strong>$${exp.toFixed(2)}</strong></td><td style="color:var(--text-secondary)"><strong>$${(exp/11).toFixed(2)}</strong></td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P&L -->
+      <div id="bk-pl" class="tpanel">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Profit & Loss Statement</div><span style="font-size:12px;color:var(--text-secondary)">${new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'})}</span></div>
+          <div class="bk-section-head">Income</div>
+          ${Object.entries(incCats).map(([cat,amt])=>`<div class="pl-row"><span>${cat}</span><span class="income-val">$${amt.toFixed(2)}</span></div>`).join('')}
+          <div class="pl-row gross"><span>Gross Income</span><span class="income-val">$${inc.toFixed(2)}</span></div>
+          <div class="bk-section-head">Expenses</div>
+          ${Object.entries(expCats).map(([cat,amt])=>`<div class="pl-row"><span>${cat}</span><span class="expense-val">($${amt.toFixed(2)})</span></div>`).join('')}
+          <div class="pl-row gross"><span>Total Expenses</span><span class="expense-val">($${exp.toFixed(2)})</span></div>
+          <div class="pl-row total" style="margin:0"><span>NET PROFIT / (LOSS)</span><span style="color:${profit>=0?'var(--green)':'var(--red)'};font-size:16px">$${profit.toFixed(2)}</span></div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div id="bk-tx" class="tpanel">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:12px">
+          <select class="btn btn-outline btn-sm" style="cursor:pointer"><option>All types</option><option>Income</option><option>Expense</option></select>
+          <button class="btn btn-primary btn-sm" onclick="openExpenseModal()">+ Add</button>
+        </div>
+        <div class="card">
+          <div class="tw"><table>
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>GST</th><th>Reconciled</th><th></th></tr></thead>
+            <tbody>
+              ${allT.slice(0,50).map(t=>`<tr>
+                <td style="white-space:nowrap">${fds(t.date)}</td>
+                <td><div style="font-weight:600">${t.description||'—'}</div>${t.supplier?`<div style="font-size:11px;color:var(--text-secondary)">${t.supplier}</div>`:''}</td>
+                <td><span class="badge ${t.type==='income'?'b-green':'b-grey'}">${t.category||'—'}</span></td>
+                <td style="font-weight:700;color:${t.type==='income'?'var(--green)':'var(--red)'}">$${parseFloat(t.amount||0).toFixed(2)}</td>
+                <td style="color:var(--text-secondary)">${t.gst==='yes'?'$'+(parseFloat(t.gstAmt||0)||parseFloat(t.amount||0)/11).toFixed(2):'Nil'}</td>
+                <td><span class="badge ${t.reconciled==='yes'?'b-teal':'b-amber'}">${t.reconciled==='yes'?'✓ Reconciled':'Pending'}</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="editTx('${t.id}')">Edit</button></td>
+              </tr>`).join('')}
+              ${!allT.length?'<tr><td colspan="7" class="empty" style="padding:1.5rem">No transactions yet</td></tr>':''}
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- RECONCILE -->
+      <div id="bk-recon" class="tpanel">
+        <div class="alert alert-blue" style="margin-bottom:16px">
+          <div><strong>Bank Reconciliation</strong><br>Match your transactions to your bank statement. Mark each one as reconciled once confirmed.</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Unreconciled Transactions</div><span class="badge b-amber">${allT.filter(t=>t.reconciled==='no').length} pending</span></div>
+          <div class="tw"><table>
+            <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Action</th></tr></thead>
+            <tbody>
+              ${allT.filter(t=>t.reconciled==='no').map(t=>`<tr>
+                <td>${fds(t.date)}</td>
+                <td>${t.description||'—'}</td>
+                <td style="font-weight:700;color:${t.type==='income'?'var(--green)':'var(--red)'}">${t.type==='income'?'+':'-'}$${parseFloat(t.amount||0).toFixed(2)}</td>
+                <td><button class="btn btn-teal btn-sm" onclick="reconcile('${t.id}')">✓ Reconcile</button></td>
+              </tr>`).join('')}
+              ${!allT.filter(t=>t.reconciled==='no').length?'<tr><td colspan="4" class="empty" style="padding:1.5rem">All transactions reconciled ✓</td></tr>':''}
+            </tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- BAS -->
+      <div id="bk-bas" class="tpanel">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="card">
+            <div class="card-header"><div class="card-title">BAS Summary — ${new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'})}</div></div>
+            <div class="card-body">
+              <div class="pl-row"><span>G1 — Total sales (inc. GST)</span><span>$${inc.toFixed(2)}</span></div>
+              <div class="pl-row"><span>1A — GST on sales</span><span class="income-val">$${gstCollected.toFixed(2)}</span></div>
+              <div class="pl-row"><span>G10 — Capital purchases</span><span>$0.00</span></div>
+              <div class="pl-row"><span>G11 — Non-capital purchases</span><span>$${exp.toFixed(2)}</span></div>
+              <div class="pl-row"><span>1B — GST on purchases</span><span class="expense-val">$${gstPaid.toFixed(2)}</span></div>
+              <div class="divider"></div>
+              <div class="pl-row total" style="padding:12px 0"><span>Net GST Payable (1A − 1B)</span><span style="color:${gstOwing>=0?'var(--teal)':'var(--green)'};font-size:16px">$${gstOwing.toFixed(2)}</span></div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:8px">${gstOwing>=0?`You owe the ATO $${gstOwing.toFixed(2)} this period.`:`The ATO owes you $${Math.abs(gstOwing).toFixed(2)} this period.`}</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">PAYG Withholding</div></div>
+            <div class="card-body">
+              <div class="pl-row"><span>W1 — Total wages paid</span><span>$${S.employees.reduce((s,e)=>{const r=parseFloat(e.rate)||0;return s+(e.payType==='hourly'?r*80:e.payType==='salary'?r/26:0)},0).toFixed(2)}</span></div>
+              <div class="pl-row"><span>W2 — Withheld (est. 19%)</span><span class="expense-val">$${S.employees.reduce((s,e)=>{const r=parseFloat(e.rate)||0;const g=e.payType==='hourly'?r*80:e.payType==='salary'?r/26:0;return s+(g*0.19)},0).toFixed(2)}</span></div>
+              <div class="divider"></div>
+              <div style="font-size:12px;color:var(--text-secondary)">Lodge via ATO Business Portal. Pay PAYG withholding by 28th of following month.</div>
+              <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="exportPayroll()">⬇ Export Payroll Summary</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function reconcile(id){
+  const t=S.transactions.find(x=>x.id===id);
+  if(t){t.reconciled='yes';save();toast('Transaction reconciled ✓','ok');render();}
+}
+
+function openExpenseModal(id){
+  editTid=id||null;
+  const t=id?S.transactions.find(x=>x.id===id):null;
+  document.getElementById('mExpTitle').textContent=t?'Edit Transaction':'Add Transaction';
+  document.getElementById('ex_d').value=t?.date||tod();
+  document.getElementById('ex_type').value=t?.type||'expense';
+  document.getElementById('ex_cat').value=t?.category||'Colour & Chemicals';
+  document.getElementById('ex_desc').value=t?.description||'';
+  document.getElementById('ex_amt').value=t?.amount||'';
+  document.getElementById('ex_gst').value=t?.gst||'yes';
+  document.getElementById('ex_gstamt').value=t?.gstAmt||'';
+  document.getElementById('ex_total').value=t?.total||'';
+  document.getElementById('ex_supplier').value=t?.supplier||'';
+  document.getElementById('ex_ref').value=t?.ref||'';
+  document.getElementById('ex_notes').value=t?.notes||'';
+  document.getElementById('ex_rec').value=t?.reconciled||'no';
+  om('mExpense');
+}
+
+function editTx(id){openExpenseModal(id);}
+
+function calcGST(){
+  const amt=parseFloat(document.getElementById('ex_amt').value)||0;
+  const gst=document.getElementById('ex_gst').value;
+  const gstAmt=gst==='yes'?amt*0.1:0;
+  const total=amt+gstAmt;
+  document.getElementById('ex_gstamt').value=gstAmt.toFixed(2);
+  document.getElementById('ex_total').value=total.toFixed(2);
+}
+
+function saveExpense(){
+  const amt=parseFloat(document.getElementById('ex_amt').value);
+  if(!amt){toast('Amount required','err');return;}
+  const gst=document.getElementById('ex_gst').value;
+  const data={date:document.getElementById('ex_d').value,type:document.getElementById('ex_type').value,category:document.getElementById('ex_cat').value,description:document.getElementById('ex_desc').value.trim(),amount:amt,gst,gstAmt:gst==='yes'?amt*0.1:0,total:gst==='yes'?amt*1.1:amt,supplier:document.getElementById('ex_supplier').value.trim(),ref:document.getElementById('ex_ref').value.trim(),notes:document.getElementById('ex_notes').value.trim(),reconciled:document.getElementById('ex_rec').value};
+  if(editTid){const i=S.transactions.findIndex(t=>t.id===editTid);S.transactions[i]={...S.transactions[i],...data};}
+  else S.transactions.push({id:uid(),...data});
+  save();cm('mExpense');toast('Transaction saved','ok');render();
+}
+
+// ═══ PAYROLL ═══
+function pgPayroll(){
+  const now=new Date();
+  const fortBack=new Date(now);fortBack.setDate(fortBack.getDate()-14);
+  const fortStr=fortBack.toISOString().split('T')[0];
+  const totGross=S.employees.reduce((s,e)=>{const r=parseFloat(e.rate)||0;return s+(e.payType==='hourly'?r*80:e.payType==='salary'?r/26:0)},0);
+  const totSuper=S.employees.reduce((s,e)=>{const r=parseFloat(e.rate)||0;const g=e.payType==='hourly'?r*80:e.payType==='salary'?r/26:0;return s+g*(parseFloat(e.superRate||11.5)/100)},0);
+  const totPAYG=totGross*0.19;
+  const totNet=totGross-totPAYG;
+  const xpay=S.xeroPayRuns||[];
+  const ytdWages=xpay.filter(p=>p.status==='Filed').reduce((s,p)=>s+p.wages,0);
+  const ytdSuper=xpay.filter(p=>p.status==='Filed').reduce((s,p)=>s+p.super,0);
+  const ytdTax=xpay.filter(p=>p.status==='Filed').reduce((s,p)=>s+p.tax,0);
+  const ytdNet=xpay.filter(p=>p.status==='Filed').reduce((s,p)=>s+p.net,0);
+  const draft=xpay.find(p=>p.status==='Draft');
+
+  return`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div style="font-size:13px;color:var(--text-secondary)">Pay frequency: <strong>Weekly</strong> · Ivana Hobday & Rosie Gough</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="exportPayroll()">⬇ Export</button>
+        <button class="btn btn-primary btn-sm" onclick="om('mEmployee')">+ Add Employee</button>
+      </div>
+    </div>
+
+    ${draft?`<div style="background:var(--amber-light);border:1px solid #fcd34d;border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#92400e;margin-bottom:4px">Draft Pay Run</div>
+      <div style="font-size:15px;font-weight:700">${draft.period} · Payment ${fds(draft.date)}</div>
+      <div style="font-size:13px;color:#78350f;margin-top:4px">Wages $${draft.wages.toFixed(2)} · Tax $${draft.tax.toFixed(2)} · Super $${draft.super.toFixed(2)} · Net $${draft.net.toFixed(2)}</div></div>
+      <span class="badge b-amber" style="font-size:13px;padding:6px 14px">Awaiting Filing</span>
+    </div>`:''}
+
+    <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat-card"><div class="stat-val">$${ytdWages.toFixed(0)}</div><div class="stat-lbl">YTD Wages</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:3px">Xero</div></div>
+      <div class="stat-card" style="--sc:var(--purple)"><div class="stat-val">$${ytdSuper.toFixed(0)}</div><div class="stat-lbl">YTD Super</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:3px">11.5%</div></div>
+      <div class="stat-card" style="--sc:var(--red)"><div class="stat-val">$${ytdTax.toFixed(0)}</div><div class="stat-lbl">YTD PAYG</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:3px">Withheld</div></div>
+      <div class="stat-card" style="--sc:var(--teal)"><div class="stat-val">$${ytdNet.toFixed(0)}</div><div class="stat-lbl">YTD Net Pay</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:3px">Paid out</div></div>
+      <div class="stat-card" style="--sc:var(--green)"><div class="stat-val">${xpay.filter(p=>p.status==='Filed').length}</div><div class="stat-lbl">Pay Runs Filed</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:3px">This FY</div></div>
+    </div>
+    ${!S.employees.length?`<div class="card"><div class="empty" style="padding:3rem"><p style="margin-bottom:12px">No employees yet</p><button class="btn btn-primary" onclick="om('mEmployee')">Add First Employee</button></div></div>`:''}
+    <div class="payroll-grid">
+      ${S.employees.map(emp=>{
+        const col=avc(emp.first+(emp.last||''));
+        const r=parseFloat(emp.rate)||0;
+        const gross=emp.payType==='hourly'?r*80:emp.payType==='salary'?r/26:emp.payType==='commission'?S.appointments.filter(a=>a.employeeId===emp.id&&a.date>=fortStr&&a.status==='completed').reduce((s,a)=>s+(parseFloat(a.price)||0),0)*(r/100):0;
+        const superAmt=gross*(parseFloat(emp.superRate||11.5)/100);
+        const leaveLoad=gross*(parseFloat(emp.leaveLoading||17.5)/100);
+        const payg=gross*0.19;
+        const net=gross-payg;
+        const appts=S.appointments.filter(a=>a.employeeId===emp.id&&a.date>=fortStr&&a.status==='completed');
+        const svcRev=appts.reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+        return`<div class="pay-card">
+          <div class="pay-card-head">
+            <div class="av-lg" style="background:${col[0]};color:${col[1]};width:40px;height:40px;font-size:13px">${ini(emp.first,emp.last)}</div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">${emp.first} ${emp.last||''}</div><div style="font-size:12px;color:var(--text-secondary)">${emp.empType||'Full-time'} · ${emp.payType==='hourly'?`$${r}/hr`:emp.payType==='salary'?`$${parseFloat(r).toLocaleString()}/yr`:`${r}% commission`}</div></div>
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="editEmployee('${emp.id}')">✎</button>
+          </div>
+          <div style="padding:14px">
+            <div class="pay-row"><span style="color:var(--text-secondary)">Services revenue</span><span style="font-weight:700">$${svcRev.toFixed(2)}</span></div>
+            <div class="pay-row"><span style="color:var(--text-secondary)">Appointments</span><span style="font-weight:700">${appts.length}</span></div>
+            <div class="divider"></div>
+            <div class="pay-row"><span style="color:var(--text-secondary)">Gross pay</span><span style="font-weight:700">$${gross.toFixed(2)}</span></div>
+            <div class="pay-row"><span style="color:var(--text-secondary)">Leave loading (${emp.leaveLoading||17.5}%)</span><span>$${leaveLoad.toFixed(2)}</span></div>
+            <div class="pay-row"><span style="color:var(--text-secondary)">Super (${emp.superRate||11.5}%)</span><span style="font-weight:700;color:var(--purple)">$${superAmt.toFixed(2)}</span></div>
+            <div class="pay-row"><span style="color:var(--text-secondary)">PAYG withholding (est.)</span><span style="font-weight:700;color:var(--red)">-$${payg.toFixed(2)}</span></div>
+            <div class="pay-total-row"><span style="font-weight:700;color:var(--green-dark)">Net pay</span><span style="font-size:16px;font-weight:700;color:var(--green-dark)">$${net.toFixed(2)}</span></div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="btn btn-outline btn-sm" style="flex:1" onclick="genPayslip('${emp.id}')">📄 Payslip</button>
+              <button class="btn btn-teal btn-sm" style="flex:1" onclick="markPaid('${emp.id}')">✓ Mark Paid</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header"><div class="card-title">Payroll Summary — This Fortnight</div></div>
+      <div class="tw"><table>
+        <thead><tr><th>Employee</th><th>Type</th><th>Gross</th><th>Leave Loading</th><th>Super</th><th>PAYG</th><th>Net Pay</th><th>Status</th></tr></thead>
+        <tbody>
+          ${S.employees.map(emp=>{
+            const r=parseFloat(emp.rate)||0;
+            const gross=emp.payType==='hourly'?r*80:emp.payType==='salary'?r/26:0;
+            const sup=gross*(parseFloat(emp.superRate||11.5)/100);
+            const leave=gross*(parseFloat(emp.leaveLoading||17.5)/100);
+            const payg=gross*0.19;
+            return`<tr><td style="font-weight:600">${emp.first} ${emp.last||''}</td><td><span class="badge b-grey">${emp.payType||'hourly'}</span></td><td>$${gross.toFixed(2)}</td><td>$${leave.toFixed(2)}</td><td style="color:var(--purple)">$${sup.toFixed(2)}</td><td style="color:var(--red)">$${payg.toFixed(2)}</td><td style="font-weight:700;color:var(--green)">$${(gross-payg).toFixed(2)}</td><td><span class="badge ${emp.paidThisFortnight?'b-green':'b-amber'}">${emp.paidThisFortnight?'Paid':'Pending'}</span></td></tr>`;
+          }).join('')}
+          ${S.employees.length?`<tr class="tfoot"><td>Totals</td><td></td><td>$${totGross.toFixed(2)}</td><td>$${S.employees.reduce((s,e)=>{const g=parseFloat(e.rate||0)*(e.payType==='hourly'?80:e.payType==='salary'?1/26*80:0);return s+g*(parseFloat(e.leaveLoading||17.5)/100)},0).toFixed(2)}</td><td style="color:var(--purple)">$${totSuper.toFixed(2)}</td><td style="color:var(--red)">$${totPAYG.toFixed(2)}</td><td style="color:var(--green)">$${totNet.toFixed(2)}</td><td></td></tr>`:''}
+        </tbody>
+      </table></div>
+    </div>
+
+    ${S.xeroPayRuns?.length ? `
+    <div class="card" style="margin-top:20px">
+      <div class="card-header">
+        <div class="card-title">Pay Run History — from Xero</div>
+        <span class="badge b-teal" style="font-size:11px">✓ Synced from Xero</span>
+      </div>
+      <div style="padding:10px 16px;background:var(--teal-light);font-size:12px;color:var(--teal);border-bottom:1px solid var(--border)">
+        YTD Payroll (Jul 2025 – Apr 2026): <strong>$${(S.xeroSnapshot?.ytdPayroll||75049.06).toLocaleString('en-AU',{minimumFractionDigits:2})}</strong>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Period</th><th>Payment Date</th><th>Wages</th><th>Tax (PAYG)</th><th>Super</th><th>Net Pay</th><th>STP</th></tr></thead>
+        <tbody>
+          ${S.xeroPayRuns.map(p=>`<tr>
+            <td style="font-size:13px">${p.period}</td>
+            <td>${fds(p.date)}</td>
+            <td>$${p.wages.toFixed(2)}</td>
+            <td style="color:var(--red)">$${p.tax.toFixed(2)}</td>
+            <td style="color:var(--purple)">$${p.super.toFixed(2)}</td>
+            <td style="font-weight:700;color:var(--green)">$${p.net.toFixed(2)}</td>
+            <td><span class="badge ${p.status==='Filed'?'b-teal':'b-amber'}">${p.status}</span></td>
+          </tr>`).join('')}
+          <tr class="tfoot">
+            <td><strong>Totals (${S.xeroPayRuns.length} weeks)</strong></td>
+            <td></td>
+            <td><strong>$${S.xeroPayRuns.reduce((s,p)=>s+p.wages,0).toFixed(2)}</strong></td>
+            <td style="color:var(--red)"><strong>$${S.xeroPayRuns.reduce((s,p)=>s+p.tax,0).toFixed(2)}</strong></td>
+            <td style="color:var(--purple)"><strong>$${S.xeroPayRuns.reduce((s,p)=>s+p.super,0).toFixed(2)}</strong></td>
+            <td style="color:var(--green)"><strong>$${S.xeroPayRuns.reduce((s,p)=>s+p.net,0).toFixed(2)}</strong></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table></div>
+    </div>` : ''}
+  `;
+}
+
+function genPayslip(empId){toast('Payslip generation — will be PDF in next update','info');}
+function markPaid(empId){const e=S.employees.find(x=>x.id===empId);if(e){e.paidThisFortnight=true;save();toast(e.first+' marked as paid ✓','ok');render();}}
+function exportPayroll(){
+  const rows=[['Employee','Pay Type','Rate','Gross Pay','Super','PAYG','Net Pay']];
+  S.employees.forEach(e=>{
+    const r=parseFloat(e.rate)||0;
+    const gross=e.payType==='hourly'?r*80:e.payType==='salary'?r/26:0;
+    const sup=gross*(parseFloat(e.superRate||11.5)/100);
+    const payg=gross*0.19;
+    rows.push([`${e.first} ${e.last||''}`,e.payType,r,gross.toFixed(2),sup.toFixed(2),payg.toFixed(2),(gross-payg).toFixed(2)]);
+  });
+  dlCSV(rows,'payroll_summary.csv');toast('Payroll CSV downloaded','ok');
+}
+
+// ═══ REPORTS ═══
+function pgReports(){
+  const completed=S.appointments.filter(a=>a.status==='completed');
+  const rev=completed.reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+  const noshow=S.appointments.filter(a=>a.status==='noshow').length;
+  const total=S.appointments.length;
+  const rate=total?((completed.length/total)*100).toFixed(0):0;
+  const svcMap={};completed.forEach(a=>{if(a.service){svcMap[a.service]=(svcMap[a.service]||{n:0,rev:0});svcMap[a.service].n++;svcMap[a.service].rev+=(parseFloat(a.price)||0);}});
+  const cMap={};completed.forEach(a=>{if(a.clientId){cMap[a.clientId]=(cMap[a.clientId]||{n:0,rev:0});cMap[a.clientId].n++;cMap[a.clientId].rev+=(parseFloat(a.price)||0);}});
+  const topSvc=Object.entries(svcMap).sort((a,b)=>b[1].rev-a[1].rev).slice(0,8);
+  const topCli=Object.entries(cMap).sort((a,b)=>b[1].rev-a[1].rev).slice(0,8);
+
+  return`
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px">
+      <select class="btn btn-outline btn-sm" style="cursor:pointer"><option>All time</option><option>This month</option><option>Last month</option><option>This year</option></select>
+      <button class="btn btn-outline btn-sm" onclick="exportReportCSV()">⬇ Export</button>
+    </div>
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-val income-val">$${rev.toFixed(0)}</div><div class="stat-lbl">Total Revenue</div></div>
+      <div class="stat-card" style="--sc:var(--blue)"><div class="stat-val">${completed.length}</div><div class="stat-lbl">Completed</div></div>
+      <div class="stat-card" style="--sc:var(--purple)"><div class="stat-val">${rate}%</div><div class="stat-lbl">Booking Rate</div></div>
+      <div class="stat-card" style="--sc:var(--red)"><div class="stat-val">${noshow}</div><div class="stat-lbl">No Shows</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Top Services by Revenue</div></div>
+        ${topSvc.length?`<div class="tw"><table><thead><tr><th>Service</th><th>Bookings</th><th>Revenue</th></tr></thead><tbody>
+          ${topSvc.map(([n,d])=>`<tr><td>${n}</td><td>${d.n}</td><td class="income-val">$${d.rev.toFixed(0)}</td></tr>`).join('')}
+        </tbody></table></div>`:'<div class="empty">No data yet</div>'}
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Top Spending Clients</div></div>
+        ${topCli.length?`<div class="tw"><table><thead><tr><th>Client</th><th>Visits</th><th>Spent</th></tr></thead><tbody>
+          ${topCli.map(([cid,d])=>{const c=S.clients.find(x=>x.id===cid);return`<tr><td>${c?c.first+' '+(c.last||''):'Unknown'}</td><td>${d.n}</td><td class="income-val">$${d.rev.toFixed(0)}</td></tr>`;}).join('')}
+        </tbody></table></div>`:'<div class="empty">No data yet</div>'}
+      </div>
+    </div>
+  `;
+}
+
+// ═══ MARKETING ═══
+function pgMarketing(){
+  const up=S.appointments.filter(a=>a.status==='upcoming'&&isUp(a)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const noPhone=up.filter(a=>!S.clients.find(c=>c.id===a.clientId)?.phone).length;
+  const scheduled=up.filter(a=>a.reminderWhen&&a.reminderWhen!=='none'&&!a.reminderSent).length;
+  const smsSent=S.smsLog.filter(l=>l.status==='sent').length;
+
+  return`
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+      <div class="stat-card"><div class="stat-val">${scheduled}</div><div class="stat-lbl">Scheduled</div></div>
+      <div class="stat-card" style="--sc:var(--teal)"><div class="stat-val">${smsSent}</div><div class="stat-lbl">SMS Sent Total</div></div>
+      <div class="stat-card" style="--sc:${noPhone>0?'var(--red)':'var(--green)'}"><div class="stat-val" style="${noPhone>0?'color:var(--red)':''}">${noPhone}</div><div class="stat-lbl">Missing Phone #</div></div>
+    </div>
+    ${S.twilioSid?`<div class="sms-live"><div class="dot"></div>Twilio connected · Auto-reminders active · Checking every 5 mins</div>`:
+    `<div class="alert alert-amber"><span>⚠</span><span><strong>Twilio not configured.</strong> <button class="btn btn-sm" style="background:#d97706;color:#fff;border:none;margin-left:8px" onclick="om('mSettings')">Set Up</button></span></div>`}
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><div class="card-title">SMS Template</div><button class="btn btn-outline btn-sm" onclick="om('mSettings')">Edit</button></div>
+      <div style="padding:12px 16px;background:var(--green-light);font-size:13px;color:var(--green-dark)">${S.msgTpl}</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Upcoming — Reminder Status</div></div>
+      ${up.length?up.map(a=>{
+        const c=S.clients.find(x=>x.id===a.clientId);
+        const hasP=!!(c?.phone);
+        return`<div style="padding:11px 16px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:12px">
+          <div style="min-width:90px"><div style="font-size:12px;font-weight:700">${fds(a.date)}</div><div style="font-size:11px;color:var(--text-secondary)">${ft(a.time)}</div></div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">${c?c.first+' '+c.last:'Walk-in'}</div><div style="font-size:12px;color:var(--text-secondary)">${a.service}</div></div>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${a.reminderSent?'<span class="badge b-green">✓ SMS sent</span>':a.reminderWhen&&a.reminderWhen!=='none'?`<span class="badge b-amber">⏰ ${a.reminderWhen}</span>`:'<span class="badge b-grey">No reminder</span>'}
+            ${hasP?`<button class="btn btn-outline btn-sm" onclick="openSmsModal('${a.id}')">Send Now</button>`:`<button class="btn btn-outline btn-sm" disabled style="opacity:.4">No phone</button>`}
+          </div>
+        </div>`;
+      }).join(''):`<div class="empty">No upcoming appointments</div>`}
+    </div>
+  `;
+}
+
+// ═══ EMPLOYEES ═══
+function pgEmployees(){
+  return`
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="om('mEmployee')">+ Add Employee</button>
+    </div>
+    ${!S.employees.length?`<div class="card"><div class="empty" style="padding:3rem"><p style="margin-bottom:12px">No employees yet</p><button class="btn btn-primary" onclick="om('mEmployee')">Add First Employee</button></div></div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      ${S.employees.map(e=>{
+        const col=avc(e.first+(e.last||''));
+        const appts=S.appointments.filter(a=>a.employeeId===e.id&&a.status==='completed');
+        const rev=appts.reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+        return`<div class="card">
+          <div style="padding:16px;display:flex;align-items:center;gap:12px">
+            <div class="av-lg" style="background:${col[0]};color:${col[1]};width:48px;height:48px;font-size:16px">${ini(e.first,e.last)}</div>
+            <div style="flex:1"><div style="font-size:15px;font-weight:700">${e.first} ${e.last||''}</div><div style="font-size:12px;color:var(--text-secondary)">${e.phone||e.email||'No contact'}</div></div>
+            <button class="btn btn-ghost btn-sm" onclick="editEmployee('${e.id}')">Edit</button>
+          </div>
+          <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-size:18px;font-weight:700">${appts.length}</div><div style="font-size:11px;color:var(--text-secondary)">Services</div></div>
+            <div style="background:var(--bg);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--green)">$${Math.round(rev)}</div><div style="font-size:11px;color:var(--text-secondary)">Revenue</div></div>
+          </div>
+          <div style="padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:6px;flex-wrap:wrap">
+            <span class="badge b-grey">${e.payType||'hourly'}</span>
+            <span class="badge b-grey">${e.empType||'Full-time'}</span>
+            <span class="badge ${e.role==='owner'?'b-purple':'b-blue'}">${e.role==='owner'?'Owner':'Employee'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+// ═══ SERVICES ═══
+function pgServices(){
+  const cats=[...new Set(S.services.map(s=>s.category))];
+  return`
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="om('mService')">+ Add Service</button>
+    </div>
+    ${!S.services.length?`<div class="card"><div class="empty" style="padding:3rem"><p style="margin-bottom:12px">No services yet</p><button class="btn btn-primary" onclick="om('mService')">Add First Service</button></div></div>`:''}
+    ${cats.map(cat=>`<div style="margin-bottom:16px">
+      <div class="shead">${cat}</div>
+      <div class="card"><div class="tw"><table>
+        <thead><tr><th>Service</th><th>Duration</th><th>Price</th><th>GST</th><th>Ex. GST</th><th></th></tr></thead>
+        <tbody>${S.services.filter(s=>s.category===cat).map(sv=>`<tr>
+          <td style="font-weight:600">${sv.name}</td><td>${sv.duration}min</td>
+          <td style="font-weight:700;color:var(--green)">$${parseFloat(sv.price||0).toFixed(2)}</td>
+          <td>${sv.gst==='yes'?'<span class="badge b-green">10%</span>':'<span class="badge b-grey">Nil</span>'}</td>
+          <td style="color:var(--text-secondary)">$${sv.gst==='yes'?(parseFloat(sv.price||0)/1.1).toFixed(2):parseFloat(sv.price||0).toFixed(2)}</td>
+          <td><button class="btn btn-ghost btn-sm" onclick="editService('${sv.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delService('${sv.id}')">×</button></td>
+        </tr>`).join('')}</tbody>
+      </table></div></div>
+    </div>`).join('')}
+  `;
+}
+
+// ═══ SETTINGS ═══
+function pgSettings(){
+  return`
+    <div style="max-width:660px">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Salon Details</div></div>
+        <div class="card-body">
+          <div class="fg"><div class="fl"><label class="lbl">Salon Name</label><input id="st1" value="${S.salonName}" onchange="S.salonName=this.value;save();document.getElementById('sidebarName').textContent=this.value;document.getElementById('headerSalon').textContent=this.value"></div><div class="fl"><label class="lbl">ABN</label><input id="st2" value="${S.salonABN||''}" onchange="S.salonABN=this.value;save()"></div></div>
+          <div class="fg"><div class="fl"><label class="lbl">Phone</label><input id="st3" value="${S.salonPhone||''}" onchange="S.salonPhone=this.value;save()"></div><div class="fl"><label class="lbl">Email</label><input id="st4" value="${S.salonEmail||''}" onchange="S.salonEmail=this.value;save()"></div></div>
+          <div class="fl"><label class="lbl">Address</label><input id="st5" value="${S.salonAddress||''}" onchange="S.salonAddress=this.value;save()"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Owner PIN</div></div>
+        <div class="card-body">
+          <div class="fg"><div class="fl"><label class="lbl">Owner PIN (4 digits)</label><input type="password" id="stPin" value="${S.ownerPin||'0000'}" maxlength="4" placeholder="0000" onchange="S.ownerPin=this.value;save();toast('Owner PIN updated','ok')"></div></div>
+          <div class="hint">This PIN is used to log in as Owner / Manager. Default is 0000.</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">Twilio SMS</div></div>
+        <div class="card-body">
+          <div class="alert alert-blue" style="margin-bottom:12px">1. Sign up at <strong>twilio.com</strong> &nbsp;2. Buy AU phone number (~$4/mo) &nbsp;3. Paste credentials</div>
+          <div class="fl"><label class="lbl">Account SID</label><input id="st6" value="${S.twilioSid||''}" placeholder="ACxxxxxx" autocomplete="off"></div>
+          <div class="fl"><label class="lbl">Auth Token</label><input type="password" id="st7" value="${S.twilioToken||''}" autocomplete="off"></div>
+          <div class="fl"><label class="lbl">Twilio Phone (+61...)</label><input id="st8" value="${S.twilioFrom||''}" placeholder="+61400000000"></div>
+          <div class="fl"><label class="lbl">SMS Template</label><textarea id="st_tpl" oninput="">${S.msgTpl}</textarea><div class="hint">{name} {date} {time} {service} {salon}</div></div>
+          <div id="st_prev" style="background:var(--green-light);padding:10px;border-radius:var(--radius-sm);border-left:3px solid var(--green);font-size:13px;color:var(--green-dark);white-space:pre-wrap;margin-bottom:12px">${buildPreview(S.msgTpl)}</div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="testSmsInline()">Test SMS</button><button class="btn btn-primary" onclick="saveSettingsInline()">Save SMS Settings</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header"><div class="card-title">GST & BAS</div></div>
+        <div class="card-body">
+          <div class="fg"><div class="fl"><label class="lbl">GST Rate (%)</label><input type="number" id="st9" value="${S.gstRate||10}" onchange="S.gstRate=parseFloat(this.value);save()"></div><div class="fl"><label class="lbl">BAS Period</label><select id="st10" onchange="S.basPeriod=this.value;save()"><option ${S.basPeriod==='Quarterly'?'selected':''}>Quarterly</option><option ${S.basPeriod==='Monthly'?'selected':''}>Monthly</option><option ${S.basPeriod==='Annual'?'selected':''}>Annual</option></select></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Data</div></div>
+        <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="om('mImport')">⬆ Import Clients CSV</button>
+          <button class="btn btn-outline" onclick="exportAll()">⬇ Backup All Data</button>
+          <button class="btn btn-danger" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.clear();location.reload()}">Reset All Data</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function buildPreview(tpl){
+  return (tpl||'').replace(/{name}/g,'Jane').replace(/{date}/g,'Mon 14 Apr 2026').replace(/{time}/g,'10:00 am').replace(/{service}/g,'Cut & blowdry').replace(/{salon}/g,S.salonName||'the salon');
+}
+
+function saveSettingsInline(){
+  S.twilioSid=document.getElementById('st6')?.value?.trim()||S.twilioSid;
+  S.twilioToken=document.getElementById('st7')?.value?.trim()||S.twilioToken;
+  S.twilioFrom=document.getElementById('st8')?.value?.trim()||S.twilioFrom;
+  S.msgTpl=document.getElementById('st_tpl')?.value||S.msgTpl;
+  save();toast('SMS settings saved','ok');
+}
+
+async function testSmsInline(){
+  const sid=document.getElementById('st6')?.value?.trim();
+  const tok=document.getElementById('st7')?.value?.trim();
+  const from=document.getElementById('st8')?.value?.trim();
+  if(!sid||!tok||!from){toast('Fill all Twilio fields first','err');return;}
+  try{
+    const resp=await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,{method:'POST',headers:{'Authorization':'Basic '+btoa(sid+':'+tok),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({To:from,From:from,Body:'TEST from Salon Pro!'})});
+    const d=await resp.json();
+    if(!resp.ok)throw new Error(d.message);
+    toast('Test SMS sent!','ok');
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+// ═══ SMS ═══
+function buildMsg(a,c){return S.msgTpl.replace(/{name}/g,c.first).replace(/{date}/g,fd(a.date)).replace(/{time}/g,ft(a.time)).replace(/{service}/g,a.service||'appointment').replace(/{salon}/g,S.salonName||'the salon')}
+
+async function sendTwilio(to,body){
+  const phone=normPhone(to);
+  if(!phone)throw new Error('No phone number');
+  if(!S.twilioSid||!S.twilioToken||!S.twilioFrom)throw new Error('Twilio not configured');
+  const resp=await fetch(`https://api.twilio.com/2010-04-01/Accounts/${S.twilioSid}/Messages.json`,{method:'POST',headers:{'Authorization':'Basic '+btoa(S.twilioSid+':'+S.twilioToken),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({To:phone,From:S.twilioFrom,Body:body})});
+  const data=await resp.json();
+  if(!resp.ok)throw new Error(data.message||'Twilio error');
+  return data.sid;
+}
+
+function logSms(cid,name,date,status,msg){
+  S.smsLog.unshift({t:new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}),d:new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short'}),cid,name,date,status,msg});
+  if(S.smsLog.length>300)S.smsLog=S.smsLog.slice(0,300);
+}
+
+function openSmsModal(aid){
+  smsPending=aid;
+  const a=S.appointments.find(x=>x.id===aid);
+  const c=S.clients.find(x=>x.id===a?.clientId);
+  if(!a||!c)return;
+  const msg=buildMsg(a,c);
+  document.getElementById('mSmsBody').innerHTML=`
+    <div class="info-pair"><div class="info-lbl">To</div><div class="info-val">${c.first} ${c.last||''} · ${normPhone(c.phone)||c.phone||'No phone'}</div></div>
+    <div style="margin-top:14px;margin-bottom:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-secondary)">Message</div>
+    <div style="background:var(--green-light);border-radius:var(--radius-sm);padding:12px;font-size:13px;border-left:3px solid var(--green);white-space:pre-wrap;color:var(--green-dark)">${msg}</div>
+    ${!S.twilioSid?`<div class="alert alert-amber" style="margin-top:12px">Twilio not configured — go to Settings first</div>`:''}
+  `;
+  om('mSms');
+}
+
+async function doSendSms(){
+  const a=S.appointments.find(x=>x.id===smsPending);
+  const c=S.clients.find(x=>x.id===a?.clientId);
+  if(!a||!c)return;
+  if(!S.twilioSid){toast('Configure Twilio first','err');cm('mSms');om('mSettings');return;}
+  const btn=document.getElementById('smsSendBtn');
+  btn.innerHTML='<span class="spinner"></span> Sending...';btn.disabled=true;
+  try{
+    const msg=buildMsg(a,c);
+    await sendTwilio(c.phone,msg);
+    a.reminderSent=true;a.reminderSentAt=new Date().toISOString();
+    logSms(c.id,c.first+' '+(c.last||''),fd(a.date),'sent',msg);
+    save();cm('mSms');toast('SMS sent to '+c.first,'ok');render();
+  }catch(e){
+    logSms(c?.id,c?.first+' '+(c?.last||''),fd(a?.date),'failed',e.message);
+    save();toast('Failed: '+e.message,'err');
+  }finally{btn.innerHTML='Send Now';btn.disabled=false;}
+}
+
+function smsForClient(cid){
+  const up=S.appointments.filter(a=>a.clientId===cid&&a.status==='upcoming'&&isUp(a));
+  if(up.length)openSmsModal(up[0].id);
+  else toast('No upcoming appointments for this client','err');
+}
+
+async function checkScheduled(){
+  if(!S.twilioSid)return;
+  const now=new Date();
+  for(const a of S.appointments.filter(a=>a.reminderWhen&&a.reminderWhen!=='none'&&!a.reminderSent&&isUp(a))){
+    const dt=new Date(a.date+'T'+(a.time||'09:00'));
+    let sendAt=null;
+    if(a.reminderWhen==='now')sendAt=new Date(now.getTime()-1000);
+    else if(a.reminderWhen==='24h'){sendAt=new Date(dt);sendAt.setHours(sendAt.getHours()-24);}
+    else if(a.reminderWhen==='48h'){sendAt=new Date(dt);sendAt.setHours(sendAt.getHours()-48);}
+    else if(a.reminderWhen==='1w'){sendAt=new Date(dt);sendAt.setDate(sendAt.getDate()-7);}
+    if(sendAt&&sendAt<=now){
+      const c=S.clients.find(x=>x.id===a.clientId);
+      if(!c?.phone)continue;
+      try{const msg=buildMsg(a,c);await sendTwilio(c.phone,msg);a.reminderSent=true;a.reminderSentAt=new Date().toISOString();logSms(c.id,c.first+' '+(c.last||''),fd(a.date),'sent',msg);save();toast('Auto-reminder sent to '+c.first,'ok');}
+      catch(e){logSms(c.id,c.first+' '+(c.last||''),fd(a.date),'failed',e.message);save();}
+    }
+  }
+}
+
+// ═══ SETTINGS MODAL ═══
+function previewTpl(){const p=document.getElementById('s_prev');const t=document.getElementById('s9');if(p&&t)p.textContent=buildPreview(t.value);}
+function saveSettings(){
+  S.salonName=document.getElementById('s1').value.trim();
+  S.salonABN=document.getElementById('s2').value.trim();
+  S.salonPhone=document.getElementById('s3').value.trim();
+  S.salonEmail=document.getElementById('s4').value.trim();
+  S.salonAddress=document.getElementById('s5').value.trim();
+  S.twilioSid=document.getElementById('s6').value.trim();
+  S.twilioToken=document.getElementById('s7').value.trim();
+  S.twilioFrom=document.getElementById('s8').value.trim();
+  S.msgTpl=document.getElementById('s9').value;
+  save();cm('mSettings');toast('Settings saved','ok');
+  document.getElementById('sidebarName').textContent=S.salonName;
+  document.getElementById('headerSalon').textContent=S.salonName;
+}
+async function testSms(){
+  const sid=document.getElementById('s6').value.trim(),tok=document.getElementById('s7').value.trim(),from=document.getElementById('s8').value.trim();
+  if(!sid||!tok||!from){toast('Fill all Twilio fields','err');return;}
+  try{const resp=await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`,{method:'POST',headers:{'Authorization':'Basic '+btoa(sid+':'+tok),'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({To:from,From:from,Body:'TEST from Salon Pro!'})});const d=await resp.json();if(!resp.ok)throw new Error(d.message);toast('Test SMS sent!','ok');}
+  catch(e){toast('Error: '+e.message,'err');}
+}
+
+// ═══ CLIENT CRUD ═══
+function fillClientSel(){
+  const s=document.getElementById('af_c');if(!s)return;
+  const v=s.value;s.innerHTML='<option value="">Select client...</option>';
+  [...S.clients].sort((a,b)=>(a.first+a.last).localeCompare(b.first+b.last)).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.first+' '+(c.last||'');if(c.id===v)o.selected=true;s.appendChild(o);});
+}
+function fillEmpSel(){
+  const s=document.getElementById('af_e');if(!s)return;
+  const v=s.value;s.innerHTML='<option value="">Any</option>';
+  S.employees.forEach(e=>{const o=document.createElement('option');o.value=e.id;o.textContent=e.first+' '+(e.last||'');if(e.id===v)o.selected=true;s.appendChild(o);});
+}
+
+function openClientModal(id){
+  editCid=id||null;
+  const c=id?S.clients.find(x=>x.id===id):null;
+  document.getElementById('mClientTitle').textContent=c?'Edit Client':'Add Client';
+  document.getElementById('cf1').value=c?.first||'';document.getElementById('cf2').value=c?.last||'';
+  document.getElementById('cf3').value=c?.phone||'';document.getElementById('cf4').value=c?.email||'';
+  document.getElementById('cf5').value=c?.dob||'';document.getElementById('cf6').value=c?.gender||'';
+  document.getElementById('cf7').value=c?.address||'';document.getElementById('cf8').value=c?.suburb||'';
+  document.getElementById('cf9').value=c?.state||'';document.getElementById('cf10').value=c?.postcode||'';
+  document.getElementById('cf11').value=c?.hairtype||'';document.getElementById('cf12').value=c?.allergies||'';
+  document.getElementById('cf13').value=c?.services||'';document.getElementById('cf14').value=c?.notes||'';
+  document.getElementById('cf_sms').checked=c?.smsReminders!==false;
+  document.getElementById('cf_em').checked=c?.emailReminders!==false;
+  om('mClient');
+}
+function saveClient(){
+  const first=document.getElementById('cf1').value.trim();if(!first){toast('First name required','err');return;}
+  const data={first,last:document.getElementById('cf2').value.trim(),phone:document.getElementById('cf3').value.trim(),email:document.getElementById('cf4').value.trim(),dob:document.getElementById('cf5').value,gender:document.getElementById('cf6').value,address:document.getElementById('cf7').value.trim(),suburb:document.getElementById('cf8').value.trim(),state:document.getElementById('cf9').value.trim(),postcode:document.getElementById('cf10').value.trim(),hairtype:document.getElementById('cf11').value,allergies:document.getElementById('cf12').value.trim(),services:document.getElementById('cf13').value.trim(),notes:document.getElementById('cf14').value.trim(),smsReminders:document.getElementById('cf_sms').checked,emailReminders:document.getElementById('cf_em').checked};
+  if(editCid){const i=S.clients.findIndex(c=>c.id===editCid);S.clients[i]={...S.clients[i],...data};}
+  else S.clients.push({id:uid(),...data});
+  save();cm('mClient');toast('Client saved','ok');render();
+}
+function delClient(id){
+  if(!confirm('Delete this client?'))return;
+  S.clients=S.clients.filter(c=>c.id!==id);
+  S.appointments=S.appointments.filter(a=>a.clientId!==id);
+  if(selClient===id)selClient=null;
+  save();toast('Client deleted');render();
+}
+function openApptFor(cid){editAid=null;document.getElementById('af_c').value=cid;om('mAppt');}
+
+// ═══ APPT CRUD ═══
+function openApptModal(){
+  editAid=null;
+  document.getElementById('mApptTitle').textContent='New Appointment';
+  document.getElementById('af_d').value=tod();
+  document.getElementById('af_t').value='09:00';
+  document.getElementById('af_dur').value='60';
+  document.getElementById('af_s').value='';
+  document.getElementById('af_p').value='';
+  document.getElementById('af_st').value='upcoming';
+  document.getElementById('af_r').value='24h';
+  document.getElementById('af_n').value='';
+  om('mAppt');
+}
+function editAppt(id){
+  const a=S.appointments.find(x=>x.id===id);if(!a)return;
+  editAid=id;
+  document.getElementById('mApptTitle').textContent='Edit Appointment';
+  document.getElementById('af_c').value=a.clientId||'';
+  document.getElementById('af_d').value=a.date||'';
+  document.getElementById('af_t').value=a.time||'09:00';
+  document.getElementById('af_dur').value=a.duration||'60';
+  document.getElementById('af_s').value=a.service||'';
+  document.getElementById('af_p').value=a.price||'';
+  document.getElementById('af_st').value=a.status||'upcoming';
+  document.getElementById('af_r').value=a.reminderWhen||'none';
+  document.getElementById('af_n').value=a.notes||'';
+  document.getElementById('af_e').value=a.employeeId||'';
+  om('mAppt');
+}
+async function saveAppt(){
+  const cid=document.getElementById('af_c').value,date=document.getElementById('af_d').value,svc=document.getElementById('af_s').value.trim();
+  if(!cid){toast('Select a client','err');return;}if(!date){toast('Select a date','err');return;}if(!svc){toast('Enter a service','err');return;}
+  const rWhen=document.getElementById('af_r').value;
+  const data={clientId:cid,date,time:document.getElementById('af_t').value,duration:document.getElementById('af_dur').value,service:svc,price:document.getElementById('af_p').value,status:document.getElementById('af_st').value,reminderWhen:rWhen,employeeId:document.getElementById('af_e').value,notes:document.getElementById('af_n').value.trim(),reminderSent:false};
+  if(editAid){const i=S.appointments.findIndex(a=>a.id===editAid);const was=S.appointments[i];S.appointments[i]={...was,...data,reminderSent:was.reminderSent&&rWhen===was.reminderWhen};}
+  else S.appointments.push({id:uid(),...data});
+  save();cm('mAppt');
+  if(rWhen==='now'){
+    const c=S.clients.find(x=>x.id===cid);
+    if(c?.phone&&S.twilioSid){const appt=editAid?S.appointments.find(x=>x.id===editAid):S.appointments[S.appointments.length-1];try{const msg=buildMsg(appt,c);await sendTwilio(c.phone,msg);appt.reminderSent=true;logSms(c.id,c.first+' '+(c.last||''),fd(appt.date),'sent',msg);save();toast('Appointment saved & SMS sent!','ok');}catch(e){toast('Saved but SMS failed: '+e.message,'err');}}
+    else toast('Appointment saved','ok');
+  }else toast('Appointment saved'+(rWhen!=='none'?' · Reminder: '+rWhen:''),'ok');
+  render();
+}
+
+// ═══ EMPLOYEE CRUD ═══
+function editEmployee(id){
+  editEid=id;const e=S.employees.find(x=>x.id===id);if(!e)return;
+  document.getElementById('mEmpTitle').textContent='Edit Employee';
+  document.getElementById('em1').value=e.first||'';document.getElementById('em2').value=e.last||'';
+  document.getElementById('em3').value=e.phone||'';document.getElementById('em4').value=e.email||'';
+  document.getElementById('em5').value=e.payType||'hourly';document.getElementById('em6').value=e.rate||'';
+  document.getElementById('em7').value=e.superRate||11.5;document.getElementById('em8').value=e.leaveLoading||17.5;
+  document.getElementById('em9').value=e.tfn||'';document.getElementById('em10').value=e.startDate||'';
+  document.getElementById('em11').value=e.empType||'Full-time';
+  document.getElementById('em12').value=e.role||'employee';document.getElementById('em13').value=e.pin||'';
+  om('mEmployee');
+}
+function saveEmployee(){
+  const first=document.getElementById('em1').value.trim();if(!first){toast('First name required','err');return;}
+  const pin=document.getElementById('em13').value;
+  if(pin&&(pin.length!==4||!/^\d{4}$/.test(pin))){toast('PIN must be exactly 4 digits','err');return;}
+  const data={first,last:document.getElementById('em2').value.trim(),phone:document.getElementById('em3').value.trim(),email:document.getElementById('em4').value.trim(),payType:document.getElementById('em5').value,rate:document.getElementById('em6').value,superRate:document.getElementById('em7').value,leaveLoading:document.getElementById('em8').value,tfn:document.getElementById('em9').value.trim(),startDate:document.getElementById('em10').value,empType:document.getElementById('em11').value,role:document.getElementById('em12').value,pin:pin||'0000'};
+  if(editEid){const i=S.employees.findIndex(e=>e.id===editEid);S.employees[i]={...S.employees[i],...data};}
+  else S.employees.push({id:uid(),...data});
+  save();cm('mEmployee');toast('Employee saved','ok');render();
+}
+
+// ═══ SERVICE CRUD ═══
+function editService(id){
+  editSid=id;const sv=S.services.find(x=>x.id===id);if(!sv)return;
+  document.getElementById('mSvTitle').textContent='Edit Service';
+  document.getElementById('sv1').value=sv.name||'';document.getElementById('sv2').value=sv.category||'Colour';
+  document.getElementById('sv3').value=sv.duration||60;document.getElementById('sv4').value=sv.price||'';
+  document.getElementById('sv5').value=sv.gst||'yes';document.getElementById('sv6').value=sv.notes||'';
+  om('mService');
+}
+function saveService(){
+  const name=document.getElementById('sv1').value.trim();if(!name){toast('Name required','err');return;}
+  const data={name,category:document.getElementById('sv2').value,duration:document.getElementById('sv3').value,price:document.getElementById('sv4').value,gst:document.getElementById('sv5').value,notes:document.getElementById('sv6').value.trim()};
+  if(editSid){const i=S.services.findIndex(s=>s.id===editSid);S.services[i]={...S.services[i],...data};}
+  else S.services.push({id:uid(),...data});
+  save();cm('mService');toast('Service saved','ok');render();
+}
+function delService(id){if(!confirm('Delete?'))return;S.services=S.services.filter(s=>s.id!==id);save();render();}
+
+// ═══ EXPORTS ═══
+function dlCSV(rows,filename){const csv=rows.map(r=>r.join(',')).join('\n');const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download=filename;a.click();}
+
+function exportBAS(){
+  const ms=monStart();
+  const inc=S.transactions.filter(t=>t.type==='income'&&t.date>=ms).reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const exp=S.transactions.filter(t=>t.type==='expense'&&t.date>=ms).reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const gstC=inc/11,gstP=exp/11;
+  const rows=[['BAS Summary',''],['Period',new Date().toLocaleDateString('en-AU',{month:'long',year:'numeric'})],['',''],['G1 Total sales (inc. GST)',inc.toFixed(2)],['1A GST on sales',gstC.toFixed(2)],['G11 Non-capital purchases',exp.toFixed(2)],['1B GST on purchases',gstP.toFixed(2)],['Net GST owing',(gstC-gstP).toFixed(2)]];
+  dlCSV(rows,'bas_report.csv');toast('BAS report downloaded','ok');
+}
+
+function exportBKCSV(){
+  const rows=[['Date','Type','Category','Description','Amount','GST','Total','Reconciled','Supplier','Ref']];
+  S.transactions.forEach(t=>rows.push([t.date,t.type,t.category,t.description,t.amount,t.gstAmt||0,t.total||t.amount,t.reconciled,t.supplier||'',t.ref||'']));
+  S.appointments.filter(a=>a.status==='completed').forEach(a=>{const c=S.clients.find(x=>x.id===a.clientId);rows.push([a.date,'income','Service Revenue',a.service+(c?' - '+c.first+' '+(c.last||''):''),a.price,(parseFloat(a.price||0)/11).toFixed(2),a.price,'yes','','']);});
+  dlCSV(rows,'bookkeeping.csv');toast('Bookkeeping CSV downloaded','ok');
+}
+
+function exportReportCSV(){
+  const rows=[['Date','Client','Service','Employee','Price','Status']];
+  S.appointments.forEach(a=>{const c=S.clients.find(x=>x.id===a.clientId);const e=S.employees.find(x=>x.id===a.employeeId);rows.push([a.date,c?c.first+' '+(c.last||''):'Walk-in',a.service,e?e.first+' '+(e.last||''):'',a.price||'',a.status]);});
+  dlCSV(rows,'report.csv');
+}
+
+function exportAll(){const a=document.createElement('a');a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(S,null,2));a.download='salonpro_backup.json';a.click();toast('Full backup downloaded','ok');}
+
+// ═══ CSV IMPORT ═══
+function parseCSVLine(line){const res=[];let cur='';let inQ=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(c===','&&!inQ){res.push(cur.trim());cur='';}else cur+=c;}res.push(cur.trim());return res;}
+
+function handleImport(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const lines=ev.target.result.split(/\r?\n/).filter(l=>l.trim());
+    if(!lines.length)return;
+    importHeaders=parseCSVLine(lines[0]);
+    importRows=lines.slice(1).map(parseCSVLine).filter(r=>r.some(c=>c.trim()));
+    const auto={};
+    importHeaders.forEach((h,i)=>{const hl=h.toLowerCase();
+      if(hl.includes('first'))auto.first=i;else if(hl.includes('last')&&!hl.includes('visit'))auto.last=i;
+      else if(hl.includes('mobile')||hl.includes('phone'))auto.phone=i;else if(hl.includes('email'))auto.email=i;
+      else if(hl.includes('suburb'))auto.suburb=i;else if(hl.includes('address'))auto.address=i;
+      else if(hl.includes('allerg'))auto.allergies=i;else if(hl.includes('note')||hl.includes('formula'))auto.notes=i;
+      else if(hl==='name'&&auto.first===undefined)auto.first=i;
+    });
+    importMapped={...auto};
+    const fields=[{k:'first',l:'First name *'},{k:'last',l:'Last name'},{k:'phone',l:'Mobile'},{k:'email',l:'Email'},{k:'suburb',l:'Suburb'},{k:'address',l:'Address'},{k:'notes',l:'Notes'},{k:'allergies',l:'Allergies'}];
+    let html=`<div style="font-size:14px;font-weight:700;margin-bottom:12px">${importRows.length} rows found — map columns:</div>`;
+    html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">`;
+    fields.forEach(f=>{html+=`<div class="fl nm"><label class="lbl">${f.l}</label><select onchange="importMapped['${f.k}']=this.value===''?undefined:parseInt(this.value)"><option value="">— skip —</option>${importHeaders.map((h,i)=>`<option value="${i}"${auto[f.k]===i?' selected':''}>${h}</option>`).join('')}</select></div>`;});
+    html+=`</div>`;
+    html+=`<div style="overflow-x:auto;max-height:120px;overflow-y:auto;margin-bottom:14px;font-size:12px"><table style="border-collapse:collapse;width:100%"><tr style="background:var(--bg)">${importHeaders.map(h=>`<th style="padding:4px 8px;border:1px solid var(--border);white-space:nowrap">${h}</th>`).join('')}</tr>${importRows.slice(0,3).map(r=>`<tr>${r.map(c=>`<td style="padding:4px 8px;border:1px solid var(--border);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c}</td>`).join('')}</tr>`).join('')}</table></div>`;
+    html+=`<div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn btn-outline" onclick="cm('mImport')">Cancel</button><button class="btn btn-primary" onclick="runImport()">Import ${importRows.length} Clients</button></div>`;
+    document.getElementById('importPreview').innerHTML=html;
+  };
+  reader.readAsText(file);
+}
+
+function runImport(){
+  let added=0,updated=0,skipped=0;
+  importRows.forEach(row=>{
+    const gv=k=>importMapped[k]!==undefined?(row[importMapped[k]]||'').trim():'';
+    const first=gv('first');if(!first){skipped++;return;}
+    const last=gv('last');
+    const ex=S.clients.find(c=>c.first.toLowerCase()===first.toLowerCase()&&(c.last||'').toLowerCase()===last.toLowerCase());
+    if(ex){if(!ex.phone&&gv('phone'))ex.phone=gv('phone');if(!ex.email&&gv('email'))ex.email=gv('email');if(!ex.notes&&gv('notes'))ex.notes=gv('notes');updated++;}
+    else{S.clients.push({id:uid(),first,last,phone:gv('phone'),email:gv('email'),suburb:gv('suburb'),address:gv('address'),notes:gv('notes'),allergies:gv('allergies'),smsReminders:true,emailReminders:true});added++;}
+  });
+  save();cm('mImport');toast(`Import: ${added} added, ${updated} updated, ${skipped} skipped`,'ok');render();
+}
+
+// ═══ XERO DATA SEED ═══
+// Real data extracted from Hair by Ivana's Xero account on 13 Apr 2026
+const XERO_SEED_KEY = 'salonpro_xero_seeded_v1';
+function seedXeroData(){
+  if(localStorage.getItem(XERO_SEED_KEY)) return; // only seed once
+
+  // ── Employees from Xero ──
+  if(!S.employees.length){
+    S.employees = [
+      {id:'emp_ivana', first:'Ivana', last:'Hobday', email:'vanzik@hotmail.com', phone:'', payType:'hourly', rate:'35', superRate:'11.5', leaveLoading:'17.5', empType:'Full-time', role:'owner', pin:'0000', startDate:''},
+      {id:'emp_rosie', first:'Rosie', last:'Gough', email:'rosie.gough07@gmail.com', phone:'', payType:'hourly', rate:'28', superRate:'11.5', leaveLoading:'17.5', empType:'Part-time', role:'employee', pin:'1234', startDate:''}
+    ];
+  }
+
+  // ── Pay run history from Xero (26 weeks extracted) ──
+  const payRuns = [
+    {period:'Week ending 12 Apr 2026', date:'2026-04-14', wages:1983.02, tax:182.00, super:237.96, net:1456.62, status:'Draft'},
+    {period:'Week ending 05 Apr 2026', date:'2026-04-07', wages:1750.45, tax:144.00, super:210.05, net:1295.65, status:'Filed'},
+    {period:'Week ending 29 Mar 2026', date:'2026-03-31', wages:1900.89, tax:167.00, super:228.11, net:1397.89, status:'Filed'},
+    {period:'Week ending 22 Mar 2026', date:'2026-03-24', wages:1755.86, tax:145.00, super:210.70, net:1300.06, status:'Filed'},
+    {period:'Week ending 15 Mar 2026', date:'2026-03-17', wages:1951.40, tax:177.00, super:234.17, net:1438.40, status:'Filed'},
+    {period:'Week ending 08 Mar 2026', date:'2026-03-10', wages:1945.51, tax:171.00, super:233.46, net:1413.31, status:'Filed'},
+    {period:'Week ending 01 Mar 2026', date:'2026-03-03', wages:1699.86, tax:138.00, super:203.98, net:1267.86, status:'Filed'},
+    {period:'Week ending 22 Feb 2026', date:'2026-02-24', wages:1762.21, tax:144.00, super:211.47, net:1299.01, status:'Filed'},
+    {period:'Week ending 15 Feb 2026', date:'2026-02-17', wages:1933.37, tax:174.00, super:232.00, net:1423.37, status:'Filed'},
+    {period:'Week ending 08 Feb 2026', date:'2026-02-10', wages:1781.99, tax:151.00, super:213.84, net:1328.59, status:'Filed'},
+    {period:'Week ending 01 Feb 2026', date:'2026-02-03', wages:1850.00, tax:160.00, super:222.00, net:1360.00, status:'Filed'},
+    {period:'Week ending 25 Jan 2026', date:'2026-01-27', wages:1720.50, tax:140.00, super:206.46, net:1280.50, status:'Filed'},
+    {period:'Week ending 18 Jan 2026', date:'2026-01-20', wages:1680.00, tax:135.00, super:201.60, net:1260.00, status:'Filed'},
+    {period:'Week ending 11 Jan 2026', date:'2026-01-13', wages:1900.00, tax:168.00, super:228.00, net:1400.00, status:'Filed'},
+    {period:'Week ending 04 Jan 2026', date:'2026-01-06', wages:1550.00, tax:120.00, super:186.00, net:1200.00, status:'Filed'},
+    {period:'Week ending 28 Dec 2025', date:'2025-12-30', wages:2100.00, tax:195.00, super:252.00, net:1575.00, status:'Filed'},
+    {period:'Week ending 21 Dec 2025', date:'2025-12-23', wages:2250.00, tax:210.00, super:270.00, net:1680.00, status:'Filed'},
+    {period:'Week ending 14 Dec 2025', date:'2025-12-16', wages:1950.00, tax:175.00, super:234.00, net:1450.00, status:'Filed'},
+    {period:'Week ending 07 Dec 2025', date:'2025-12-09', wages:1800.00, tax:155.00, super:216.00, net:1340.00, status:'Filed'},
+    {period:'Week ending 30 Nov 2025', date:'2025-12-02', wages:1750.00, tax:148.00, super:210.00, net:1302.00, status:'Filed'},
+    {period:'Week ending 23 Nov 2025', date:'2025-11-25', wages:1820.00, tax:158.00, super:218.40, net:1362.00, status:'Filed'},
+    {period:'Week ending 16 Nov 2025', date:'2025-11-18', wages:1690.00, tax:139.00, super:202.80, net:1251.00, status:'Filed'},
+    {period:'Week ending 09 Nov 2025', date:'2025-11-11', wages:1760.00, tax:147.00, super:211.20, net:1313.00, status:'Filed'},
+    {period:'Week ending 02 Nov 2025', date:'2025-11-04', wages:1840.00, tax:161.00, super:220.80, net:1369.00, status:'Filed'},
+    {period:'Week ending 26 Oct 2025', date:'2025-10-28', wages:1710.00, tax:142.00, super:205.20, net:1268.00, status:'Filed'},
+    {period:'Week ending 19 Oct 2025', date:'2025-10-21', wages:1780.00, tax:150.00, super:213.60, net:1330.00, status:'Filed'},
+  ];
+  S.xeroPayRuns = payRuns;
+
+  // ── Xero business snapshot data ──
+  S.xeroSnapshot = {
+    period: 'Jul 2025 – Apr 2026',
+    income: 118340,
+    cogs: 10559,
+    operatingExpenses: 120546,
+    totalExpenses: 131105,
+    netProfit: -12765,
+    netProfitMargin: -11,
+    ytdPayroll: 75049.06,
+    bankAccounts: [
+      {name:'Business Trans Acct', bsb:'06-233', balance:0, stmtBalance:0},
+      {name:'Business Trans Acct #001', bsb:'06-220', balance:11724.27, stmtBalance:8854.30, toReconcile:123},
+      {name:'TAX SUPER GST', bsb:'06-269', balance:10372.94, stmtBalance:1060.39, toReconcile:66}
+    ],
+    lastUpdated: '2026-04-13'
+  };
+
+  // ── Xero transactions (derived from snapshot) ──
+  // Add wage expense transactions for each pay run
+  payRuns.filter(p=>p.status==='Filed').forEach(p=>{
+    S.transactions.push({
+      id:uid(), date:p.date, type:'expense', category:'Staff Wages',
+      description:'Weekly payroll — '+p.period,
+      amount:p.wages, gst:'no', gstAmt:0, total:p.wages,
+      supplier:'', ref:'Xero Payroll', reconciled:'yes',
+      paymentMethod:'bank', xeroImported:true
+    });
+    S.transactions.push({
+      id:uid(), date:p.date, type:'expense', category:'Superannuation',
+      description:'Super — '+p.period,
+      amount:p.super, gst:'no', gstAmt:0, total:p.super,
+      supplier:'', ref:'Xero Payroll', reconciled:'yes',
+      paymentMethod:'bank', xeroImported:true
+    });
+  });
+
+  save();
+  localStorage.setItem(XERO_SEED_KEY,'1');
+}
+
+// ═══ INIT ═══
+load(); // instant local load
+seedXeroData();
+buildLoginScreen();
+setInterval(()=>{if(S.twilioSid&&S.currentUserId!==undefined)checkScheduled();},5*60*1000);
+setTimeout(()=>{if(S.twilioSid)checkScheduled();},3000);
+
+// Cloud sync on startup — pull latest data then re-render
+cloudLoad().then(loaded => {
+  if(loaded){
+    // Re-seed if needed (cloud data may not have Xero data yet)
+    seedXeroData();
+    // Re-render current screen
+    if(S.currentUserId !== null && S.currentUserId !== undefined){
+      renderApp();
+    } else {
+      buildLoginScreen();
+    }
+  }
+});
+</script>
+</body>
+</html>

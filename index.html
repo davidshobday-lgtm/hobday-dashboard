@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Life Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;--bg4:#242840;
+  --border:#ffffff0f;--border2:#ffffff18;
+  --text:#f0f2f8;--text2:#8b92a8;--text3:#4a5068;
+  --green:#00e676;--green2:#00c853;--green-dim:#00e67620;
+  --red:#ff5252;--red-dim:#ff525220;
+  --blue:#448aff;--blue-dim:#448aff20;
+  --amber:#ffab40;--amber-dim:#ffab4020;
+  --purple:#e040fb;--purple-dim:#e040fb20;
+  --teal:#1de9b6;--teal-dim:#1de9b620;
+  --gold:#ffd740;--gold-dim:#ffd74020;
+  --radius:10px;--radius-sm:7px;--radius-lg:14px;
+  --shadow:0 2px 20px rgba(0,0,0,.4);
+  --font:'DM Sans',sans-serif;
+  --font-display:'DM Serif Display',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:2px}
+
+/* ── LAYOUT ── */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;overflow-y:auto}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:40}
+.content{padding:24px;flex:1}
+
+/* ── SIDEBAR ── */
+.sb-logo{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+.sb-logo-title{font-family:var(--font-display);font-size:18px;color:var(--text);letter-spacing:.01em}
+.sb-logo-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.sb-section{padding:14px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3)}
+.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;margin:1px 8px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:calc(100%-16px);font-family:var(--font);text-align:left}
+.nav-btn:hover{background:var(--bg3);color:var(--text)}
+.nav-btn.active{background:var(--bg4);color:var(--text);font-weight:600}
+.nav-btn .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.nav-btn .nav-val{margin-left:auto;font-size:11px;font-weight:600;opacity:.7}
+.sb-bottom{margin-top:auto;padding:14px 16px;border-top:1px solid var(--border)}
+.net-worth-sb{font-family:var(--font-display);font-size:20px;color:var(--green);line-height:1.1}
+.net-worth-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+
+/* ── TOPBAR ── */
+.tb-title{font-size:16px;font-weight:700;color:var(--text)}
+.tb-date{font-size:12px;color:var(--text3);margin-left:4px}
+.tb-actions{margin-left:auto;display:flex;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{font-family:var(--font);font-size:12px;font-weight:600;padding:6px 13px;border-radius:var(--radius-sm);cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--green);color:#000}
+.btn-primary:hover{background:var(--green2)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{background:var(--bg3);color:var(--text)}
+.btn-ghost{background:transparent;color:var(--text3);border:none}
+.btn-ghost:hover{color:var(--text2)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-icon{width:30px;height:30px;padding:0;justify-content:center;border-radius:var(--radius-sm)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid #ff52524d}
+.btn-danger:hover{background:#ff525230}
+
+/* ── CARDS ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.card-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:700;color:var(--text)}
+.card-body{padding:16px}
+
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;gap:12px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--sc,var(--green))}
+.stat-val{font-size:24px;font-weight:700;line-height:1;color:var(--text)}
+.stat-lbl{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-top:5px}
+.stat-change{font-size:11px;font-weight:600;margin-top:5px}
+.up{color:var(--green)}.down{color:var(--red)}
+.neutral{color:var(--text3)}
+
+/* ── TABLES ── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--bg3)}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle;color:var(--text2)}
+tr:hover td{background:#ffffff04}
+tr:last-child td{border-bottom:none}
+.tfoot td{background:var(--bg3);font-weight:700;color:var(--text);border-top:1px solid var(--border2)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:3px 7px;border-radius:20px;white-space:nowrap}
+.b-green{background:var(--green-dim);color:var(--green)}
+.b-red{background:var(--red-dim);color:var(--red)}
+.b-amber{background:var(--amber-dim);color:var(--amber)}
+.b-blue{background:var(--blue-dim);color:var(--blue)}
+.b-purple{background:var(--purple-dim);color:var(--purple)}
+.b-teal{background:var(--teal-dim);color:var(--teal)}
+.b-gold{background:var(--gold-dim);color:var(--gold)}
+.b-grey{background:#ffffff0a;color:var(--text3)}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);gap:0;margin-bottom:18px}
+.tbt{padding:9px 14px;font-size:12px;font-weight:600;background:transparent;border:none;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .15s;font-family:var(--font)}
+.tbt:hover{color:var(--text2)}.tbt.active{color:var(--green);border-bottom-color:var(--green)}
+.tpanel{display:none}.tpanel.active{display:block}
+
+/* ── MODALS ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:flex-start;justify-content:center;padding:50px 16px;overflow-y:auto;backdrop-filter:blur(4px)}
+.ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:520px;box-shadow:var(--shadow);margin:auto}
+.mh{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:700;color:var(--text)}
+.mb{padding:20px}
+.mf{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* ── FORMS ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fl{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl.nm{margin-bottom:0}
+.lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+input,select,textarea{font-family:var(--font);font-size:13px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:8px 11px;color:var(--text);width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px var(--green-dim)}
+textarea{resize:vertical;min-height:70px}
+select option{background:var(--bg3)}
+
+/* ── PROGRESS BAR ── */
+.pbar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:8px}
+.pbar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+
+/* ── NET WORTH RING ── */
+.nw-ring-wrap{position:relative;width:160px;height:160px;margin:0 auto}
+.nw-ring-wrap svg{transform:rotate(-90deg)}
+.nw-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nw-center-val{font-family:var(--font-display);font-size:22px;color:var(--text);line-height:1}
+.nw-center-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px}
+.divider{border:none;border-top:1px solid var(--border);margin:14px 0}
+.shead{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:10px}
+.ip{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+.ip:last-child{border-bottom:none}
+.ip-lbl{width:140px;flex-shrink:0;color:var(--text3)}
+.ip-val{color:var(--text);font-weight:600;flex:1}
+.alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;margin-bottom:14px;border-left:3px solid;display:flex;gap:8px}
+.alert-green{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.alert-amber{background:var(--amber-dim);border-color:var(--amber);color:var(--amber)}
+.alert-red{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.alert-blue{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.conn-line{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text3);padding:6px 0}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:32px}
+.spark-bar{flex:1;background:var(--green-dim);border-radius:2px 2px 0 0;min-height:3px;transition:height .4s}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;border-radius:var(--radius);font-size:12px;font-weight:600;display:none;z-index:9999;box-shadow:var(--shadow)}
+#toast.ok{background:var(--green);color:#000}
+#toast.err{background:var(--red);color:#fff}
+#toast.info{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+
+/* ── GOAL PROGRESS ── */
+.goal-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:10px}
+.goal-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.goal-name{font-size:13px;font-weight:700;color:var(--text)}
+.goal-pct{font-size:12px;font-weight:700}
+.goal-meta{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* ── MODULES COLOR CODING ── */
+.mod-business{--mc:var(--green)}
+.mod-property{--mc:var(--amber)}
+.mod-super{--mc:var(--purple)}
+.mod-budget{--mc:var(--blue)}
+.mod-networth{--mc:var(--teal)}
+.mod-shares{--mc:var(--gold)}
+.mod-tax{--mc:var(--red)}
+.mod-goals{--mc:#ff6090}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-title">My Life</div>
+    <div class="sb-logo-sub">Personal Finance Dashboard</div>
+  </div>
+
+  <div style="padding:8px;flex:1">
+    <div class="sb-section">Overview</div>
+    <button class="nav-btn active" onclick="nav('networth')">
+      <div class="dot" style="background:var(--teal)"></div>Net Worth<span class="nav-val" id="sb-nw">$0</span></button>
+
+    <div class="sb-section">Modules</div>
+    <button class="nav-btn mod-business" onclick="nav('business')">
+      <div class="dot" style="background:var(--green)"></div>Salon Business<span class="nav-val" id="sb-biz">—</span></button>
+    <button class="nav-btn mod-property" onclick="nav('property')">
+      <div class="dot" style="background:var(--amber)"></div>Investment Property<span class="nav-val" id="sb-prop">—</span></button>
+    <button class="nav-btn mod-super" onclick="nav('super')">
+      <div class="dot" style="background:var(--purple)"></div>Superannuation<span class="nav-val" id="sb-super">—</span></button>
+    <button class="nav-btn mod-budget" onclick="nav('budget')">
+      <div class="dot" style="background:var(--blue)"></div>Personal Budget<span class="nav-val" id="sb-budget">—</span></button>
+    <button class="nav-btn mod-shares" onclick="nav('shares')">
+      <div class="dot" style="background:var(--gold)"></div>Share Portfolio<span class="nav-val" id="sb-shares">—</span></button>
+    <button class="nav-btn mod-tax" onclick="nav('tax')">
+      <div class="dot" style="background:var(--red)"></div>Tax</button>
+    <button class="nav-btn mod-goals" onclick="nav('goals')">
+      <div class="dot" style="background:#ff6090"></div>Goals</button>
+
+    <div class="sb-section">Apps</div>
+    <button class="nav-btn" onclick="window.open('salon.html','_blank')">
+      <div class="dot" style="background:var(--green)"></div>Open Salon App ↗</button>
+  </div>
+
+  <div class="sb-bottom">
+    <div id="sb-basiq-btn" style="margin-bottom:12px"></div>
+    <div class="net-worth-lbl">Total Net Worth</div>
+    <div class="net-worth-sb" id="sb-nw-big">$0</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:3px" id="sb-nw-change">Loading...</div>
+  </div>
+</nav>
+
+<!-- QUICK BALANCE SYNC MODAL -->
+<div id="mSync" class="ov"><div class="modal" style="max-width:520px">
+  <div class="mh"><div class="mt">⚡ Quick Balance Update</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSync')">✕</button></div>
+  <div class="mb">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Update your account balances — takes 30 seconds. Check your banking app then enter current balances below.</div>
+    <div id="syncFields"></div>
+    <div class="divider"></div>
+    <div style="font-size:11px;color:var(--text3);text-align:center">Last updated: <span id="syncLastUpdated">Never</span></div>
+  </div>
+  <div class="mf">
+    <button class="btn btn-outline" onclick="cm('mSync')">Cancel</button>
+    <button class="btn btn-primary" onclick="saveSync()">💾 Save Balances</button>
+  </div>
+</div></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="tbTitle">Net Worth Overview</div>
+    </div>
+    <div class="tb-actions">
+      <span style="font-size:11px;color:var(--text3)" id="tbDate"></span>
+      <button class="btn btn-outline btn-sm" onclick="om('mSettings')">⚙ Settings</button>
+      <button class="btn btn-primary btn-sm" id="tbAddBtn" onclick="quickAdd()">+ Add</button>
+    </div>
+  </div>
+  <div class="content" id="mainContent"></div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Property Modal -->
+<div id="mProperty" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mPropTitle">Add Property</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mProperty')">✕</button></div>
+  <div class="mb">
+    <div class="fg">
+      <div class="fl full" style="grid-column:1/-1"><label class="lbl">Property Address</label><input id="pr1" placeholder="123 Example St, Suburb QLD 4000"></div>
+      <div class="fl"><label class="lbl">Purchase Price ($)</label><input type="number" id="pr2" placeholder="500000"></div>
+      <div class="fl"><label class="lbl">Current Value ($)</label><input type="number" id="pr3" placeholder="620000"></div>
+      <div class="fl"><label class="lbl">Loan Balance ($)</label><input type="number" id="pr4" placeholder="380000"></div>
+      <div class="fl"><label class="lbl">Interest Rate (%)</label><input type="number" id="pr5" placeholder="6.24" step="0.01"></div>
+      <div class="fl"><label class="lbl">Weekly Rent ($)</label><input type="number" id="pr6" placeholder="550"></div>
+      <div class="fl"><label class="lbl">Weekly Expenses ($)</label><input type="number" id="pr7" placeholder="120" title="rates, insurance, PM fees, maintenance"></div>
+      <div class="fl"><label class="lbl">Loan Type</label><select id="pr8"><option>Principal & Interest</option><option>Interest Only</option></select></div>
+      <div class="fl"><label class="lbl">Purchase Date</label><input type="date" id="pr9"></div>
+      <div class="fl"><label class="lbl">Property Type</label><select id="pr10"><option>House</option><option>Unit/Apartment</option><option>Townhouse</option><option>Land</option></select></div>
+    </div>
+    <div class="fl" style="grid-column:1/-1"><label class="lbl">Notes</label><textarea id="pr11" placeholder="Agent, property manager, tenant details..."></textarea></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mProperty')">Cancel</button><button class="btn btn-primary" onclick="saveProp()">Save Property</button></div>
+</div></div>
+
+<!-- Super Modal -->
+<div id="mSuper" class="ov"><div class="modal">
+  <div class="mh"><div class="mt">Superannuation Details</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSuper')">✕</button></div>
+  <div class="mb">
+    <div class="fg">
+      <div class="fl"><label class="lbl">Fund Name</label><input id="su1" placeholder="Australian Super"></div>
+      <div class="fl"><label class="lbl">Member Number</label><input id="su2" placeholder="123456789"></div>
+      <div class="fl"><label class="lbl">Current Balance ($)</label><input type="number" id="su3" placeholder="85000"></div>
+      <div class="fl"><label class="lbl">Investment Option</label><select id="su4"><option>Balanced</option><option>High Growth</option><option>Conservative</option><option>Cash</option><option>Shares</option><option>Property</option><option>International</option></select></div>
+      <div class="fl"><label class="lbl">Employer Contributions ($/yr)</label><input type="number" id="su5" placeholder="8750"></div>
+      <div class="fl"><label class="lbl">Personal Contributions ($/yr)</label><input type="number" id="su6" placeholder="0"></div>
+      <div class="fl"><label class="lbl">Annual Return (%)</label><input type="number" id="su7" placeholder="8.5" step="0.1"></div>
+      <div class="fl"><label class="lbl">Target Retirement Age</label><input type="number" id="su8" placeholder="67"></div>
+      <div class="fl"><label class="lbl">Current Age</label><input type="number" id="su9" placeholder="40"></div>
+      <div class="fl"><label class="lbl">Target Balance at Retirement ($)</label><input type="number" id="su10" placeholder="1000000"></div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mSuper')">Cancel</button><button class="btn btn-primary" onclick="saveSuper()">Save</button></div>
+</div></div>
+
+<!-- Share Modal -->
+<div id="mShare" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mShareTitle">Add Holding</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mShare')">✕</button></div>
+  <div class="mb">
+    <div class="fg">
+      <div class="fl"><label class="lbl">Ticker / Code</label><input id="sh1" placeholder="VAS, CBA, ETH..."></div>
+      <div class="fl"><label class="lbl">Type</label><select id="sh2"><option>ASX Stock</option><option>ETF</option><option>US Stock</option><option>Crypto</option><option>Managed Fund</option><option>Bonds</option></select></div>
+      <div class="fl"><label class="lbl">Units / Shares</label><input type="number" id="sh3" placeholder="100" step="0.001"></div>
+      <div class="fl"><label class="lbl">Buy Price (per unit $)</label><input type="number" id="sh4" placeholder="89.50" step="0.01"></div>
+      <div class="fl"><label class="lbl">Current Price (per unit $)</label><input type="number" id="sh5" placeholder="94.20" step="0.01"></div>
+      <div class="fl"><label class="lbl">Purchase Date</label><input type="date" id="sh6"></div>
+      <div class="fl"><label class="lbl">Annual Dividend Yield (%)</label><input type="number" id="sh7" placeholder="3.5" step="0.1"></div>
+      <div class="fl"><label class="lbl">Platform</label><input id="sh8" placeholder="CommSec, SelfWealth, Stake..."></div>
+    </div>
+    <div class="fl"><label class="lbl">Notes</label><input id="sh9" placeholder="Optional notes..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mShare')">Cancel</button><button class="btn btn-primary" onclick="saveShare()">Save Holding</button></div>
+</div></div>
+
+<!-- Budget Transaction Modal -->
+<div id="mBudget" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mBudgetTitle">Add Transaction</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mBudget')">✕</button></div>
+  <div class="mb">
+    <div class="fg">
+      <div class="fl"><label class="lbl">Date</label><input type="date" id="bt1"></div>
+      <div class="fl"><label class="lbl">Type</label><select id="bt2"><option value="expense">Expense</option><option value="income">Income</option></select></div>
+      <div class="fl" style="grid-column:1/-1"><label class="lbl">Description</label><input id="bt3" placeholder="e.g. Woolworths groceries"></div>
+      <div class="fl"><label class="lbl">Category</label><select id="bt4">
+        <optgroup label="Living"><option>Groceries</option><option>Eating out</option><option>Utilities</option><option>Rent / Mortgage</option><option>Insurance</option><option>Health</option><option>Personal care</option></optgroup>
+        <optgroup label="Lifestyle"><option>Entertainment</option><option>Clothing</option><option>Travel</option><option>Gym / Sport</option><option>Subscriptions</option></optgroup>
+        <optgroup label="Finance"><option>Loan repayment</option><option>Investment</option><option>Super contribution</option><option>Tax</option><option>Savings</option></optgroup>
+        <optgroup label="Income"><option>Salary / Wages</option><option>Business income</option><option>Rental income</option><option>Investment income</option><option>Other income</option></optgroup>
+      </select></div>
+      <div class="fl"><label class="lbl">Amount ($)</label><input type="number" id="bt5" placeholder="0.00" step="0.01"></div>
+      <div class="fl"><label class="lbl">Account</label><select id="bt6"><option>Everyday account</option><option>Savings account</option><option>Credit card</option><option>Cash</option></select></div>
+    </div>
+    <div class="fl"><label class="lbl">Notes</label><input id="bt7" placeholder="Optional..."></div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mBudget')">Cancel</button><button class="btn btn-primary" onclick="saveBudgetTx()">Save</button></div>
+</div></div>
+
+<!-- Goal Modal -->
+<div id="mGoal" class="ov"><div class="modal">
+  <div class="mh"><div class="mt" id="mGoalTitle">Add Goal</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mGoal')">✕</button></div>
+  <div class="mb">
+    <div class="fg">
+      <div class="fl" style="grid-column:1/-1"><label class="lbl">Goal Name</label><input id="gl1" placeholder="e.g. Pay off investment property loan"></div>
+      <div class="fl"><label class="lbl">Category</label><select id="gl2"><option>Property</option><option>Retirement</option><option>Savings</option><option>Investment</option><option>Business</option><option>Personal</option><option>Education</option><option>Emergency Fund</option></select></div>
+      <div class="fl"><label class="lbl">Target Amount ($)</label><input type="number" id="gl3" placeholder="100000"></div>
+      <div class="fl"><label class="lbl">Current Progress ($)</label><input type="number" id="gl4" placeholder="0"></div>
+      <div class="fl"><label class="lbl">Target Date</label><input type="date" id="gl5"></div>
+      <div class="fl"><label class="lbl">Priority</label><select id="gl6"><option>High</option><option>Medium</option><option>Low</option></select></div>
+      <div class="fl" style="grid-column:1/-1"><label class="lbl">Notes</label><textarea id="gl7" placeholder="Strategy, milestones..."></textarea></div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mGoal')">Cancel</button><button class="btn btn-primary" onclick="saveGoal()">Save Goal</button></div>
+</div></div>
+
+<!-- Settings Modal -->
+<div id="mSettings" class="ov"><div class="modal" style="max-width:600px">
+  <div class="mh"><div class="mt">Settings</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSettings')">✕</button></div>
+  <div class="mb">
+    <div class="shead">Personal Details</div>
+    <div class="fg">
+      <div class="fl"><label class="lbl">Your Name</label><input id="st1" placeholder="David"></div>
+      <div class="fl"><label class="lbl">Financial Year Start</label><select id="st2"><option value="07">July (AU)</option><option value="01">January</option></select></div>
+    </div>
+    <div class="divider"></div>
+    <div class="shead">Basiq — Live Bank & Super Data</div>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+      <strong style="color:var(--text)">🔗 Basiq is connected via your secure proxy</strong><br>
+      Your CommBank accounts sync automatically through <strong>hobday-dashboard-mnx7tfk7.netlify.app</strong><br>
+      Uses Australia's CDR Open Banking — your banking credentials never leave CommBank.
+    </div>
+    <div id="basiq_status" style="font-size:12px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="basiqConnect()">🏦 Connect / Add Bank</button>
+      <button class="btn btn-outline btn-sm" onclick="basiqSync()">↻ Sync Now</button>
+      <button class="btn btn-ghost btn-sm" onclick="basiqDisconnect()">Disconnect</button>
+    </div>
+    <div id="basiq_accounts" style="margin-top:12px"></div>
+    <div class="divider"></div>
+    <div class="shead">Link to Salon App</div>
+    <div class="alert alert-green">Salon app data (revenue, payroll, Xero) flows automatically into this dashboard.</div>
+    <div class="divider"></div>
+    <div class="shead">Data</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline btn-sm" onclick="exportAll()">⬇ Backup JSON</button>
+      <button class="btn btn-outline btn-sm" onclick="importData()">⬆ Restore Backup</button>
+      <button class="btn btn-danger btn-sm" onclick="if(confirm('Reset ALL data?')){localStorage.clear();location.reload()}">Reset All</button>
+    </div>
+  </div>
+  <div class="mf"><button class="btn btn-outline" onclick="cm('mSettings')">Cancel</button><button class="btn btn-primary" onclick="saveSettings()">Save</button></div>
+</div></div>
+
+<script>
+const SK='lifedb_v1';
+let D={
+  name:'',fyStart:'07',
+  properties:[], superFunds:[], shares:[], budgetTx:[], goals:[],
+  // Linked from salon app (read from salon localStorage)
+  salonLinked:false
+};
+let page='networth';
+let editPid=null,editSid=null,editShid=null,editBid=null,editGid=null;
+
+function load(){try{const r=localStorage.getItem(SK);if(r)D={...D,...JSON.parse(r)};}catch(e){}}
+function save(){
+  try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}
+  cloudSave();
+}
+// ── Cloud sync ──
+const CLOUD_URL='https://hobday-dashboard-mnx7tfk7.netlify.app/.netlify/functions/data';
+const CLOUD_TOKEN='hobday2026';
+let _cloudSaving=false;
+async function cloudSave(){
+  if(_cloudSaving)return;_cloudSaving=true;
+  try{await fetch(CLOUD_URL+'?key='+SK+'&token='+CLOUD_TOKEN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:D})});}
+  catch(e){}
+  _cloudSaving=false;
+}
+async function cloudLoad(){
+  try{
+    const r=await fetch(CLOUD_URL+'?key='+SK+'&token='+CLOUD_TOKEN);
+    const d=await r.json();
+    if(d.data){D={...D,...d.data};try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){} return true;}
+  }catch(e){}
+  return false;
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function tod(){return new Date().toISOString().split('T')[0]}
+function fds(d){if(!d)return'—';try{return new Date(d+'T00:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});}catch(e){return d}}
+function fmoney(n){return'$'+(parseFloat(n)||0).toLocaleString('en-AU',{minimumFractionDigits:0,maximumFractionDigits:0})}
+function fmoney2(n){return'$'+(parseFloat(n)||0).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function pct(n){return((parseFloat(n)||0)>0?'+':'')+parseFloat(n||0).toFixed(1)+'%'}
+
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=type;t.style.display='block';clearTimeout(t._to);t._to=setTimeout(()=>t.style.display='none',2600)}
+function om(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='mSettings'){
+    // Pre-fill settings fields
+    const n=document.getElementById('st1');if(n)n.value=D.name||'';
+    const f=document.getElementById('st2');if(f)f.value=D.fyStart||'07';
+    const k=document.getElementById('st_basiq_key');
+    if(k)k.value=D.basiqKey?'••••••••••••••••':'';
+    const s=document.getElementById('basiq_status');
+    if(s){
+      if(D.basiqKey){
+        s.textContent=`✓ Connected · ${D.basiqAccounts?.length||0} accounts · Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}`;
+        s.style.color='var(--green)';
+      }else{s.textContent='Not connected';s.style.color='var(--text3)';}
+    }
+    renderBasiqAccounts();
+  }
+}
+function cm(id){document.getElementById(id).classList.remove('open')}
+window.onclick=e=>{['mProperty','mSuper','mShare','mBudget','mGoal','mSettings','mSync'].forEach(id=>{const el=document.getElementById(id);if(e.target===el)cm(id)})}
+
+// ── SALON DATA BRIDGE ──
+function getSalonData(){
+  try{
+    const raw=localStorage.getItem('salonpro_v2')||localStorage.getItem('salonpro_v1');
+    if(!raw)return null;
+    return JSON.parse(raw);
+  }catch(e){return null}
+}
+
+// ── NET WORTH CALCULATION ──
+function calcNetWorth(){
+  const salon=getSalonData();
+  // Cash: use live Basiq accounts if available, else manual
+  const cashBal=(D.basiqAccounts?.length)
+    ? D.basiqAccounts.filter(a=>!a.type?.toLowerCase().includes('super')).reduce((s,a)=>s+(parseFloat(a.balance)||0),0)
+    : (D.manualAccounts||[]).reduce((s,a)=>s+(parseFloat(a.balance)||0),0);
+  // Assets
+  const propValues=D.properties.reduce((s,p)=>s+(parseFloat(p.value)||0),0);
+  const propLoans=D.properties.reduce((s,p)=>s+(parseFloat(p.loan)||0),0);
+  const propEquity=propValues-propLoans;
+  const superBal=D.superFunds.reduce((s,f)=>s+(parseFloat(f.balance)||0),0);
+  const shareVal=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)),0);
+  const budgetSavings=D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+(parseFloat(t.amount)||0),0)
+    - D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  // Salon business value (rough: annual profit × 2.5 multiple, or fallback)
+  let salonEquity=0;
+  if(salon&&salon.xeroSnapshot){
+    const annualRev=salon.xeroSnapshot.income||0;
+    salonEquity=Math.max(0,annualRev*0.4); // rough goodwill: 40% of revenue
+  }
+  const totalAssets=propValues+superBal+shareVal+Math.max(0,salonEquity)+cashBal;
+  const totalLiabilities=propLoans;
+  const netWorth=totalAssets-totalLiabilities;
+  return{propValues,propLoans,propEquity,superBal,shareVal,salonEquity,totalAssets,totalLiabilities,netWorth,budgetSavings,cashBal};
+}
+
+// ── SIDEBAR UPDATES ──
+function updateSidebar(){
+  const nw=calcNetWorth();
+  const salon=getSalonData();
+  document.getElementById('sb-nw').textContent=fmoney(nw.netWorth);
+  document.getElementById('sb-nw-big').textContent=fmoney(nw.netWorth);
+  document.getElementById('sb-nw-change').textContent='Assets '+fmoney(nw.totalAssets)+' · Liabilities '+fmoney(nw.totalLiabilities);
+  if(salon&&salon.xeroSnapshot)document.getElementById('sb-biz').textContent=fmoney(nw.salonEquity);
+  if(D.properties.length)document.getElementById('sb-prop').textContent=fmoney(nw.propEquity);
+  if(D.superFunds.length)document.getElementById('sb-super').textContent=fmoney(nw.superBal);
+  if(D.shares.length)document.getElementById('sb-shares').textContent=fmoney(nw.shareVal);
+  // Quick sync button in sidebar
+  const sbBtn=document.getElementById('sb-basiq-btn');
+  if(sbBtn){
+    const lastSync=D.manualSyncTime?new Date(D.manualSyncTime).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never';
+    const acctCount=(D.manualAccounts||[]).length;
+    if(acctCount>0){
+      sbBtn.innerHTML=`<div style="display:flex;align-items:center;gap:6px;padding:7px 10px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:8px;cursor:pointer" onclick="openSync()">
+        <span style="font-size:12px">✓</span>
+        <div><div style="font-size:11px;font-weight:600;color:#00e676">${acctCount} accounts synced</div><div style="font-size:10px;color:#4a5068">${lastSync}</div></div>
+        <span style="font-size:11px;color:#4a5068;margin-left:auto">↻</span>
+      </div>`;
+    } else {
+      sbBtn.innerHTML=`<button onclick="openSync()" style="width:100%;padding:8px 10px;background:rgba(19,181,234,.15);border:1px solid rgba(19,181,234,.4);border-radius:8px;color:#13b5ea;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px">
+        ↻ Sync CommBank
+      </button>`;
+    }
+  }
+}
+
+// ── NAV ──
+function nav(p){
+  page=p;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes(`'${p}'`)));
+  const titles={networth:'Net Worth Overview',business:'Salon Business',property:'Investment Property',super:'Superannuation',budget:'Personal Budget',shares:'Share Portfolio',tax:'Tax Overview',goals:'Goals & Milestones'};
+  document.getElementById('tbTitle').textContent=titles[p]||p;
+  const addLabels={networth:null,business:null,property:'+ Add Property',super:'+ Add Fund',budget:'+ Add Transaction',shares:'+ Add Holding',tax:null,goals:'+ Add Goal'};
+  const btn=document.getElementById('tbAddBtn');
+  btn.textContent=addLabels[p]||'+ Add';
+  btn.style.display=addLabels[p]?'':'none';
+  render();updateSidebar();
+}
+
+function quickAdd(){
+  const adds={property:'mProperty',super:'mSuper',budget:'mBudget',shares:'mShare',goals:'mGoal'};
+  if(adds[page])om(adds[page]);
+}
+
+function render(){
+  const pages={networth:pgNetWorth,business:pgBusiness,property:pgProperty,super:pgSuper,budget:pgBudget,shares:pgShares,tax:pgTax,goals:pgGoals};
+  document.getElementById('mainContent').innerHTML=(pages[page]||pgNetWorth)();
+  // Init tabs
+  document.querySelectorAll('[data-tabs]').forEach(grp=>{
+    grp.querySelectorAll('.tbt').forEach(btn=>{
+      btn.onclick=()=>{
+        grp.querySelectorAll('.tbt').forEach(b=>b.classList.toggle('active',b===btn));
+        grp.querySelectorAll('.tpanel').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.tab));
+      };
+    });
+  });
+}
+
+// ═══ NET WORTH PAGE ═══
+function pgNetWorth(){
+  const nw=calcNetWorth();
+  const salon=getSalonData();
+  const xero=salon?.xeroSnapshot||{};
+  const assets=[
+    {label:'Salon Business (est. goodwill)',val:nw.salonEquity,color:'var(--green)',pct:nw.totalAssets?nw.salonEquity/nw.totalAssets*100:0},
+    {label:'Investment Property (equity)',val:nw.propEquity,color:'var(--amber)',pct:nw.totalAssets?nw.propEquity/nw.totalAssets*100:0},
+    {label:'Superannuation',val:nw.superBal,color:'var(--purple)',pct:nw.totalAssets?nw.superBal/nw.totalAssets*100:0},
+    {label:'Cash & Bank Accounts',val:nw.cashBal,color:'var(--teal)',pct:nw.totalAssets?nw.cashBal/nw.totalAssets*100:0},
+    {label:'Share Portfolio',val:nw.shareVal,color:'var(--gold)',pct:nw.totalAssets?nw.shareVal/nw.totalAssets*100:0},
+  ].filter(a=>a.val>0);
+  const cashflow=salon?{
+    income:xero.income||0,
+    expenses:xero.totalExpenses||0,
+    payroll:xero.ytdPayroll||0,
+    propIncome:D.properties.reduce((s,p)=>s+(parseFloat(p.rent||0)*52),0),
+    propExp:D.properties.reduce((s,p)=>s+(parseFloat(p.expenses||0)*52),0),
+    divs:D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)*parseFloat(sh.yield||0)/100),0),
+  }:{income:0,expenses:0,payroll:0,propIncome:0,propExp:0,divs:0};
+  const totalIncome=cashflow.income+cashflow.propIncome+cashflow.divs;
+  const totalExpenses=cashflow.expenses;
+  const netCashflow=totalIncome-totalExpenses;
+
+  return`
+    ${basiqStatusBadge()}
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat" style="--sc:var(--teal)"><div class="stat-val">${fmoney(nw.netWorth)}</div><div class="stat-lbl">Total Net Worth</div></div>
+      <div class="stat" style="--sc:var(--green)"><div class="stat-val">${fmoney(nw.totalAssets)}</div><div class="stat-lbl">Total Assets</div></div>
+      <div class="stat" style="--sc:var(--red)"><div class="stat-val">${fmoney(nw.totalLiabilities)}</div><div class="stat-lbl">Total Liabilities</div></div>
+      <div class="stat" style="--sc:${netCashflow>=0?'var(--green)':'var(--red)'}"><div class="stat-val" style="color:${netCashflow>=0?'var(--green)':'var(--red)'}">${fmoney(netCashflow)}</div><div class="stat-lbl">FY Net Cashflow</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <!-- Asset Breakdown -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Asset Allocation</div><span class="badge b-teal">${fmoney(nw.totalAssets)}</span></div>
+        <div class="card-body">
+          ${assets.length?assets.map(a=>`
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:12px;color:var(--text2)">${a.label}</span>
+                <span style="font-size:12px;font-weight:700;color:var(--text)">${fmoney(a.val)}</span>
+              </div>
+              <div class="pbar"><div class="pbar-fill" style="width:${a.pct.toFixed(1)}%;background:${a.color}"></div></div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">${a.pct.toFixed(1)}% of assets</div>
+            </div>`).join('')
+          :`<div class="empty" style="padding:1.5rem">Add assets across modules to see allocation</div>`}
+        </div>
+      </div>
+
+      <!-- Cashflow Summary -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Annual Cashflow</div><span class="badge ${netCashflow>=0?'b-green':'b-red'}">${fmoney(netCashflow)}</span></div>
+        <div class="card-body">
+          <div style="margin-bottom:10px">
+            <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Income Sources</div>
+            ${cashflow.income?`<div class="conn-line"><div class="conn-dot"></div><span>Salon Revenue</span><span style="margin-left:auto;font-weight:700;color:var(--green)">${fmoney(cashflow.income)}</span></div>`:''}
+            ${cashflow.propIncome?`<div class="conn-line"><div class="conn-dot" style="background:var(--amber)"></div><span>Rental Income</span><span style="margin-left:auto;font-weight:700;color:var(--amber)">${fmoney(cashflow.propIncome)}</span></div>`:''}
+            ${cashflow.divs?`<div class="conn-line"><div class="conn-dot" style="background:var(--gold)"></div><span>Dividends</span><span style="margin-left:auto;font-weight:700;color:var(--gold)">${fmoney(cashflow.divs)}</span></div>`:''}
+            ${!cashflow.income&&!cashflow.propIncome&&!cashflow.divs?`<div style="font-size:12px;color:var(--text3)">No income sources linked yet</div>`:''}
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Expenses</div>
+            ${cashflow.expenses?`<div class="conn-line"><div class="conn-dot" style="background:var(--red)"></div><span>Business Expenses</span><span style="margin-left:auto;font-weight:700;color:var(--red)">${fmoney(cashflow.expenses)}</span></div>`:''}
+            ${cashflow.payroll?`<div class="conn-line"><div class="conn-dot" style="background:var(--purple)"></div><span>Payroll (YTD)</span><span style="margin-left:auto;font-weight:700;color:var(--purple)">${fmoney(cashflow.payroll)}</span></div>`:''}
+            ${D.properties.reduce((s,p)=>s+parseFloat(p.expenses||0),0)?`<div class="conn-line"><div class="conn-dot" style="background:var(--amber)"></div><span>Property Expenses</span><span style="margin-left:auto;font-weight:700;color:var(--amber)">${fmoney(D.properties.reduce((s,p)=>s+(parseFloat(p.expenses||0)*52),0))}</span></div>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module Status Cards -->
+    <div class="card">
+      <div class="card-header"><div class="card-title">All Modules — Quick View</div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)">
+        ${[
+          {label:'Salon Business',val:fmoney(nw.salonEquity),sub:xero.income?'Rev '+fmoney(xero.income):' Click to view',color:'var(--green)',page:'business',icon:'✂'},
+          {label:'Investment Property',val:D.properties.length?fmoney(nw.propEquity):'Not added',sub:D.properties.length?D.properties[0].address?.split(',')[0]||'1 property':'Tap to add',color:'var(--amber)',page:'property',icon:'🏠'},
+          {label:'Superannuation',val:D.superFunds.length?fmoney(nw.superBal):'Not added',sub:D.superFunds.length?D.superFunds[0].fund||'Fund':'Tap to add',color:'var(--purple)',page:'super',icon:'🏦'},
+          {label:'Share Portfolio',val:D.shares.length?fmoney(nw.shareVal):'Not added',sub:D.shares.length?D.shares.length+' holdings':'Tap to add',color:'var(--gold)',page:'shares',icon:'📈'},
+          {label:'Personal Budget',val:D.budgetTx.length?fmoney(D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount||0),0)-D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount||0),0)):'Not tracked',sub:D.budgetTx.length?D.budgetTx.length+' transactions':'Tap to add',color:'var(--blue)',page:'budget',icon:'💳'},
+          {label:'Tax',val:'Overview',sub:'Business + Property',color:'var(--red)',page:'tax',icon:'📋'},
+          {label:'Goals',val:D.goals.length+' goals',sub:D.goals.filter(g=>g.progress>=g.target).length+' completed',color:'#ff6090',page:'goals',icon:'🎯'},
+          {label:'Xero',val:xero.period||'Not linked',sub:xero.lastUpdated?'Updated '+fds(xero.lastUpdated):'Link via Salon App',color:'#13b5ea',page:'business',icon:'X'},
+        ].map(m=>`
+          <div onclick="nav('${m.page}')" style="padding:16px;background:var(--bg2);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
+            <div style="font-size:18px;margin-bottom:6px">${m.icon}</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${m.label}</div>
+            <div style="font-size:15px;font-weight:700;color:${m.color}">${m.val}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${m.sub}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ═══ BUSINESS PAGE ═══
+function pgBusiness(){
+  const salon=getSalonData();
+  if(!salon)return`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">✂</div><p style="margin-bottom:8px">Salon app not linked</p><p style="font-size:12px;color:var(--text3)">Open the Salon App in the same browser to see data here</p><button class="btn btn-primary" style="margin-top:16px" onclick="window.open('salon.html','_blank')">Open Salon App ↗</button></div></div>`;
+  const xero=salon.xeroSnapshot||{};
+  const inc=xero.income||0,exp=xero.totalExpenses||0,profit=xero.netProfit||(inc-exp);
+  const ytdPay=xero.ytdPayroll||0;
+  const banks=xero.bankAccounts||[];
+  const payRuns=salon.xeroPayRuns||[];
+  const clients=salon.clients||[];
+  const appts=salon.appointments||[];
+  const completedAppts=appts.filter(a=>a.status==='completed');
+  const revenue=completedAppts.reduce((s,a)=>s+(parseFloat(a.price)||0),0);
+  const upAppts=appts.filter(a=>a.status==='upcoming'&&new Date(a.date+'T'+(a.time||'00:00'))>=new Date());
+
+  return`
+    <div class="alert alert-green" style="margin-bottom:16px">
+      <span>✓</span><span>Live data from <strong>Hair by Ivana</strong> salon app + Xero · ${clients.length} clients · ${appts.length} appointments on record</span>
+    </div>
+    <div class="stat-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stat"><div class="stat-val" style="color:var(--green)">${fmoney(inc||revenue)}</div><div class="stat-lbl">FY Revenue</div></div>
+      <div class="stat" style="--sc:var(--red)"><div class="stat-val" style="color:var(--red)">${fmoney(exp)}</div><div class="stat-lbl">FY Expenses</div></div>
+      <div class="stat" style="--sc:${profit>=0?'var(--green)':'var(--red)'}"><div class="stat-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${fmoney(profit)}</div><div class="stat-lbl">Net Profit</div></div>
+      <div class="stat" style="--sc:var(--purple)"><div class="stat-val">${fmoney(ytdPay)}</div><div class="stat-lbl">YTD Payroll</div></div>
+      <div class="stat" style="--sc:var(--blue)"><div class="stat-val">${clients.length}</div><div class="stat-lbl">Total Clients</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Xero — Bank Accounts</div></div>
+        ${banks.map(b=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+          <div><div style="font-size:13px;font-weight:600">${b.name}</div><div style="font-size:11px;color:var(--text3)">${b.bsb}</div></div>
+          <div style="text-align:right">
+            <div style="font-size:14px;font-weight:700;color:var(--green)">${fmoney(b.balance)}</div>
+            <div style="font-size:11px;color:var(--text3)">Stmt: ${fmoney(b.stmtBalance)}</div>
+            ${b.toReconcile?`<span class="badge b-amber" style="margin-top:4px">${b.toReconcile} unreconciled</span>`:''}
+          </div>
+        </div>`).join('')||'<div class="empty">No bank data</div>'}
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Upcoming Appointments</div><span class="badge b-blue">${upAppts.length}</span></div>
+        ${upAppts.slice(0,5).map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<div style="display:flex;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border)"><div style="font-size:12px"><div style="font-weight:600">${c?c.first+' '+(c.last||''):'Walk-in'}</div><div style="color:var(--text3)">${a.service}</div></div><div style="text-align:right;font-size:11px;color:var(--text3)">${a.date}<br>${a.time}</div></div>`;}).join('')||'<div class="empty">No upcoming</div>'}
+      </div>
+    </div>
+    <div class="card"><div class="card-header"><div class="card-title">Weekly Pay Run History (Xero)</div><span class="badge b-green">${payRuns.filter(p=>p.status==='Filed').length} weeks filed</span></div>
+      <div class="tw"><table><thead><tr><th>Period</th><th>Payment Date</th><th>Wages</th><th>Tax</th><th>Super</th><th>Net Pay</th><th>Status</th></tr></thead>
+        <tbody>${payRuns.slice(0,10).map(p=>`<tr><td>${p.period}</td><td>${fds(p.date)}</td><td style="color:var(--text)">${fmoney2(p.wages)}</td><td style="color:var(--red)">${fmoney2(p.tax)}</td><td style="color:var(--purple)">${fmoney2(p.super)}</td><td style="color:var(--green);font-weight:700">${fmoney2(p.net)}</td><td><span class="badge ${p.status==='Filed'?'b-teal':'b-amber'}">${p.status}</span></td></tr>`).join('')}
+        </tbody>
+      </table></div>
+    </div>`;
+}
+
+// ═══ PROPERTY PAGE ═══
+function pgProperty(){
+  const totalEquity=D.properties.reduce((s,p)=>s+(parseFloat(p.value)||0)-(parseFloat(p.loan)||0),0);
+  const totalValue=D.properties.reduce((s,p)=>s+(parseFloat(p.value)||0),0);
+  const totalLoan=D.properties.reduce((s,p)=>s+(parseFloat(p.loan)||0),0);
+  return`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      ${D.properties.length?`<div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin:0;flex:1;margin-right:16px">
+        <div class="stat" style="padding:12px"><div class="stat-val" style="font-size:18px">${fmoney(totalValue)}</div><div class="stat-lbl">Total Property Value</div></div>
+        <div class="stat" style="padding:12px;--sc:var(--red)"><div class="stat-val" style="font-size:18px;color:var(--red)">${fmoney(totalLoan)}</div><div class="stat-lbl">Total Loans</div></div>
+        <div class="stat" style="padding:12px;--sc:var(--amber)"><div class="stat-val" style="font-size:18px;color:var(--amber)">${fmoney(totalEquity)}</div><div class="stat-lbl">Total Equity</div></div>
+      </div>`:''}
+      <button class="btn btn-primary" onclick="om('mProperty')">+ Add Property</button>
+    </div>
+    ${!D.properties.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🏠</div><p style="margin-bottom:8px">No investment properties added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mProperty')">Add Your Property</button></div></div>`:''}
+    ${D.properties.map(p=>{
+      const val=parseFloat(p.value)||0;
+      const loan=parseFloat(p.loan)||0;
+      const equity=val-loan;
+      const loanPct=val?(loan/val*100):0;
+      // Use detailed figures from sheet if available, otherwise calculate
+      const annualIncome=parseFloat(p.adjustedIncome||p.annualRent)||(parseFloat(p.rent||0)*52);
+      const annualExpenses=parseFloat(p.totalAnnualExpenses)||(parseFloat(p.expenses||0)*52+(loan*(parseFloat(p.rate||0)/100)));
+      const annualLoanInt=parseFloat(p.loanInterest)||(loan*(parseFloat(p.rate||0)/100));
+      const netCashflow=annualIncome-annualExpenses;
+      const weeklyCF=netCashflow/52;
+      const grossYield=val?(annualIncome/val*100):0;
+      const netYield=val?(netCashflow/val*100):0;
+      const capitalGain=val-(parseFloat(p.purchasePrice)||val);
+      const isShep=p.id==='prop_shep1';
+      return`<div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="card-title">${p.address||'Investment Property'}</div>
+              ${isShep?`<span class="badge b-amber">Shepparton VIC · Single Lease</span><span class="badge b-blue">From Google Sheet</span>`:''}
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">${p.type||'House'} · Contract ${fds(p.contractDate||p.purchaseDate)} · ${p.daysToSettlement||42} days to settlement</div>
+          </div>
+          <div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="editProp('${p.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delProp('${p.id}')">×</button></div>
+        </div>
+
+        <!-- Top stats grid -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)">
+          ${[
+            {l:'Purchase Price',v:fmoney(p.purchasePrice||p.value),c:'var(--text)'},
+            {l:'Loan (88% LVR)',v:fmoney(loan),c:'var(--red)'},
+            {l:'Deposit Required',v:fmoney(p.deposit||equity),c:'var(--amber)'},
+            {l:'Equity',v:fmoney(equity),c:equity>=0?'var(--green)':'var(--red)'},
+            {l:'Weekly Rent',v:'$'+(parseFloat(p.rent||0).toFixed(2)),c:'var(--amber)'},
+            {l:'Weekly Net',v:(weeklyCF>=0?'+':'')+fmoney2(weeklyCF),c:weeklyCF>=0?'var(--green)':'var(--red)'},
+            {l:'Gross Yield',v:grossYield.toFixed(2)+'%',c:'var(--gold)'},
+            {l:'Net Yield',v:netYield.toFixed(2)+'%',c:netYield>=0?'var(--teal)':'var(--red)'},
+          ].map(s=>`<div style="padding:14px;background:var(--bg2)"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">${s.l}</div><div style="font-size:17px;font-weight:700;color:${s.c}">${s.v}</div></div>`).join('')}
+        </div>
+
+        <div class="card-body" data-tabs>
+          <div class="tabs" style="margin-bottom:14px">
+            <button class="tbt active" data-tab="pt-overview-${p.id}">Overview</button>
+            <button class="tbt" data-tab="pt-costs-${p.id}">Annual Costs</button>
+            <button class="tbt" data-tab="pt-cashflow-${p.id}">Cashflow</button>
+            ${isShep?`<button class="tbt" data-tab="pt-build-${p.id}">🏗 Build Tracker</button>`:''}
+            <button class="tbt" data-tab="pt-notes-${p.id}">Notes</button>
+          </div>
+
+          <div id="pt-overview-${p.id}" class="tpanel active">
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px"><span>LVR — ${loanPct.toFixed(1)}%</span><span>${loanPct>80?'⚠ High LVR':loanPct>60?'Moderate':'Good'}</span></div>
+              <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${Math.min(loanPct,100)}%;background:${loanPct>80?'var(--red)':loanPct>60?'var(--amber)':'var(--green)'}"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div><div class="shead">Loan Details</div>
+                <div class="ip"><div class="ip-lbl">Interest rate</div><div class="ip-val">${p.rate||6.4}% p.a.</div></div>
+                <div class="ip"><div class="ip-lbl">Loan type</div><div class="ip-val">${p.loanType||'P&I'}</div></div>
+                <div class="ip"><div class="ip-lbl">Loan term</div><div class="ip-val">${p.loanTerm||30} years</div></div>
+                <div class="ip"><div class="ip-lbl">Annual interest</div><div class="ip-val" style="color:var(--red)">${fmoney(annualLoanInt)}</div></div>
+              </div>
+              <div><div class="shead">Rental</div>
+                <div class="ip"><div class="ip-lbl">Gross annual rent</div><div class="ip-val" style="color:var(--amber)">${fmoney(p.grossAnnualRent||annualIncome)}</div></div>
+                <div class="ip"><div class="ip-lbl">Vacancy allowance</div><div class="ip-val">${p.vacancyRate||1.1}%</div></div>
+                <div class="ip"><div class="ip-lbl">Adjusted income</div><div class="ip-val">${fmoney(p.adjustedIncome||annualIncome)}</div></div>
+                <div class="ip"><div class="ip-lbl">PM fee</div><div class="ip-val">${fmoney(p.propertyMgmt||0)}/yr (6%)</div></div>
+              </div>
+              <div><div class="shead">Purchase Costs</div>
+                <div class="ip"><div class="ip-lbl">PttB engagement</div><div class="ip-val">${fmoney(p.pttbEngagementFee||3300)}</div></div>
+                <div class="ip"><div class="ip-lbl">B&P inspection</div><div class="ip-val">${fmoney(p.buildingPestInspection||600)}</div></div>
+                <div class="ip"><div class="ip-lbl">Deposit paid</div><div class="ip-val">${fmoney(p.deposit||82800)}</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pt-costs-${p.id}" class="tpanel">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <div class="shead">Annual Expenses (from sheet)</div>
+                ${[
+                  ['Loan Interest (6.40%)',p.loanInterest||36897.61,'var(--red)'],
+                  ['Property Management (6%)',p.propertyMgmt||1871.55,'var(--text2)'],
+                  ['Building & Landlord Insurance',p.buildingInsurance||1900,'var(--text2)'],
+                  ['Council Rates + Water (est.)',p.councilRates||3000,'var(--text2)'],
+                  ['Maintenance Allowance',p.maintenanceAllowance||1000,'var(--text2)'],
+                  ['Land Tax',p.landTax||1400,'var(--text2)'],
+                  ['Yard Maintenance',p.yardMaintenance||0,'var(--text2)'],
+                ].map(([lbl,amt,c])=>`<div class="ip"><div class="ip-lbl">${lbl}</div><div class="ip-val" style="color:${c}">${fmoney(amt)}</div></div>`).join('')}
+                <div class="divider"></div>
+                <div class="ip"><div class="ip-lbl" style="font-weight:700;color:var(--text)">Total Annual Expenses</div><div class="ip-val" style="color:var(--red);font-size:16px;font-weight:700">${fmoney(p.totalAnnualExpenses||44669)}</div></div>
+              </div>
+              <div>
+                <div class="shead">Annual Income</div>
+                <div class="ip"><div class="ip-lbl">Gross rental income</div><div class="ip-val" style="color:var(--amber)">${fmoney(p.grossAnnualRent||32500)}</div></div>
+                <div class="ip"><div class="ip-lbl">Less vacancy (${p.vacancyRate||1.1}%)</div><div class="ip-val" style="color:var(--red)">-${fmoney((parseFloat(p.grossAnnualRent||32500)*parseFloat(p.vacancyRate||1.1)/100).toFixed(0))}</div></div>
+                <div class="ip"><div class="ip-lbl">Adjusted income</div><div class="ip-val" style="color:var(--green)">${fmoney(p.adjustedIncome||31192)}</div></div>
+                <div class="divider"></div>
+                <div class="ip"><div class="ip-lbl" style="font-weight:700;color:var(--text)">Net Annual Cashflow</div><div class="ip-val" style="color:var(--red);font-size:16px;font-weight:700">${fmoney(netCashflow)}</div></div>
+                <div class="ip"><div class="ip-lbl">Per week</div><div class="ip-val" style="color:var(--red)">${fmoney2(weeklyCF)}/wk</div></div>
+                <div style="margin-top:12px" class="alert alert-amber">Negatively geared — tax deductions apply. Estimated tax saving depends on your marginal tax rate.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="pt-cashflow-${p.id}" class="tpanel">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div>
+                <div class="shead">Weekly Cashflow Summary</div>
+                <div class="ip"><div class="ip-lbl">Weekly rent</div><div class="ip-val" style="color:var(--amber)">+${fmoney2(p.rent||625)}</div></div>
+                <div class="ip"><div class="ip-lbl">Less vacancy</div><div class="ip-val" style="color:var(--red)">-${fmoney2((parseFloat(p.rent||625)*parseFloat(p.vacancyRate||1.1)/100).toFixed(2))}</div></div>
+                <div class="ip"><div class="ip-lbl">Less interest</div><div class="ip-val" style="color:var(--red)">-${fmoney2((annualLoanInt/52).toFixed(2))}</div></div>
+                <div class="ip"><div class="ip-lbl">Less PM fee</div><div class="ip-val" style="color:var(--red)">-${fmoney2((parseFloat(p.propertyMgmt||1871)/52).toFixed(2))}</div></div>
+                <div class="ip"><div class="ip-lbl">Less other expenses</div><div class="ip-val" style="color:var(--red)">-${fmoney2(((parseFloat(p.totalAnnualExpenses||44669)-annualLoanInt-parseFloat(p.propertyMgmt||1871))/52).toFixed(2))}</div></div>
+                <div class="divider"></div>
+                <div class="ip"><div class="ip-lbl" style="font-weight:700">Net weekly</div><div class="ip-val" style="color:var(--red);font-size:18px;font-weight:700">${fmoney2(weeklyCF)}/wk</div></div>
+              </div>
+              <div>
+                <div class="shead">10-Year Capital Growth Projection</div>
+                ${[3,5,7,10].map(yrs=>{
+                  const proj=val*Math.pow(1.055,yrs); // assume 5.5% p.a. growth
+                  const projEquity=proj-loan;
+                  return`<div class="ip"><div class="ip-lbl">In ${yrs} years (5.5% p.a.)</div><div class="ip-val"><span style="color:var(--green)">${fmoney(proj)}</span><span style="color:var(--text3);font-size:11px;margin-left:6px">equity ${fmoney(projEquity)}</span></div></div>`;
+                }).join('')}
+                <div class="alert alert-blue" style="margin-top:10px">Capital growth projections are estimates only. Past performance is not indicative of future results.</div>
+              </div>
+            </div>
+          </div>
+
+
+          ${isShep?`<div id="pt-build-${p.id}" class="tpanel">
+            <!-- Build progress banner -->
+            <div style="background:linear-gradient(135deg,#1a2a1a,#1a2030);border:1px solid var(--green);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:4px">Build Status</div>
+                <div style="font-size:20px;font-weight:700;color:var(--text)">Occupancy Permit Issued ✓</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:3px">24 March 2026 · Permit No. 3983618599490 · Final inspection complete</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:11px;color:var(--text3)">Paid to date</div>
+                <div style="font-size:22px;font-weight:700;color:var(--green)">$375,617</div>
+                <div style="font-size:11px;color:var(--amber)">Final due: $41,457</div>
+              </div>
+            </div>
+
+            <!-- Payment stages progress -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header"><div class="card-title">SR Homes Progress Payments · Contract 350136</div><span class="badge b-green">$375,617 of $417,074 paid</span></div>
+              <div style="padding:14px 0">
+                ${[
+                  {stage:'S:00',name:'Deposit',desc:'Contract signed',date:'11 Mar 2025',amount:20728.70,paid:true,receipt:'111703'},
+                  {stage:'S:01',name:'Base Stage',desc:'Concrete slab poured',date:'25 Sep 2025',amount:62186.10,paid:true,receipt:'121919'},
+                  {stage:'S:02',name:'Frame Stage',desc:'Timber walls & trusses',date:'13 Oct 2025',amount:103643.50,paid:true,receipt:'122669'},
+                  {stage:'S:03',name:'Lockup Stage',desc:'Bricks, roof, windows & sliding doors',date:'5 Dec 2025',amount:103643.50,paid:true,receipt:'125398'},
+                  {stage:'S:04',name:'Fix Stage',desc:'Plaster, skirtings, kitchen & bathroom cabinetry',date:'5 Dec 2025',amount:82914.80,paid:true,receipt:'125399'},
+                  {stage:'V:03',name:'Variation — Colourboard',desc:'PCV3 colour change',date:'15 Dec 2025',amount:2500.00,paid:true,receipt:'125714'},
+                  {stage:'S:05',name:'Final Stage',desc:'Final items · Occupancy permit issued 24 Mar 2026',date:'Due ~May 2026',amount:41457.40,paid:false,receipt:''},
+                ].map((s,i)=>{
+                  const bg = s.paid ? '' : ';background:rgba(255,171,64,.05)';
+                  const circleBg = s.paid ? 'var(--green-dim)' : 'var(--amber-dim)';
+                  const circleCol = s.paid ? 'var(--green)' : 'var(--amber)';
+                  const border = s.paid ? '' : 'border:1px solid var(--amber);';
+                  const amtCol = s.paid ? 'var(--green)' : 'var(--amber)';
+                  const badge = s.paid ? 'b-green' : 'b-amber';
+                  const badgeTxt = s.paid ? 'Paid ✓' : 'Outstanding';
+                  const icon = s.paid ? '✓' : '!';
+                  return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)'+bg+'">'
+                    +'<div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:'+circleBg+';color:'+circleCol+';'+border+'">'+icon+'</div>'
+                    +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">'+s.name+'</div><div style="font-size:11px;color:var(--text3)">'+s.desc+'</div></div>'
+                    +'<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:700;color:'+amtCol+'">$'+s.amount.toLocaleString('en-AU',{minimumFractionDigits:2})+'</div>'
+                    +'<div style="font-size:10px;color:var(--text3)">'+s.date+(s.receipt?' · Inv '+s.receipt:'')+'</div></div>'
+                    +'<span class="badge '+badge+'" style="flex-shrink:0">'+badgeTxt+'</span></div>';
+                }).join('')}
+                <!-- Total bar -->
+                <div style="padding:14px 16px">
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px"><span>Payment progress</span><span>$375,617 / $417,074</span></div>
+                  <div class="pbar" style="height:10px"><div class="pbar-fill" style="width:${(375616.60/417074*100).toFixed(1)}%;background:var(--green)"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px"><span>${(375616.60/417074*100).toFixed(1)}% paid</span><span>$41,457 remaining</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Key contacts & permit details -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="card">
+                <div class="card-header"><div class="card-title">Build Permits & Certificates</div></div>
+                <div class="card-body">
+                  <div class="ip"><div class="ip-lbl">Building Permit No.</div><div class="ip-val">3983618599490</div></div>
+                  <div class="ip"><div class="ip-lbl">Permit issued</div><div class="ip-val">20 August 2025</div></div>
+                  <div class="ip"><div class="ip-lbl">Must commence by</div><div class="ip-val">20 August 2026</div></div>
+                  <div class="ip"><div class="ip-lbl">Must complete by</div><div class="ip-val">20 August 2027</div></div>
+                  <div class="ip"><div class="ip-lbl">Occupancy Permit</div><div class="ip-val" style="color:var(--green)">✓ Issued 24 March 2026</div></div>
+                  <div class="ip"><div class="ip-lbl">Final inspection</div><div class="ip-val" style="color:var(--green)">✓ 24 March 2026</div></div>
+                  <div class="ip"><div class="ip-lbl">Job Number</div><div class="ip-val">25/02478</div></div>
+                  <div class="ip"><div class="ip-lbl">Insurance policy</div><div class="ip-val">C951289 · Bovill Risk</div></div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-header"><div class="card-title">Key Contacts</div></div>
+                <div class="card-body">
+                  <div class="ip"><div class="ip-lbl">Builder</div><div class="ip-val">SR Homes / Royston Homes<br><span style="font-size:10px;color:var(--text3)">1300 188 668 · ABN 16-643-554-590</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Site contact</div><div class="ip-val">Sheri Hills · 8390 1000<br><span style="font-size:10px;color:var(--text3)">shills@sherridonhomes.com.au</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Surveyor</div><div class="ip-val">Watershed Building Consultants<br><span style="font-size:10px;color:var(--text3)">CBS-U 65767 · 03 9791 3355</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Struct. engineer</div><div class="ip-val">Matthew Borzillo · Intrax<br><span style="font-size:10px;color:var(--text3)">PE0003026</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Buyers agent</div><div class="ip-val">PttB · Absolute Investments</div></div>
+                  <div class="ip"><div class="ip-lbl">Council</div><div class="ip-val">Greater Shepparton City Council</div></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cost summary from Excel -->
+            <div class="card" style="margin-top:16px">
+              <div class="card-header"><div class="card-title">Total Investment Summary (from Excel tracker)</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border)">
+                ${[
+                  {l:'Land Price',v:'$280,000',c:'var(--text)'},
+                  {l:'Build Contract',v:'$414,574',c:'var(--text)'},
+                  {l:'Variation (Colourboard)',v:'$2,500',c:'var(--amber)'},
+                  {l:'PttB Retainer',v:'$3,000',c:'var(--text2)'},
+                  {l:'PttB Commission',v:'$10,000',c:'var(--text2)'},
+                  {l:'Stamp Duty',v:'$11,840',c:'var(--text2)'},
+                  {l:'Legal Fees',v:'$900',c:'var(--text2)'},
+                  {l:'TOTAL INVESTMENT',v:'$722,814',c:'var(--gold)'},
+                ].map(s=>`<div style="padding:12px 16px;background:var(--bg2)"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">${s.l}</div><div style="font-size:14px;font-weight:700;color:${s.c}">${s.v}</div></div>`).join('')}
+              </div>
+            </div>
+          </div>`:''}
+
+          <div id="pt-notes-${p.id}" class="tpanel">
+            ${p.notes?`<div style="background:var(--bg3);padding:14px;border-radius:var(--radius-sm);font-size:12px;color:var(--text2);white-space:pre-wrap;line-height:1.7">${p.notes}</div>`:'<div class="empty">No notes</div>'}
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+// ═══ SUPER PAGE ═══
+function pgSuper(){
+  const salon=getSalonData();
+  const xeroPayroll=salon?.xeroSnapshot?.ytdPayroll||75049.06;
+  const ivanaSuperYTD=xeroPayroll*(11.5/100);
+
+  // Combined totals
+  const totalBal=D.superFunds.reduce((s,f)=>s+(parseFloat(f.balance)||0),0);
+  const totalTarget=D.superFunds.reduce((s,f)=>s+(parseFloat(f.target)||0),0);
+  // Project combined future value
+  function projectFV(bal,annual,rate,years){let fv=parseFloat(bal)||0;for(let i=0;i<years;i++)fv=(fv+(parseFloat(annual)||0))*(1+(parseFloat(rate)||8)/100);return Math.round(fv);}
+  const totalProjected=D.superFunds.reduce((s,f)=>s+projectFV(f.balance,(parseFloat(f.empContrib||0)+parseFloat(f.persContrib||0)),f.returnRate,Math.max(0,(parseInt(f.retAge)||67)-(parseInt(f.age)||40))),0);
+  const colors=['var(--purple)','#e040fb88'];
+
+  return`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin:0;flex:1;margin-right:16px">
+        <div class="stat" style="padding:12px;--sc:var(--purple)"><div class="stat-val" style="font-size:18px;color:var(--purple)">${fmoney(totalBal)}</div><div class="stat-lbl">Combined Balance</div></div>
+        <div class="stat" style="padding:12px;--sc:var(--green)"><div class="stat-val" style="font-size:18px;color:var(--green)">${fmoney(totalProjected)}</div><div class="stat-lbl">Combined Projection</div></div>
+        <div class="stat" style="padding:12px;--sc:var(--teal)"><div class="stat-val" style="font-size:18px;color:var(--teal)">${fmoney(ivanaSuperYTD)}</div><div class="stat-lbl">Super from Xero (YTD)</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="om('mSuper')">+ Add Fund</button>
+    </div>
+
+    ${!D.superFunds.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🏦</div><p>No super funds added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mSuper')">Add Super Fund</button></div></div>`:''}
+
+    <!-- Combined progress bar -->
+    ${D.superFunds.length>=2?`<div class="card" style="margin-bottom:16px">
+      <div class="card-header"><div class="card-title">Combined Household Superannuation</div><span class="badge b-purple">${D.superFunds.length} funds</span></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center">
+          <div>
+            ${D.superFunds.map((f,i)=>{
+              const bal=parseFloat(f.balance)||0;
+              const target=parseFloat(f.target)||1;
+              const pct=Math.min(100,bal/target*100);
+              const col=i===0?'var(--purple)':'#a855f7';
+              return`<div style="margin-bottom:14px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                  <span style="font-size:13px;font-weight:600;color:var(--text)">${f.owner||f.fund}</span>
+                  <span style="font-size:12px;font-weight:700;color:${col}">${fmoney(bal)}</span>
+                </div>
+                <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${pct}%;background:${col}"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px">
+                  <span>${pct.toFixed(0)}% of target ${fmoney(f.target)}</span>
+                  <span>${f.age} yrs old · retire at ${f.retAge}</span>
+                </div>
+              </div>`;
+            }).join('')}
+            <div class="divider"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:12px;color:var(--text2)">Combined target</span>
+              <span style="font-size:15px;font-weight:700;color:var(--purple)">${fmoney(totalTarget)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+              <span style="font-size:12px;color:var(--text2)">Combined projected</span>
+              <span style="font-size:15px;font-weight:700;color:var(--green)">${fmoney(totalProjected)}</span>
+            </div>
+            ${totalProjected>=totalTarget?`<span class="badge b-green" style="margin-top:8px">Combined on track ✓</span>`:`<div style="margin-top:8px"><span class="badge b-amber">Combined gap: ${fmoney(totalTarget-totalProjected)}</span></div>`}
+          </div>
+          <div style="text-align:center">
+            <!-- Dual ring chart -->
+            <div style="position:relative;width:180px;height:180px;margin:0 auto">
+              <svg viewBox="0 0 180 180" width="180" height="180" style="transform:rotate(-90deg)">
+                <!-- Outer ring: David -->
+                <circle cx="90" cy="90" r="78" fill="none" stroke="var(--bg4)" stroke-width="12"/>
+                <circle cx="90" cy="90" r="78" fill="none" stroke="var(--purple)" stroke-width="12"
+                  stroke-dasharray="${2*Math.PI*78}"
+                  stroke-dashoffset="${2*Math.PI*78*(1-Math.min(100,parseFloat(D.superFunds[0]?.balance||0)/parseFloat(D.superFunds[0]?.target||1)*100)/100)}"
+                  stroke-linecap="round"/>
+                <!-- Inner ring: Ivana -->
+                <circle cx="90" cy="90" r="60" fill="none" stroke="var(--bg4)" stroke-width="12"/>
+                <circle cx="90" cy="90" r="60" fill="none" stroke="#a855f7" stroke-width="12"
+                  stroke-dasharray="${2*Math.PI*60}"
+                  stroke-dashoffset="${2*Math.PI*60*(1-Math.min(100,parseFloat(D.superFunds[1]?.balance||0)/parseFloat(D.superFunds[1]?.target||1)*100)/100)}"
+                  stroke-linecap="round"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div style="font-family:var(--font-display);font-size:20px;color:var(--text)">${fmoney(totalBal)}</div>
+                <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">combined</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:center;gap:16px;margin-top:10px;font-size:11px">
+              <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:50%;background:var(--purple)"></div> ${D.superFunds[0]?.owner||'You'}</div>
+              <div style="display:flex;align-items:center;gap:4px"><div style="width:8px;height:8px;border-radius:50%;background:#a855f7"></div> ${D.superFunds[1]?.owner||'Partner'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`:''}
+
+    <!-- Individual fund cards -->
+    ${D.superFunds.map((f,fi)=>{
+      const bal=parseFloat(f.balance)||0;
+      const empCont=parseFloat(f.empContrib)||0;
+      const persCont=parseFloat(f.persContrib)||0;
+      const returnRate=parseFloat(f.returnRate)||8;
+      const age=parseInt(f.age)||40;
+      const retAge=parseInt(f.retAge)||67;
+      const target=parseFloat(f.target)||1000000;
+      const years=Math.max(0,retAge-age);
+      const annual=empCont+persCont;
+      const fv=projectFV(bal,annual,returnRate,years);
+      const currentPct=Math.min(100,bal/target*100);
+      const projPct=Math.min(100,fv/target*100);
+      const col=fi===0?'var(--purple)':'#a855f7';
+      const isIvana=f.id==='super_ivana';
+      return`<div class="card" style="margin-bottom:16px;border-left:3px solid ${col}">
+        <div class="card-header">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="card-title">${f.owner||f.fund} — ${f.fund}</div>
+              ${isIvana?`<span class="badge b-green">Xero linked</span>`:''}
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">Member #${f.member||'—'} · ${f.option||'Balanced'} · Age ${age} → retire ${retAge} (${years} yrs)</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-sm" onclick="editSuper('${f.id}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="delSuper('${f.id}')">×</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-bottom:16px">
+            ${[
+              {l:'Current Balance',v:fmoney(bal),c:col},
+              {l:'Annual Contributions',v:fmoney(annual),c:'var(--text)'},
+              {l:'Projected at '+retAge,v:fmoney(fv),c:'var(--green)'},
+              {l:'Target',v:fmoney(target),c:'var(--text3)'},
+            ].map(s=>`<div style="padding:12px;background:var(--bg2)"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">${s.l}</div><div style="font-size:16px;font-weight:700;color:${s.c}">${s.v}</div></div>`).join('')}
+          </div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;align-items:start">
+            <div>
+              <div class="ip"><div class="ip-lbl">Employer contributions</div><div class="ip-val">${fmoney(empCont)}/yr (11.5%)</div></div>
+              <div class="ip"><div class="ip-lbl">Personal contributions</div><div class="ip-val">${fmoney(persCont)}/yr</div></div>
+              <div class="ip"><div class="ip-lbl">Expected return</div><div class="ip-val">${returnRate}% p.a.</div></div>
+              <div class="ip"><div class="ip-lbl">Investment option</div><div class="ip-val">${f.option||'Balanced'}</div></div>
+              ${isIvana?`<div class="ip"><div class="ip-lbl">Super from Xero YTD</div><div class="ip-val" style="color:var(--green)">${fmoney(ivanaSuperYTD)} <span style="font-size:10px;color:var(--text3)">(11.5% of $75,049)</span></div></div>`:''}
+              <div class="divider"></div>
+              <div style="margin-bottom:8px">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+                  <span>Progress to target (current)</span><span>${currentPct.toFixed(1)}%</span>
+                </div>
+                <div class="pbar"><div class="pbar-fill" style="width:${currentPct}%;background:${col}"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+                  <span>Projected at retirement</span><span>${projPct.toFixed(1)}%</span>
+                </div>
+                <div class="pbar"><div class="pbar-fill" style="width:${projPct}%;background:var(--green);opacity:.5"></div></div>
+              </div>
+              ${fv>=target?`<div class="alert alert-green" style="margin-top:10px">On track ✓ Projected ${fmoney(fv)} exceeds target ${fmoney(target)}</div>`:`<div class="alert alert-amber" style="margin-top:10px">Gap of ${fmoney(target-fv)} to reach target. Consider increasing contributions.</div>`}
+              ${f.notes?`<div style="margin-top:10px;background:var(--bg3);padding:10px;border-radius:var(--radius-sm);font-size:11px;color:var(--text3)">${f.notes}</div>`:''}
+            </div>
+            <div>
+              <!-- Mini projection table -->
+              <div class="shead">Growth Milestones</div>
+              ${[5,10,15,20,years].filter((v,i,a)=>a.indexOf(v)===i&&v>0&&v<=years).map(y=>{
+                const proj=projectFV(bal,annual,returnRate,y);
+                return`<div class="ip" style="padding:6px 0"><div class="ip-lbl">In ${y} yrs</div><div class="ip-val" style="color:${col};font-size:12px">${fmoney(proj)}</div></div>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+
+// ═══ BUDGET PAGE ═══
+function pgBudget(){
+  const inc=D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const exp=D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
+  const net=inc-exp;
+  // Group expenses by category
+  const cats={};
+  D.budgetTx.filter(t=>t.type==='expense').forEach(t=>{cats[t.category]=(cats[t.category]||0)+(parseFloat(t.amount)||0)});
+  const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  const manualAccts = D.manualAccounts||[];
+  const lastSync = D.manualSyncTime ? new Date(D.manualSyncTime).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : null;
+  return`
+    ${manualAccts.length?`
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header">
+        <div class="card-title">Bank Accounts</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${lastSync?`<span style="font-size:11px;color:var(--text3)">Updated ${lastSync}</span>`:''}
+          <button class="btn btn-outline btn-sm" onclick="openSync()">⚡ Update</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--border)">
+        ${manualAccts.map(a=>`
+          <div style="padding:14px;background:var(--bg2)">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${a.name}</div>
+            <div style="font-size:18px;font-weight:700;color:var(--green)">$${(parseFloat(a.balance)||0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:3px">${a.institution||''}</div>
+          </div>`).join('')}
+        <div style="padding:14px;background:var(--bg3)">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">Total Cash</div>
+          <div style="font-size:18px;font-weight:700;color:var(--teal)">$${manualAccts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0).toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">across ${manualAccts.length} accounts</div>
+        </div>
+      </div>
+    </div>`
+    :`<div style="display:flex;align-items:center;gap:10px;background:rgba(19,181,234,.08);border:1px solid rgba(19,181,234,.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px">
+      <span style="font-size:16px">⚡</span>
+      <span style="color:var(--text2)">Add your account balances for an accurate picture of your cash position</span>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto;white-space:nowrap" onclick="openSync()">Add Accounts →</button>
+    </div>`}
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat"><div class="stat-val" style="color:var(--green)">${fmoney(inc)}</div><div class="stat-lbl">Total Income</div></div>
+      <div class="stat" style="--sc:var(--red)"><div class="stat-val" style="color:var(--red)">${fmoney(exp)}</div><div class="stat-lbl">Total Expenses</div></div>
+      <div class="stat" style="--sc:${net>=0?'var(--green)':'var(--red)'}"><div class="stat-val" style="color:${net>=0?'var(--green)':'var(--red)'}">${fmoney(net)}</div><div class="stat-lbl">Net Savings</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Spending by Category</div></div>
+        <div class="card-body">
+          ${sorted.slice(0,8).map(([cat,amt])=>`
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                <span style="font-size:12px;color:var(--text2)">${cat}</span>
+                <span style="font-size:12px;font-weight:700">${fmoney(amt)}</span>
+              </div>
+              <div class="pbar"><div class="pbar-fill" style="width:${exp?(amt/exp*100).toFixed(0):0}%;background:var(--blue)"></div></div>
+            </div>`).join('')}
+          ${!sorted.length?'<div class="empty" style="padding:1rem">No expenses recorded</div>':''}
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Recent Transactions</div><button class="btn btn-primary btn-sm" onclick="om('mBudget')">+ Add</button></div>
+        ${[...D.budgetTx].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(t=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border)">
+            <div><div style="font-size:12px;font-weight:600;color:var(--text)">${t.description||t.category}</div><div style="font-size:10px;color:var(--text3)">${fds(t.date)} · ${t.category}</div></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:13px;font-weight:700;color:${t.type==='income'?'var(--green)':'var(--red)'}">${t.type==='income'?'+':'-'}${fmoney2(t.amount)}</span>
+              <button class="btn btn-ghost btn-sm btn-icon" onclick="delBudgetTx('${t.id}')">×</button>
+            </div>
+          </div>`).join('')||'<div class="empty">No transactions yet</div>'}
+      </div>
+    </div>
+  `;
+}
+
+// ═══ SHARES PAGE ═══
+function pgShares(){
+  const totalVal=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)),0);
+  const totalCost=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.buyPrice||0)),0);
+  const totalGain=totalVal-totalCost;
+  const totalDivs=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)*parseFloat(sh.yield||0)/100),0);
+  return`
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat"><div class="stat-val" style="color:var(--gold)">${fmoney(totalVal)}</div><div class="stat-lbl">Portfolio Value</div></div>
+      <div class="stat" style="--sc:var(--green)"><div class="stat-val" style="color:${totalGain>=0?'var(--green)':'var(--red)'}">${fmoney(totalGain)}</div><div class="stat-lbl">Total Gain/Loss</div></div>
+      <div class="stat" style="--sc:var(--teal)"><div class="stat-val">${fmoney(totalDivs)}</div><div class="stat-lbl">Annual Dividends (est.)</div></div>
+      <div class="stat" style="--sc:var(--blue)"><div class="stat-val">${D.shares.length}</div><div class="stat-lbl">Holdings</div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn btn-primary" onclick="om('mShare')">+ Add Holding</button></div>
+    <div class="card">
+      <div class="tw"><table>
+        <thead><tr><th>Ticker</th><th>Type</th><th>Units</th><th>Buy Price</th><th>Current</th><th>Value</th><th>Gain/Loss</th><th>Yield</th><th>Platform</th><th></th></tr></thead>
+        <tbody>
+          ${D.shares.map(sh=>{
+            const val=(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0));
+            const cost=(parseFloat(sh.units||0)*parseFloat(sh.buyPrice||0));
+            const gain=val-cost;
+            const gainPct=cost?(gain/cost*100):0;
+            return`<tr>
+              <td style="font-weight:700;color:var(--gold)">${sh.ticker||'—'}</td>
+              <td><span class="badge b-grey">${sh.type||'Stock'}</span></td>
+              <td>${parseFloat(sh.units||0).toLocaleString()}</td>
+              <td>${fmoney2(sh.buyPrice)}</td>
+              <td>${fmoney2(sh.currentPrice)}</td>
+              <td style="font-weight:700;color:var(--text)">${fmoney(val)}</td>
+              <td style="font-weight:700;color:${gain>=0?'var(--green)':'var(--red)'}">${gain>=0?'+':''}${fmoney(gain)}<br><span style="font-size:10px">${gainPct>=0?'+':''}${gainPct.toFixed(1)}%</span></td>
+              <td style="color:var(--teal)">${sh.yield||0}%</td>
+              <td style="font-size:11px;color:var(--text3)">${sh.platform||'—'}</td>
+              <td><button class="btn btn-ghost btn-sm btn-icon" onclick="delShare('${sh.id}')">×</button></td>
+            </tr>`;
+          }).join('')||`<tr><td colspan="10" class="empty" style="padding:2rem">No holdings yet — add your first</td></tr>`}
+          ${D.shares.length?`<tr class="tfoot"><td colspan="5">Totals</td><td>${fmoney(totalVal)}</td><td style="color:${totalGain>=0?'var(--green)':'var(--red)'}">${totalGain>=0?'+':''}${fmoney(totalGain)}</td><td>${fmoney(totalDivs)}/yr</td><td colspan="2"></td></tr>`:''}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+}
+
+// ═══ TAX PAGE ═══
+function pgTax(){
+  const salon=getSalonData();
+  const xero=salon?.xeroSnapshot||{};
+  const inc=xero.income||0;
+  const exp=xero.totalExpenses||0;
+  const profit=inc-exp;
+  // Rental income/loss
+  const rentalInc=D.properties.reduce((s,p)=>s+(parseFloat(p.rent||0)*52),0);
+  const rentalExp=D.properties.reduce((s,p)=>s+(parseFloat(p.expenses||0)*52+(parseFloat(p.loan||0)*parseFloat(p.rate||0)/100)),0);
+  const rentalPL=rentalInc-rentalExp;
+  // Dividend income
+  const divInc=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)*parseFloat(sh.yield||0)/100),0);
+  // Taxable income (rough estimate)
+  const taxableIncome=Math.max(0,profit+rentalPL+divInc);
+  // Australian tax brackets 2025-26
+  function calcTax(inc){
+    if(inc<=18200)return 0;
+    if(inc<=45000)return(inc-18200)*0.19;
+    if(inc<=120000)return5092+(inc-45000)*0.325;
+    if(inc<=180000)return29467+(inc-120000)*0.37;
+    return51667+(inc-180000)*0.45;
+  }
+  const incomeTax=calcTax(taxableIncome);
+  const medicareLevy=taxableIncome*0.02;
+  const totalTax=incomeTax+medicareLevy;
+  const gstCollected=inc/11;
+  const gstPaid=exp/11;
+  const gstOwing=Math.max(0,gstCollected-gstPaid);
+  const payg=xero.ytdPayroll?xero.ytdPayroll*0.19:0;
+  return`
+    <div class="alert alert-amber" style="margin-bottom:16px">⚠ Estimated figures only — always consult your accountant. Based on Xero data + your entered asset details.</div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat" style="--sc:var(--red)"><div class="stat-val" style="color:var(--red)">${fmoney(totalTax)}</div><div class="stat-lbl">Est. Income Tax</div></div>
+      <div class="stat" style="--sc:var(--amber)"><div class="stat-val" style="color:var(--amber)">${fmoney(gstOwing)}</div><div class="stat-lbl">GST Owing</div></div>
+      <div class="stat" style="--sc:var(--purple)"><div class="stat-val" style="color:var(--purple)">${fmoney(payg)}</div><div class="stat-lbl">PAYG Withholding</div></div>
+      <div class="stat" style="--sc:var(--blue)"><div class="stat-val" style="color:var(--blue)">${fmoney(taxableIncome)}</div><div class="stat-lbl">Taxable Income (est.)</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Income Summary</div></div>
+        <div class="card-body">
+          <div class="ip"><div class="ip-lbl">Business profit</div><div class="ip-val" style="color:${profit>=0?'var(--green)':'var(--red)'}">${fmoney(profit)}</div></div>
+          <div class="ip"><div class="ip-lbl">Rental income/loss</div><div class="ip-val" style="color:${rentalPL>=0?'var(--green)':'var(--red)'}">${fmoney(rentalPL)}</div></div>
+          <div class="ip"><div class="ip-lbl">Dividend income</div><div class="ip-val" style="color:var(--gold)">${fmoney(divInc)}</div></div>
+          <div class="divider"></div>
+          <div class="ip"><div class="ip-lbl">Taxable income</div><div class="ip-val" style="font-size:16px;color:var(--text)">${fmoney(taxableIncome)}</div></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-header"><div class="card-title">Tax Breakdown</div></div>
+        <div class="card-body">
+          <div class="ip"><div class="ip-lbl">Income tax</div><div class="ip-val" style="color:var(--red)">${fmoney(incomeTax)}</div></div>
+          <div class="ip"><div class="ip-lbl">Medicare levy (2%)</div><div class="ip-val" style="color:var(--red)">${fmoney(medicareLevy)}</div></div>
+          <div class="ip"><div class="ip-lbl">Effective tax rate</div><div class="ip-val">${taxableIncome?(totalTax/taxableIncome*100).toFixed(1)+'%':'0%'}</div></div>
+          <div class="divider"></div>
+          <div class="ip"><div class="ip-lbl">GST collected</div><div class="ip-val">${fmoney(gstCollected)}</div></div>
+          <div class="ip"><div class="ip-lbl">GST paid (credits)</div><div class="ip-val">${fmoney(gstPaid)}</div></div>
+          <div class="ip"><div class="ip-lbl">Net GST owing</div><div class="ip-val" style="color:var(--amber);font-weight:700">${fmoney(gstOwing)}</div></div>
+          <div class="divider"></div>
+          <div class="ip"><div class="ip-lbl">PAYG withholding</div><div class="ip-val" style="color:var(--purple)">${fmoney(payg)}</div></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══ GOALS PAGE ═══
+function pgGoals(){
+  const cats={Property:'var(--amber)',Retirement:'var(--purple)',Savings:'var(--green)',Investment:'var(--gold)',Business:'var(--teal)',Personal:'#ff6090',Education:'var(--blue)'};
+  const completed=D.goals.filter(g=>parseFloat(g.progress||0)>=parseFloat(g.target||1));
+  const active=D.goals.filter(g=>parseFloat(g.progress||0)<parseFloat(g.target||1));
+  return`
+    <div style="display:flex;justify-content:flex-end;margin-bottom:16px"><button class="btn btn-primary" onclick="om('mGoal')">+ Add Goal</button></div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+      <div class="stat"><div class="stat-val">${D.goals.length}</div><div class="stat-lbl">Total Goals</div></div>
+      <div class="stat" style="--sc:var(--green)"><div class="stat-val" style="color:var(--green)">${completed.length}</div><div class="stat-lbl">Completed</div></div>
+      <div class="stat" style="--sc:var(--amber)"><div class="stat-val" style="color:var(--amber)">${active.length}</div><div class="stat-lbl">In Progress</div></div>
+      <div class="stat" style="--sc:var(--blue)"><div class="stat-val" style="color:var(--blue)">${fmoney(D.goals.reduce((s,g)=>s+(parseFloat(g.target||0)),0))}</div><div class="stat-lbl">Total Target</div></div>
+    </div>
+    ${!D.goals.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🎯</div><p>Set your first financial goal</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mGoal')">Add Goal</button></div></div>`:''}
+    ${active.map(g=>{
+      const progress=parseFloat(g.progress||0);
+      const target=parseFloat(g.target||1);
+      const pct=Math.min(100,progress/target*100);
+      const color=cats[g.category]||'var(--green)';
+      const daysLeft=g.targetDate?Math.max(0,Math.round((new Date(g.targetDate)-new Date())/(1000*60*60*24))):null;
+      return`<div class="goal-card">
+        <div class="goal-header">
+          <div>
+            <div class="goal-name">${g.name}</div>
+            <div class="goal-meta">${g.category} · Priority: ${g.priority||'Medium'}${daysLeft!==null?` · ${daysLeft} days left`:''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="goal-pct" style="color:${color}">${pct.toFixed(0)}%</div>
+            <button class="btn btn-outline btn-sm" onclick="editGoal('${g.id}')">Edit</button>
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="delGoal('${g.id}')">×</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+          <span>${fmoney(progress)} saved</span><span>Target: ${fmoney(target)}</span>
+        </div>
+        <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${color}"></div></div>
+        ${g.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px">${g.notes}</div>`:''}
+      </div>`;
+    }).join('')}
+    ${completed.length?`<div class="shead" style="margin-top:20px">Completed Goals</div>`:''}
+    ${completed.map(g=>`<div class="goal-card" style="opacity:.6">
+      <div class="goal-header"><div><div class="goal-name">${g.name}</div><div class="goal-meta">${g.category}</div></div><span class="badge b-green">✓ Complete</span></div>
+    </div>`).join('')}
+  `;
+}
+
+// ═══ CRUD ═══
+// Properties
+function saveProp(){
+  const data={address:document.getElementById('pr1').value,purchasePrice:document.getElementById('pr2').value,value:document.getElementById('pr3').value,loan:document.getElementById('pr4').value,rate:document.getElementById('pr5').value,rent:document.getElementById('pr6').value,expenses:document.getElementById('pr7').value,loanType:document.getElementById('pr8').value,purchaseDate:document.getElementById('pr9').value,type:document.getElementById('pr10').value,notes:document.getElementById('pr11').value};
+  if(!data.address){toast('Address required','err');return;}
+  if(editPid){const i=D.properties.findIndex(p=>p.id===editPid);D.properties[i]={...D.properties[i],...data};}
+  else D.properties.push({id:uid(),...data});
+  save();cm('mProperty');toast('Property saved','ok');render();updateSidebar();editPid=null;
+}
+function editProp(id){editPid=id;const p=D.properties.find(x=>x.id===id);if(!p)return;document.getElementById('mPropTitle').textContent='Edit Property';document.getElementById('pr1').value=p.address||'';document.getElementById('pr2').value=p.purchasePrice||'';document.getElementById('pr3').value=p.value||'';document.getElementById('pr4').value=p.loan||'';document.getElementById('pr5').value=p.rate||'';document.getElementById('pr6').value=p.rent||'';document.getElementById('pr7').value=p.expenses||'';document.getElementById('pr8').value=p.loanType||'Principal & Interest';document.getElementById('pr9').value=p.purchaseDate||'';document.getElementById('pr10').value=p.type||'House';document.getElementById('pr11').value=p.notes||'';om('mProperty');}
+function delProp(id){if(!confirm('Delete this property?'))return;D.properties=D.properties.filter(p=>p.id!==id);save();toast('Deleted');render();updateSidebar();}
+
+// Super
+function saveSuper(){
+  const data={fund:document.getElementById('su1').value,member:document.getElementById('su2').value,balance:document.getElementById('su3').value,option:document.getElementById('su4').value,empContrib:document.getElementById('su5').value,persContrib:document.getElementById('su6').value,returnRate:document.getElementById('su7').value,retAge:document.getElementById('su8').value,age:document.getElementById('su9').value,target:document.getElementById('su10').value};
+  if(editSid){const i=D.superFunds.findIndex(f=>f.id===editSid);D.superFunds[i]={...D.superFunds[i],...data};}
+  else D.superFunds.push({id:uid(),...data});
+  save();cm('mSuper');toast('Super fund saved','ok');render();updateSidebar();editSid=null;
+}
+function editSuper(id){editSid=id;const f=D.superFunds.find(x=>x.id===id);if(!f)return;document.getElementById('su1').value=f.fund||'';document.getElementById('su2').value=f.member||'';document.getElementById('su3').value=f.balance||'';document.getElementById('su4').value=f.option||'Balanced';document.getElementById('su5').value=f.empContrib||'';document.getElementById('su6').value=f.persContrib||'';document.getElementById('su7').value=f.returnRate||'8.5';document.getElementById('su8').value=f.retAge||'67';document.getElementById('su9').value=f.age||'40';document.getElementById('su10').value=f.target||'';om('mSuper');}
+function delSuper(id){if(!confirm('Delete?'))return;D.superFunds=D.superFunds.filter(f=>f.id!==id);save();render();updateSidebar();}
+
+// Shares
+function saveShare(){
+  const data={ticker:document.getElementById('sh1').value.toUpperCase(),type:document.getElementById('sh2').value,units:document.getElementById('sh3').value,buyPrice:document.getElementById('sh4').value,currentPrice:document.getElementById('sh5').value,purchaseDate:document.getElementById('sh6').value,yield:document.getElementById('sh7').value,platform:document.getElementById('sh8').value,notes:document.getElementById('sh9').value};
+  if(!data.ticker){toast('Ticker required','err');return;}
+  if(editShid){const i=D.shares.findIndex(s=>s.id===editShid);D.shares[i]={...D.shares[i],...data};}
+  else D.shares.push({id:uid(),...data});
+  save();cm('mShare');toast('Holding saved','ok');render();updateSidebar();editShid=null;
+}
+function delShare(id){if(!confirm('Delete?'))return;D.shares=D.shares.filter(s=>s.id!==id);save();render();updateSidebar();}
+
+// Budget
+function saveBudgetTx(){
+  const data={date:document.getElementById('bt1').value||tod(),type:document.getElementById('bt2').value,description:document.getElementById('bt3').value,category:document.getElementById('bt4').value,amount:document.getElementById('bt5').value,account:document.getElementById('bt6').value,notes:document.getElementById('bt7').value};
+  if(!data.amount){toast('Amount required','err');return;}
+  if(editBid){const i=D.budgetTx.findIndex(t=>t.id===editBid);D.budgetTx[i]={...D.budgetTx[i],...data};}
+  else D.budgetTx.push({id:uid(),...data});
+  save();cm('mBudget');toast('Transaction saved','ok');render();updateSidebar();editBid=null;
+}
+function delBudgetTx(id){D.budgetTx=D.budgetTx.filter(t=>t.id!==id);save();render();}
+
+// Goals
+function saveGoal(){
+  const data={name:document.getElementById('gl1').value,category:document.getElementById('gl2').value,target:document.getElementById('gl3').value,progress:document.getElementById('gl4').value,targetDate:document.getElementById('gl5').value,priority:document.getElementById('gl6').value,notes:document.getElementById('gl7').value};
+  if(!data.name){toast('Name required','err');return;}
+  if(editGid){const i=D.goals.findIndex(g=>g.id===editGid);D.goals[i]={...D.goals[i],...data};}
+  else D.goals.push({id:uid(),...data});
+  save();cm('mGoal');toast('Goal saved','ok');render();editGid=null;
+}
+function editGoal(id){editGid=id;const g=D.goals.find(x=>x.id===id);if(!g)return;document.getElementById('mGoalTitle').textContent='Edit Goal';document.getElementById('gl1').value=g.name||'';document.getElementById('gl2').value=g.category||'Savings';document.getElementById('gl3').value=g.target||'';document.getElementById('gl4').value=g.progress||'';document.getElementById('gl5').value=g.targetDate||'';document.getElementById('gl6').value=g.priority||'Medium';document.getElementById('gl7').value=g.notes||'';om('mGoal');}
+function delGoal(id){if(!confirm('Delete?'))return;D.goals=D.goals.filter(g=>g.id!==id);save();render();}
+
+// Settings
+function saveSettings(){
+  D.name=document.getElementById('st1').value;
+  D.fyStart=document.getElementById('st2').value;
+  // Save Basiq key if entered
+  const k=document.getElementById('st_basiq_key')?.value?.trim();
+  if(k&&k!=='••••••••••••••••'){D.basiqKey=k;}
+  save();cm('mSettings');toast('Settings saved','ok');
+}
+
+// ══════════════════════════════════════════════════
+// BASIQ LIVE DATA INTEGRATION
+// Australian Open Banking (CDR) — banks + super
+// API: https://au-api.basiq.io
+// ══════════════════════════════════════════════════
+const BASIQ_KEY = 'MjdjMDYwNWYtOGE4NC00ZDIxLWExMTEtMWM4MjYxZGY5N2ZjOmU2MTEyYmQ5LTBjZmQtNDkxNi1hZThjLTUwZDkxNGY0M2Q1OQ==';
+const BASIQ = 'https://au-api.basiq.io';
+if(!D.basiqUserId) D.basiqUserId = '6080ba78-bc4e-406c-8e18-d919d22ed8f6';
+
+async function basiqGetToken(){
+  const r=await fetch('https://au-api.basiq.io/token',{method:'POST',headers:{'Authorization':'Basic '+BASIQ_KEY,'Content-Type':'application/x-www-form-urlencoded','basiq-version':'3.0'},body:'scope=SERVER_ACCESS'});
+  const d=await r.json();if(!r.ok)throw new Error(d.message||'Token failed');return d.access_token;
+}
+async function basiqConnect(){
+  // statusEl may be null if Settings modal isn't open — always guard it
+  const statusEl=document.getElementById('basiq_status');
+  const setStatus=(msg,col)=>{if(statusEl){statusEl.textContent=msg;statusEl.style.color=col||'var(--amber)';}};
+
+  const NETLIFY='https://hobday-dashboard-mnx7tfk7.netlify.app';
+
+  // When running as file:// the browser blocks fetch() to external URLs (CORS)
+  // Solution: open the Netlify connect page directly — it handles everything
+  // and writes results back to localStorage which we share
+  if(window.location.protocol==='file:'||window.location.protocol==='null:'){
+    toast('Opening CommBank connection...','info');
+    const w=window.open(NETLIFY,'basiq_connect','width=520,height=740,left='+Math.round((screen.width-520)/2)+',top=60');
+    if(!w){toast('Please allow popups for this page, then try again','err');return;}
+    // Poll localStorage for when the Netlify page saves account data
+    let polls=0;
+    const poller=setInterval(()=>{
+      polls++;
+      // Check if Netlify page wrote data back
+      try{
+        const saved=JSON.parse(localStorage.getItem('lifedb_v1')||'{}');
+        if(saved.basiqAccounts?.length&&saved.basiqAccounts.length!==(D.basiqAccounts?.length||0)){
+          clearInterval(poller);
+          load(); // reload D from localStorage
+          toast('✓ '+D.basiqAccounts.length+' accounts connected!','ok');
+          render();updateSidebar();
+          return;
+        }
+      }catch(e){}
+      if(w.closed||polls>120){
+        clearInterval(poller);
+        load();
+        if(D.basiqAccounts?.length){
+          toast('✓ '+D.basiqAccounts.length+' accounts connected!','ok');
+          render();updateSidebar();
+        } else {
+          toast('In the popup: connect your bank then click 💾 Save','info');
+        }
+      }
+    },2000);
+    return;
+  }
+
+  // Running from https:// — use proxy directly
+  setStatus('⏳ Getting secure link...','var(--amber)');
+  try{
+    const r=await fetch(BASIQ_PROXY+'?action=connect',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({userId:D.basiqUserId||null})
+    });
+    const d=await r.json();
+    if(!r.ok||d.error)throw new Error(d.error||'Connect failed');
+    D.basiqUserId=d.userId;save();
+    setStatus('✓ Opening bank connection...','var(--green)');
+    const w=window.open(d.connectUrl,'basiq_connect','width=500,height=720,left=200,top=80');
+    let polls=0;
+    const poller=setInterval(async()=>{
+      polls++;
+      if(w?.closed||polls>90){
+        clearInterval(poller);
+        try{
+          await basiqSyncFromProxy();
+          toast('✓ Accounts linked!','ok');
+          renderBasiqAccounts();render();updateSidebar();
+        }catch(e){toast('Complete bank auth in the popup first','info');}
+      }
+    },3000);
+  }catch(e){
+    setStatus('✗ '+e.message,'var(--red)');
+    toast('Error: '+e.message,'err');
+  }
+}
+
+async function basiqSync(){
+  if(!D.basiqUserId){basiqConnect();return;}
+  toast('Syncing live data...','info');
+  try{
+    await basiqSyncFromProxy();
+    toast('✓ Live data synced!','ok');
+    render();updateSidebar();
+  }catch(e){
+    toast('Sync failed: '+e.message,'err');
+  }
+}
+
+async function basiqSyncFromProxy(){
+  const tok=await basiqGetToken();
+  const ar=await fetch('https://au-api.basiq.io/users/'+D.basiqUserId+'/accounts',{headers:{'Authorization':'Bearer '+tok,'basiq-version':'3.0'}});
+  const ad=await ar.json();
+  if(!ar.ok)throw new Error(ad.message||'Could not fetch accounts');
+  const accounts=ad.data||[];
+  if(!accounts.length)throw new Error('No accounts yet — complete CommBank auth first');
+  return accounts;
+}
+
+async function basiqSyncInner(token, userId){
+  // Redirect to proxy-based sync
+  const accounts=await basiqSyncFromProxy();
+  if(!accounts.length)return;
+
+  D.basiqAccounts=accounts.map(a=>({
+    id:a.id,
+    name:a.name||a.accountHolder,
+    number:a.accountNo,
+    balance:parseFloat(a.balance||0),
+    available:parseFloat(a.availableFunds||a.balance||0),
+    type:a.class?.type||a.class||'bank',
+    product:a.class?.product||'',
+    institution:a.institution,
+    currency:a.currency||'AUD',
+    lastUpdated:a.lastUpdated||new Date().toISOString(),
+    status:a.status
+  }));
+
+  // Update super balances if any accounts look like super
+  const superAccounts=D.basiqAccounts.filter(a=>
+    a.type?.toLowerCase().includes('super')||
+    a.product?.toLowerCase().includes('super')||
+    a.name?.toLowerCase().includes('super')
+  );
+  superAccounts.forEach(sa=>{
+    // Match to our super funds by name similarity
+    D.superFunds.forEach(f=>{
+      if(f.owner==='Ivana'&&sa.institution?.includes('super')){
+        f.balance=sa.balance.toString();f.lastSynced=new Date().toISOString();
+      }
+      if(f.owner==='David'&&sa.institution?.includes('super')){
+        f.balance=sa.balance.toString();f.lastSynced=new Date().toISOString();
+      }
+    });
+  });
+
+  D.basiqLastSync=new Date().toISOString();
+  save();
+}
+
+function renderBasiqAccounts(){
+  const el=document.getElementById('basiq_accounts');
+  if(!el)return;
+  if(!D.basiqAccounts?.length){el.innerHTML='<div style="font-size:12px;color:var(--text3)">No accounts linked yet.</div>';return;}
+  const totalBalance=D.basiqAccounts.reduce((s,a)=>s+a.balance,0);
+  el.innerHTML=`
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">
+      ${D.basiqAccounts.length} Linked Accounts · Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}
+    </div>
+    ${D.basiqAccounts.map(a=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:6px;border:1px solid var(--border)">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text)">${a.name}</div>
+          <div style="font-size:10px;color:var(--text3)">${a.number||''} · ${a.type}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:var(--green)">$${a.balance.toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+          <div style="font-size:10px;color:var(--text3)">available $${a.available.toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
+        </div>
+      </div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:8px 10px;background:var(--bg4);border-radius:var(--radius-sm);border:1px solid var(--border2)">
+      <span style="font-size:12px;font-weight:700;color:var(--text)">Total across all accounts</span>
+      <span style="font-size:14px;font-weight:700;color:var(--green)">$${totalBalance.toLocaleString('en-AU',{minimumFractionDigits:2})}</span>
+    </div>
+  `;
+}
+
+function basiqDisconnect(){
+  if(!confirm('Disconnect Basiq? Live data will stop syncing.'))return;
+  delete D.basiqKey;delete D.basiqUserId;delete D.basiqAccounts;delete D.basiqLastSync;
+  save();toast('Basiq disconnected','info');
+  const el=document.getElementById('basiq_accounts');
+  if(el)el.innerHTML='';
+  const s=document.getElementById('basiq_status');
+  if(s){s.textContent='Disconnected';s.style.color='var(--text3)';}
+}
+
+// Add a live sync banner to the net worth page if Basiq connected
+function basiqStatusBadge(){
+  const accts = D.manualAccounts||[];
+  const lastSync = D.manualSyncTime ? new Date(D.manualSyncTime).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : null;
+  if(accts.length){
+    const total = accts.reduce((s,a)=>s+(parseFloat(a.balance)||0),0);
+    return `<div style="display:flex;align-items:center;gap:10px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px;cursor:pointer" onclick="openSync()">
+      <div style="width:8px;height:8px;border-radius:50%;background:#00e676;flex-shrink:0"></div>
+      <div style="flex:1">
+        <span style="color:#00e676;font-weight:600">${accts.length} accounts</span>
+        <span style="color:var(--text3);margin-left:6px">Total $${total.toLocaleString('en-AU',{minimumFractionDigits:2})} · Updated ${lastSync}</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openSync()">↻ Update</button>
+    </div>`;
+  }
+  return `<div style="display:flex;align-items:center;gap:10px;background:rgba(19,181,234,.08);border:1px solid rgba(19,181,234,.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px">
+    <span style="font-size:16px">⚡</span>
+    <div style="flex:1"><strong style="color:#13b5ea">Quick Balance Update</strong> <span style="color:var(--text3)">— enter your account balances for an accurate net worth</span></div>
+    <button class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:12px;white-space:nowrap" onclick="openSync()">Update Now</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// MANUAL ACCOUNT SYNC
+// ══════════════════════════════════════════════════
+function openSync(){
+  const fields = [];
+
+  // Existing manual bank accounts
+  (D.manualAccounts||[]).forEach(a => {
+    if(a.type !== 'super') // only bank accounts here
+      fields.push({ id: a.id, label: a.name, type: a.type||'bank', balance: a.balance, institution: a.institution||'' });
+  });
+
+  // If no bank accounts yet, seed with CommBank defaults
+  if(!fields.length){
+    fields.push({ id:'acc_cba_everyday', label:'CommBank Everyday', type:'bank', balance:'', institution:'CommBank' });
+    fields.push({ id:'acc_cba_savings',  label:'CommBank Savings',  type:'bank', balance:'', institution:'CommBank' });
+    fields.push({ id:'acc_cba_offset',   label:'CommBank Offset',   type:'bank', balance:'', institution:'CommBank' });
+  }
+
+  const lastSync = D.manualSyncTime ? new Date(D.manualSyncTime).toLocaleString('en-AU',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Never';
+  document.getElementById('syncLastUpdated').textContent = lastSync;
+
+  document.getElementById('syncFields').innerHTML = `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Bank Accounts</div>
+    ${fields.map(f=>`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:600;color:var(--text)">${f.label}</div>
+          <div style="font-size:10px;color:var(--text3)">${f.institution}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:13px;color:var(--text3)">$</span>
+          <input type="number" id="sync_${f.id}" value="${f.balance||''}" placeholder="0.00" step="0.01" min="0"
+            style="width:130px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;text-align:right">
+        </div>
+      </div>`).join('')}
+    <button onclick="addAccount()" style="background:none;border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;color:var(--text3);font-size:11px;cursor:pointer;width:100%;margin-bottom:8px;font-family:'DM Sans',sans-serif">+ Add account</button>
+    <div style="font-size:11px;color:var(--text3);padding:8px;background:var(--bg3);border-radius:6px">💡 Update superannuation balances on the <strong style="color:var(--text)">Superannuation</strong> page</div>
+  `;
+  om('mSync');
+}
+
+function addAccount(){
+  const name = prompt('Account name (e.g. CommBank Savings):');
+  if(!name) return;
+  const institution = prompt('Bank name (e.g. CommBank):') || '';
+  const id = 'acc_'+Date.now();
+  if(!D.manualAccounts) D.manualAccounts=[];
+  D.manualAccounts.push({ id, name, type:'bank', balance:'', institution });
+  save(); openSync();
+}
+
+function saveSync(){
+  if(!D.manualAccounts) D.manualAccounts = [
+    {id:'acc_cba_everyday', name:'CommBank Everyday', type:'bank', institution:'CommBank', balance:0},
+    {id:'acc_cba_savings',  name:'CommBank Savings',  type:'bank', institution:'CommBank', balance:0},
+    {id:'acc_cba_offset',   name:'CommBank Offset',   type:'bank', institution:'CommBank', balance:0},
+  ];
+
+  // Save bank account balances only
+  D.manualAccounts.forEach(a => {
+    const input = document.getElementById('sync_'+a.id);
+    if(input) a.balance = parseFloat(input.value)||0;
+  });
+
+  D.manualSyncTime = new Date().toISOString();
+  save();
+  cm('mSync');
+  toast('✓ Balances updated!','ok');
+  render(); updateSidebar();
+}
+
+function exportAll(){const a=document.createElement('a');a.href='data:text/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(D,null,2));a.download='life_dashboard_backup.json';a.click();toast('Backup downloaded','ok');}
+function importData(){toast('Paste your backup JSON and I will restore it — feature coming soon','info');}
+
+// Date display
+document.getElementById('tbDate').textContent=new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── SEED DATA — pre-load real data on first run ──
+const SEED_KEY = 'lifedb_seeded_v5';
+function seedRealData(){
+  if(localStorage.getItem(SEED_KEY)) return;
+
+  // ── Pre-load Basiq API key ──
+  D.basiqKey = 'MjdjMDYwNWYtOGE4NC00ZDIxLWExMTEtMWM4MjYxZGY5N2ZjOmU2MTEyYmQ5LTBjZmQtNDkxNi1hZThjLTUwZDkxNGY0M2Q1OQ==';
+
+  // ══════════════════════════════════════════════════════
+  // SHEPPARTON INVESTMENT PROPERTY — Lot 215, 82 Warrumbungle Drive, Shepparton North VIC 3631
+  // Sources: Building Permit, Occupancy Permit, SR Homes invoices/receipts, Google Sheet, Excel tracker
+  // ══════════════════════════════════════════════════════
+  D.properties.push({
+    id: 'prop_shep1',
+    address: '82 Warrumbungle Drive, Shepparton North VIC 3631',
+    suburb: 'Shepparton North',
+    state: 'VIC',
+    postcode: '3631',
+    lot: '215',
+    lpps: 'PS913653',
+    volume: '12622',
+    folio: '718',
+    type: 'House',
+    description: 'Single storey dwelling and garage · 184m² · New build',
+
+    // ── Financials ──
+    landPrice: '280000',
+    buildPrice: '414574',
+    buildPriceApproved: '417074',   // after $2,500 colourboard variation
+    purchasePrice: '694574',        // land + build (from Excel: 280000 + 414574)
+    value: '694574',                // current est = cost (new build)
+    loan: '607200',                 // 88% LVR of $690k valuation
+    rate: '6.40',
+    loanType: 'Principal & Interest',
+    loanTerm: '30',
+    lvr: '88',
+    deposit: '82800',               // 12% deposit
+
+    // ── Total cash invested (from Excel tracker) ──
+    totalCashRequired: '22740',     // from Excel row total
+    pttbRetainer: '3000',           // 12 Feb 2025
+    pttbCommission: '10000',        // 24 Feb 2025
+    initialDeposit: '2000',         // 26 Feb 2025
+    buildDepositPaid: '20728',      // 5% build deposit — 23 Feb 2025, S:00
+    landDepositPaid: '12000',       // 5% land deposit — 24 Feb 2025
+    stampDuty: '11840',
+    legalFees: '900',
+    totalOutstanding: '672585',     // from Excel
+
+    // ── SR Homes Build Contract (Contract No. 350136) ──
+    builder: 'SR Homes Pty Ltd (Royston Homes)',
+    builderABN: '16-643-554-590',
+    builderContact: '1300 188 668',
+    buildPermitNo: '3983618599490',
+    buildPermitIssued: '2025-08-20',
+    buildPermitExpiry: '2027-08-20',
+    buildSurveyor: 'Watershed Building Consultants · M D Curtain BS-U 1590',
+    structuralEngineer: 'Matthew Borzillo · Intrax Consulting Engineers PE0003026',
+    insurance: 'Bovill Risk & Insurance Consultants P/L · Policy C951289',
+    occupancyPermit: '3983618599490',
+    occupancyIssued: '2026-03-24',
+    finalInspection: '2026-03-24',
+
+    // ── Payment schedule (from SR Homes receipts & Excel) ──
+    // Stage 0 — Deposit: $20,728.70 · Paid 11-Mar-25
+    // Stage 1 — Base (slab): $62,186.10 · Paid 25-Sep-25
+    // Stage 2 — Frame: $103,643.50 · Paid 13-Oct-25
+    // Stage 3 — Lockup: $103,643.50 · Paid 05-Dec-25
+    // Stage 4 — Fix: $82,914.80 · Paid 05-Dec-25
+    // Variation PCV3 — Colourboard: $2,500.00 · Paid 15-Dec-25
+    // Stage 5 — Final: $41,457.40 · OUTSTANDING
+    paidToDate: '375616.60',
+    finalPaymentDue: '41457.40',
+    balanceOfContract: '41457.40',
+    contractComplete: false,
+
+    // ── Rental projections (from Google Sheet 1 Lease tab) ──
+    rent: '625',
+    grossAnnualRent: '32500',
+    adjustedIncome: '31192.50',
+    vacancyRate: '1.1',
+    loanInterest: '36897.61',
+    propertyMgmt: '1871.55',
+    buildingInsurance: '1900.00',
+    councilRates: '3000.00',
+    maintenanceAllowance: '1000.00',
+    landTax: '1400.00',
+    yardMaintenance: '0',
+    totalAnnualExpenses: '44669.16',
+    annualCashflow: '-13477',
+    weeklyCashflow: '-259',
+
+    purchaseDate: '2025-02-26',
+    contractDate: '2026-05-28',
+    settledDate: '2026-03-24',
+
+    notes: 'Builder: SR Homes (Royston Homes) · Contract 350136 · Job 25/02478\nOccupancy Permit issued 24 March 2026 — COMPLETE ✓\nBuild cost $414,574 + Variation $2,500 = $417,074 approved\nPaid to date: $375,617 · Final payment outstanding: $41,457\n\nPttB (Absolute Investments) sourced property · Retainer $3,000 + Commission $10,000\nNegatively geared: -$259/wk · -$13,477/yr\nContact: davidshobday@gmail.com · 0405 654 099'
+  });
+
+  // ══════════════════════════════════════════════════════
+  // GOALS — seeded from known commitments
+  // ══════════════════════════════════════════════════════
+  D.goals.push({
+    id: 'goal_final_payment',
+    name: 'Pay Shepparton Final Stage Payment',
+    category: 'Property',
+    target: '41457.40',
+    progress: '0',
+    targetDate: '2026-06-30',
+    priority: 'High',
+    notes: 'SR Homes Stage 5 Final payment — $41,457.40 due after Occupancy Permit (issued 24 Mar 2026). Pay via bank transfer prior to handover.'
+  });
+  D.goals.push({
+    id: 'goal_tenant',
+    name: 'Secure First Tenant — Shepparton',
+    category: 'Property',
+    target: '1',
+    progress: '0',
+    targetDate: '2026-07-31',
+    priority: 'High',
+    notes: 'Property ready for tenancy from ~May 2026. Target $625/wk. Engage property manager.'
+  });
+
+  D.superFunds.push({id:'super_david',owner:'David',fund:'Australian Super',member:'',balance:'0',option:'Balanced',empContrib:'0',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'1000000',notes:'Update from MyGov or Australian Super app'});
+  D.superFunds.push({id:'super_ivana',owner:'Ivana',fund:'Australian Super',member:'',balance:'0',option:'Balanced',empContrib:'8631',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'800000',notes:'Contributions from Xero payroll 11.5pct of 75049'});
+  save();
+  localStorage.setItem(SEED_KEY,'1');
+}
+
+// ── INIT ──
+load();
+seedRealData();
+render();
+updateSidebar();
+
+// Pull latest cloud data then re-render
+cloudLoad().then(loaded => {
+  if(loaded){ seedRealData(); render(); updateSidebar(); }
+});
+
+// Auto-sync Basiq on load via proxy
+if(D.basiqUserId){
+  // Already have a linked user — silently sync in background
+  setTimeout(async () => {
+    try {
+      await basiqSyncFromProxy();
+      render(); updateSidebar();
+    } catch(e) { console.log('Basiq sync:', e.message); }
+  }, 1500);
+} else if(D.basiqKey) {
+  // Have API key but no user yet — prompt to connect
+  setTimeout(async () => {
+    if(confirm('Welcome! Connect your CommBank and other accounts?\n\nClick OK to open the secure Basiq connection screen.')){
+      basiqConnect();
+    }
+  }, 1500);
+}
+</script>
+</body>
+</html>

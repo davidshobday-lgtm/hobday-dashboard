@@ -414,35 +414,30 @@ function save(){
   cloudSave();
 }
 // ── Cloud sync ──
-
+const CLOUD_URL='https://hobday-dashboard-mnx7tfk7.netlify.app/.netlify/functions/data';
+const CLOUD_TOKEN='hobday2026';
 let _cloudSaving=false;
-let _ghDataSha=null;
-const _gp=["ghp_","UBNxkBeafF","PVpVUnD4mFV6MmyewGJe4J4N3B"];
-const _gt=()=>_gp.join('');
-const _go='davidshobday-lgtm';
-const _gr='hobday-dashboard';
-
-async function cloudSave(){
+async async function cloudSave(){
   if(_cloudSaving)return;_cloudSaving=true;
   try{
-    if(!_ghDataSha){
-      const r=await fetch('https://api.github.com/repos/'+_go+'/'+_gr+'/contents/data.json',{headers:{'Authorization':'token '+_gt(),'Accept':'application/vnd.github.v3+json'}});
-      const d=await r.json();_ghDataSha=d.sha;
-    }
-    const payload=JSON.stringify({life:D,savedAt:new Date().toISOString(),version:1},null,2);
-    const r=await fetch('https://api.github.com/repos/'+_go+'/'+_gr+'/contents/data.json',{method:'PUT',headers:{'Authorization':'token '+_gt(),'Content-Type':'application/json'},body:JSON.stringify({message:'autosave',content:btoa(unescape(encodeURIComponent(payload))),...(_ghDataSha?{sha:_ghDataSha}:{})})});
-    const rd=await r.json();if(rd.content)_ghDataSha=rd.content.sha;
-  }catch(e){console.log('cloudSave:',e.message);}
+    const _t=window._ghToken;if(!_t)return;
+    const _cr=await fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{headers:{'Authorization':'token '+_t,'Accept':'application/vnd.github.v3+json'}});
+    const _cm=await _cr.json();
+    const _payload={life:D,savedAt:new Date().toISOString()};
+    await fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{method:'PUT',headers:{'Authorization':'token '+_t,'Content-Type':'application/json'},body:JSON.stringify({message:'Auto-save',content:btoa(unescape(encodeURIComponent(JSON.stringify(_payload)))),sha:_cm.sha})});
+  }catch(e){}
   _cloudSaving=false;
 }
-
 async function cloudLoad(){
   try{
-    const r=await fetch('https://raw.githubusercontent.com/'+_go+'/'+_gr+'/main/data.json?t='+Date.now());
-    if(!r.ok)return false;
+    // Load token from config
+    const cr=await fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/cfg.json?t='+Date.now());
+    if(cr.ok){const cfg=await cr.json();window._ghToken=cfg.t;}
+    const r=await fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/data.json?t='+Date.now());
+    if(!r.ok) return false;
     const d=await r.json();
-    if(d.life){D={...D,...d.life};try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}return true;}
-  }catch(e){console.log('cloudLoad:',e.message);}
+    if(d.life){D={...D,...d.life};try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){} return true;}
+  }catch(e){}
   return false;
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}

@@ -199,15 +199,15 @@ select option{background:var(--bg3)}
 
     <div class="sb-section">Modules</div>
     <button class="nav-btn mod-business" onclick="nav('business')">
-      <div class="dot" style="background:var(--green)"></div>Salon Business<span class="nav-val" id="sb-biz">--</span></button>
+      <div class="dot" style="background:var(--green)"></div>Salon Business<span class="nav-val" id="sb-biz">—</span></button>
     <button class="nav-btn mod-property" onclick="nav('property')">
-      <div class="dot" style="background:var(--amber)"></div>Investment Property<span class="nav-val" id="sb-prop">--</span></button>
+      <div class="dot" style="background:var(--amber)"></div>Investment Property<span class="nav-val" id="sb-prop">—</span></button>
     <button class="nav-btn mod-super" onclick="nav('super')">
-      <div class="dot" style="background:var(--purple)"></div>Superannuation<span class="nav-val" id="sb-super">--</span></button>
+      <div class="dot" style="background:var(--purple)"></div>Superannuation<span class="nav-val" id="sb-super">—</span></button>
     <button class="nav-btn mod-budget" onclick="nav('budget')">
-      <div class="dot" style="background:var(--blue)"></div>Personal Budget<span class="nav-val" id="sb-budget">--</span></button>
+      <div class="dot" style="background:var(--blue)"></div>Personal Budget<span class="nav-val" id="sb-budget">—</span></button>
     <button class="nav-btn mod-shares" onclick="nav('shares')">
-      <div class="dot" style="background:var(--gold)"></div>Share Portfolio<span class="nav-val" id="sb-shares">--</span></button>
+      <div class="dot" style="background:var(--gold)"></div>Share Portfolio<span class="nav-val" id="sb-shares">—</span></button>
     <button class="nav-btn mod-tax" onclick="nav('tax')">
       <div class="dot" style="background:var(--red)"></div>Tax</button>
     <button class="nav-btn mod-goals" onclick="nav('goals')">
@@ -230,7 +230,7 @@ select option{background:var(--bg3)}
 <div id="mSync" class="ov"><div class="modal" style="max-width:520px">
   <div class="mh"><div class="mt">⚡ Quick Balance Update</div><button class="btn btn-ghost btn-sm btn-icon" onclick="cm('mSync')">✕</button></div>
   <div class="mb">
-    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Update your account balances -- takes 30 seconds. Check your banking app then enter current balances below.</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Update your account balances — takes 30 seconds. Check your banking app then enter current balances below.</div>
     <div id="syncFields"></div>
     <div class="divider"></div>
     <div style="font-size:11px;color:var(--text3);text-align:center">Last updated: <span id="syncLastUpdated">Never</span></div>
@@ -370,11 +370,11 @@ select option{background:var(--bg3)}
       <div class="fl"><label class="lbl">Financial Year Start</label><select id="st2"><option value="07">July (AU)</option><option value="01">January</option></select></div>
     </div>
     <div class="divider"></div>
-    <div class="shead">Basiq -- Live Bank & Super Data</div>
+    <div class="shead">Basiq — Live Bank & Super Data</div>
     <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.6">
       <strong style="color:var(--text)">🔗 Basiq is connected via your secure proxy</strong><br>
       Your CommBank accounts sync automatically through <strong>hobday-dashboard-mnx7tfk7.netlify.app</strong><br>
-      Uses Australia's CDR Open Banking -- your banking credentials never leave CommBank.
+      Uses Australia's CDR Open Banking — your banking credentials never leave CommBank.
     </div>
     <div id="basiq_status" style="font-size:12px;margin-bottom:12px"></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -413,7 +413,7 @@ function save(){
   try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}
   cloudSave();
 }
-// ── Cloud sync ──
+// ---- Cloud sync ----
 const CLOUD_URL='https://hobday-dashboard-mnx7tfk7.netlify.app/.netlify/functions/data';
 const CLOUD_TOKEN='hobday2026';
 let _cloudSaving=false;
@@ -451,11 +451,11 @@ function om(id){
     const n=document.getElementById('st1');if(n)n.value=D.name||'';
     const f=document.getElementById('st2');if(f)f.value=D.fyStart||'07';
     const k=document.getElementById('st_basiq_key');
-    if(k)k.value=D.basiqKey?'••••••••••••���•••':'';
+    if(k)k.value=D.basiqKey?'************   ***':'';
     const s=document.getElementById('basiq_status');
     if(s){
       if(D.basiqKey){
-        s.textContent=`✓ Connected · ${D.basiqAccounts?.length||0} accounts · Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}`;
+        s.textContent=`  Connected   ${D.basiqAccounts?.length||0} accounts   Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}`;
         s.style.color='var(--green)';
       }else{s.textContent='Not connected';s.style.color='var(--text3)';}
     }
@@ -465,7 +465,7 @@ function om(id){
 function cm(id){document.getElementById(id).classList.remove('open')}
 window.onclick=e=>{['mProperty','mSuper','mShare','mBudget','mGoal','mSettings','mSync'].forEach(id=>{const el=document.getElementById(id);if(e.target===el)cm(id)})}
 
-// ── SALON DATA BRIDGE ──
+// ---- SALON DATA BRIDGE ----
 function getSalonData(){
   try{
     const raw=localStorage.getItem('salonpro_v2')||localStorage.getItem('salonpro_v1');
@@ -474,7 +474,7 @@ function getSalonData(){
   }catch(e){return null}
 }
 
-// ── NET WORTH CALCULATION ──
+// ---- NET WORTH CALCULATION ----
 function calcNetWorth(){
   const salon=getSalonData();
   // Cash: use live Basiq accounts if available, else manual
@@ -489,7 +489,7 @@ function calcNetWorth(){
   const shareVal=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)),0);
   const budgetSavings=D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+(parseFloat(t.amount)||0),0)
     - D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
-  // Salon business value (rough: annual profit × 2.5 multiple, or fallback)
+  // Salon business value (rough: annual profit   2.5 multiple, or fallback)
   let salonEquity=0;
   if(salon&&salon.xeroSnapshot){
     const annualRev=salon.xeroSnapshot.income||0;
@@ -501,13 +501,13 @@ function calcNetWorth(){
   return{propValues,propLoans,propEquity,superBal,shareVal,salonEquity,totalAssets,totalLiabilities,netWorth,budgetSavings,cashBal};
 }
 
-// ── SIDEBAR UPDATES ──
+// ---- SIDEBAR UPDATES ----
 function updateSidebar(){
   const nw=calcNetWorth();
   const salon=getSalonData();
   document.getElementById('sb-nw').textContent=fmoney(nw.netWorth);
   document.getElementById('sb-nw-big').textContent=fmoney(nw.netWorth);
-  document.getElementById('sb-nw-change').textContent='Assets '+fmoney(nw.totalAssets)+' · Liabilities '+fmoney(nw.totalLiabilities);
+  document.getElementById('sb-nw-change').textContent='Assets '+fmoney(nw.totalAssets)+'   Liabilities '+fmoney(nw.totalLiabilities);
   if(salon&&salon.xeroSnapshot)document.getElementById('sb-biz').textContent=fmoney(nw.salonEquity);
   if(D.properties.length)document.getElementById('sb-prop').textContent=fmoney(nw.propEquity);
   if(D.superFunds.length)document.getElementById('sb-super').textContent=fmoney(nw.superBal);
@@ -519,19 +519,19 @@ function updateSidebar(){
     const acctCount=(D.manualAccounts||[]).length;
     if(acctCount>0){
       sbBtn.innerHTML=`<div style="display:flex;align-items:center;gap:6px;padding:7px 10px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:8px;cursor:pointer" onclick="openSync()">
-        <span style="font-size:12px">✓</span>
+        <span style="font-size:12px"> </span>
         <div><div style="font-size:11px;font-weight:600;color:#00e676">${acctCount} accounts synced</div><div style="font-size:10px;color:#4a5068">${lastSync}</div></div>
-        <span style="font-size:11px;color:#4a5068;margin-left:auto">↻</span>
+        <span style="font-size:11px;color:#4a5068;margin-left:auto"> </span>
       </div>`;
     } else {
       sbBtn.innerHTML=`<button onclick="openSync()" style="width:100%;padding:8px 10px;background:rgba(19,181,234,.15);border:1px solid rgba(19,181,234,.4);border-radius:8px;color:#13b5ea;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px">
-        ↻ Sync CommBank
+          Sync CommBank
       </button>`;
     }
   }
 }
 
-// ── NAV ──
+// ---- NAV ----
 function nav(p){
   page=p;
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick')?.includes(`'${p}'`)));
@@ -563,7 +563,7 @@ function render(){
   });
 }
 
-// ═══ NET WORTH PAGE ═══
+// ------ NET WORTH PAGE ------
 function pgNetWorth(){
   const nw=calcNetWorth();
   const salon=getSalonData();
@@ -641,13 +641,13 @@ function pgNetWorth(){
       <div class="card-header"><div class="card-title">All Modules -- Quick View</div></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border)">
         ${[
-          {label:'Salon Business',val:fmoney(nw.salonEquity),sub:xero.income?'Rev '+fmoney(xero.income):' Click to view',color:'var(--green)',page:'business',icon:'✂'},
-          {label:'Investment Property',val:D.properties.length?fmoney(nw.propEquity):'Not added',sub:D.properties.length?D.properties[0].address?.split(',')[0]||'1 property':'Tap to add',color:'var(--amber)',page:'property',icon:'🏠'},
-          {label:'Superannuation',val:D.superFunds.length?fmoney(nw.superBal):'Not added',sub:D.superFunds.length?D.superFunds[0].fund||'Fund':'Tap to add',color:'var(--purple)',page:'super',icon:'🏦'},
-          {label:'Share Portfolio',val:D.shares.length?fmoney(nw.shareVal):'Not added',sub:D.shares.length?D.shares.length+' holdings':'Tap to add',color:'var(--gold)',page:'shares',icon:'📈'},
-          {label:'Personal Budget',val:D.budgetTx.length?fmoney(D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount||0),0)-D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount||0),0)):'Not tracked',sub:D.budgetTx.length?D.budgetTx.length+' transactions':'Tap to add',color:'var(--blue)',page:'budget',icon:'💳'},
-          {label:'Tax',val:'Overview',sub:'Business + Property',color:'var(--red)',page:'tax',icon:'📋'},
-          {label:'Goals',val:D.goals.length+' goals',sub:D.goals.filter(g=>g.progress>=g.target).length+' completed',color:'#ff6090',page:'goals',icon:'🎯'},
+          {label:'Salon Business',val:fmoney(nw.salonEquity),sub:xero.income?'Rev '+fmoney(xero.income):' Click to view',color:'var(--green)',page:'business',icon:' '},
+          {label:'Investment Property',val:D.properties.length?fmoney(nw.propEquity):'Not added',sub:D.properties.length?D.properties[0].address?.split(',')[0]||'1 property':'Tap to add',color:'var(--amber)',page:'property',icon:'  '},
+          {label:'Superannuation',val:D.superFunds.length?fmoney(nw.superBal):'Not added',sub:D.superFunds.length?D.superFunds[0].fund||'Fund':'Tap to add',color:'var(--purple)',page:'super',icon:'  '},
+          {label:'Share Portfolio',val:D.shares.length?fmoney(nw.shareVal):'Not added',sub:D.shares.length?D.shares.length+' holdings':'Tap to add',color:'var(--gold)',page:'shares',icon:'  '},
+          {label:'Personal Budget',val:D.budgetTx.length?fmoney(D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+parseFloat(t.amount||0),0)-D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+parseFloat(t.amount||0),0)):'Not tracked',sub:D.budgetTx.length?D.budgetTx.length+' transactions':'Tap to add',color:'var(--blue)',page:'budget',icon:'  '},
+          {label:'Tax',val:'Overview',sub:'Business + Property',color:'var(--red)',page:'tax',icon:'  '},
+          {label:'Goals',val:D.goals.length+' goals',sub:D.goals.filter(g=>g.progress>=g.target).length+' completed',color:'#ff6090',page:'goals',icon:'  '},
           {label:'Xero',val:xero.period||'Not linked',sub:xero.lastUpdated?'Updated '+fds(xero.lastUpdated):'Link via Salon App',color:'#13b5ea',page:'business',icon:'X'},
         ].map(m=>`
           <div onclick="nav('${m.page}')" style="padding:16px;background:var(--bg2);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
@@ -661,10 +661,10 @@ function pgNetWorth(){
   `;
 }
 
-// ═══ BUSINESS PAGE ═══
+// ------ BUSINESS PAGE ------
 function pgBusiness(){
   const salon=getSalonData();
-  if(!salon)return`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">✂</div><p style="margin-bottom:8px">Salon app not linked</p><p style="font-size:12px;color:var(--text3)">Open the Salon App in the same browser to see data here</p><button class="btn btn-primary" style="margin-top:16px" onclick="window.open('salon.html','_blank')">Open Salon App ↗</button></div></div>`;
+  if(!salon)return`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px"> </div><p style="margin-bottom:8px">Salon app not linked</p><p style="font-size:12px;color:var(--text3)">Open the Salon App in the same browser to see data here</p><button class="btn btn-primary" style="margin-top:16px" onclick="window.open('salon.html','_blank')">Open Salon App  </button></div></div>`;
   const xero=salon.xeroSnapshot||{};
   const inc=xero.income||0,exp=xero.totalExpenses||0,profit=xero.netProfit||(inc-exp);
   const ytdPay=xero.ytdPayroll||0;
@@ -678,7 +678,7 @@ function pgBusiness(){
 
   return`
     <div class="alert alert-green" style="margin-bottom:16px">
-      <span>✓</span><span>Live data from <strong>Hair by Ivana</strong> salon app + Xero · ${clients.length} clients · ${appts.length} appointments on record</span>
+      <span> </span><span>Live data from <strong>Hair by Ivana</strong> salon app + Xero   ${clients.length} clients   ${appts.length} appointments on record</span>
     </div>
     <div class="stat-grid" style="grid-template-columns:repeat(5,1fr)">
       <div class="stat"><div class="stat-val" style="color:var(--green)">${fmoney(inc||revenue)}</div><div class="stat-lbl">FY Revenue</div></div>
@@ -710,7 +710,7 @@ function pgBusiness(){
     </div>`;
 }
 
-// ═══ PROPERTY PAGE ═══
+// ------ PROPERTY PAGE ------
 function pgProperty(){
   const totalEquity=D.properties.reduce((s,p)=>s+(parseFloat(p.value)||0)-(parseFloat(p.loan)||0),0);
   const totalValue=D.properties.reduce((s,p)=>s+(parseFloat(p.value)||0),0);
@@ -724,7 +724,7 @@ function pgProperty(){
       </div>`:''}
       <button class="btn btn-primary" onclick="om('mProperty')">+ Add Property</button>
     </div>
-    ${!D.properties.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🏠</div><p style="margin-bottom:8px">No investment properties added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mProperty')">Add Your Property</button></div></div>`:''}
+    ${!D.properties.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">  </div><p style="margin-bottom:8px">No investment properties added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mProperty')">Add Your Property</button></div></div>`:''}
     ${D.properties.map(p=>{
       const val=parseFloat(p.value)||0;
       const loan=parseFloat(p.loan)||0;
@@ -745,11 +745,11 @@ function pgProperty(){
           <div>
             <div style="display:flex;align-items:center;gap:8px">
               <div class="card-title">${p.address||'Investment Property'}</div>
-              ${isShep?`<span class="badge b-amber">Shepparton VIC · Single Lease</span><span class="badge b-blue">From Google Sheet</span>`:''}
+              ${isShep?`<span class="badge b-amber">Shepparton VIC   Single Lease</span><span class="badge b-blue">From Google Sheet</span>`:''}
             </div>
-            <div style="font-size:11px;color:var(--text3);margin-top:3px">${p.type||'House'} · Contract ${fds(p.contractDate||p.purchaseDate)} · ${p.daysToSettlement||42} days to settlement</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:3px">${p.type||'House'}   Contract ${fds(p.contractDate||p.purchaseDate)}   ${p.daysToSettlement||42} days to settlement</div>
           </div>
-          <div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="editProp('${p.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delProp('${p.id}')">×</button></div>
+          <div style="display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="editProp('${p.id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="delProp('${p.id}')"> </button></div>
         </div>
 
         <!-- Top stats grid -->
@@ -771,13 +771,13 @@ function pgProperty(){
             <button class="tbt active" data-tab="pt-overview-${p.id}">Overview</button>
             <button class="tbt" data-tab="pt-costs-${p.id}">Annual Costs</button>
             <button class="tbt" data-tab="pt-cashflow-${p.id}">Cashflow</button>
-            ${isShep?`<button class="tbt" data-tab="pt-build-${p.id}">🏗 Build Tracker</button>`:''}
+            ${isShep?`<button class="tbt" data-tab="pt-build-${p.id}">   Build Tracker</button>`:''}
             <button class="tbt" data-tab="pt-notes-${p.id}">Notes</button>
           </div>
 
           <div id="pt-overview-${p.id}" class="tpanel active">
             <div style="margin-bottom:14px">
-              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px"><span>LVR -- ${loanPct.toFixed(1)}%</span><span>${loanPct>80?'⚠ High LVR':loanPct>60?'Moderate':'Good'}</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px"><span>LVR -- ${loanPct.toFixed(1)}%</span><span>${loanPct>80?'  High LVR':loanPct>60?'Moderate':'Good'}</span></div>
               <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${Math.min(loanPct,100)}%;background:${loanPct>80?'var(--red)':loanPct>60?'var(--amber)':'var(--green)'}"></div></div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
@@ -860,8 +860,8 @@ function pgProperty(){
             <div style="background:linear-gradient(135deg,#1a2a1a,#1a2030);border:1px solid var(--green);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
               <div>
                 <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:4px">Build Status</div>
-                <div style="font-size:20px;font-weight:700;color:var(--text)">Occupancy Permit Issued ✓</div>
-                <div style="font-size:12px;color:var(--text3);margin-top:3px">24 March 2026 · Permit No. 3983618599490 · Final inspection complete</div>
+                <div style="font-size:20px;font-weight:700;color:var(--text)">Occupancy Permit Issued  </div>
+                <div style="font-size:12px;color:var(--text3);margin-top:3px">24 March 2026   Permit No. 3983618599490   Final inspection complete</div>
               </div>
               <div style="text-align:right">
                 <div style="font-size:11px;color:var(--text3)">Paid to date</div>
@@ -872,7 +872,7 @@ function pgProperty(){
 
             <!-- Payment stages progress -->
             <div class="card" style="margin-bottom:16px">
-              <div class="card-header"><div class="card-title">SR Homes Progress Payments · Contract 350136</div><span class="badge b-green">$375,617 of $417,074 paid</span></div>
+              <div class="card-header"><div class="card-title">SR Homes Progress Payments   Contract 350136</div><span class="badge b-green">$375,617 of $417,074 paid</span></div>
               <div style="padding:14px 0">
                 ${[
                   {stage:'S:00',name:'Deposit',desc:'Contract signed',date:'11 Mar 2025',amount:20728.70,paid:true,receipt:'111703'},
@@ -881,7 +881,7 @@ function pgProperty(){
                   {stage:'S:03',name:'Lockup Stage',desc:'Bricks, roof, windows & sliding doors',date:'5 Dec 2025',amount:103643.50,paid:true,receipt:'125398'},
                   {stage:'S:04',name:'Fix Stage',desc:'Plaster, skirtings, kitchen & bathroom cabinetry',date:'5 Dec 2025',amount:82914.80,paid:true,receipt:'125399'},
                   {stage:'V:03',name:'Variation -- Colourboard',desc:'PCV3 colour change',date:'15 Dec 2025',amount:2500.00,paid:true,receipt:'125714'},
-                  {stage:'S:05',name:'Final Stage',desc:'Final items · Occupancy permit issued 24 Mar 2026',date:'Due ~May 2026',amount:41457.40,paid:false,receipt:''},
+                  {stage:'S:05',name:'Final Stage',desc:'Final items   Occupancy permit issued 24 Mar 2026',date:'Due ~May 2026',amount:41457.40,paid:false,receipt:''},
                 ].map((s,i)=>{
                   const bg = s.paid ? '' : ';background:rgba(255,171,64,.05)';
                   const circleBg = s.paid ? 'var(--green-dim)' : 'var(--amber-dim)';
@@ -889,13 +889,13 @@ function pgProperty(){
                   const border = s.paid ? '' : 'border:1px solid var(--amber);';
                   const amtCol = s.paid ? 'var(--green)' : 'var(--amber)';
                   const badge = s.paid ? 'b-green' : 'b-amber';
-                  const badgeTxt = s.paid ? 'Paid ✓' : 'Outstanding';
-                  const icon = s.paid ? '✓' : '!';
+                  const badgeTxt = s.paid ? 'Paid  ' : 'Outstanding';
+                  const icon = s.paid ? ' ' : '!';
                   return '<div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)'+bg+'">'
                     +'<div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:'+circleBg+';color:'+circleCol+';'+border+'">'+icon+'</div>'
                     +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">'+s.name+'</div><div style="font-size:11px;color:var(--text3)">'+s.desc+'</div></div>'
                     +'<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:700;color:'+amtCol+'">$'+s.amount.toLocaleString('en-AU',{minimumFractionDigits:2})+'</div>'
-                    +'<div style="font-size:10px;color:var(--text3)">'+s.date+(s.receipt?' · Inv '+s.receipt:'')+'</div></div>'
+                    +'<div style="font-size:10px;color:var(--text3)">'+s.date+(s.receipt?'   Inv '+s.receipt:'')+'</div></div>'
                     +'<span class="badge '+badge+'" style="flex-shrink:0">'+badgeTxt+'</span></div>';
                 }).join('')}
                 <!-- Total bar -->
@@ -916,20 +916,20 @@ function pgProperty(){
                   <div class="ip"><div class="ip-lbl">Permit issued</div><div class="ip-val">20 August 2025</div></div>
                   <div class="ip"><div class="ip-lbl">Must commence by</div><div class="ip-val">20 August 2026</div></div>
                   <div class="ip"><div class="ip-lbl">Must complete by</div><div class="ip-val">20 August 2027</div></div>
-                  <div class="ip"><div class="ip-lbl">Occupancy Permit</div><div class="ip-val" style="color:var(--green)">✓ Issued 24 March 2026</div></div>
-                  <div class="ip"><div class="ip-lbl">Final inspection</div><div class="ip-val" style="color:var(--green)">✓ 24 March 2026</div></div>
+                  <div class="ip"><div class="ip-lbl">Occupancy Permit</div><div class="ip-val" style="color:var(--green)">  Issued 24 March 2026</div></div>
+                  <div class="ip"><div class="ip-lbl">Final inspection</div><div class="ip-val" style="color:var(--green)">  24 March 2026</div></div>
                   <div class="ip"><div class="ip-lbl">Job Number</div><div class="ip-val">25/02478</div></div>
-                  <div class="ip"><div class="ip-lbl">Insurance policy</div><div class="ip-val">C951289 · Bovill Risk</div></div>
+                  <div class="ip"><div class="ip-lbl">Insurance policy</div><div class="ip-val">C951289   Bovill Risk</div></div>
                 </div>
               </div>
               <div class="card">
                 <div class="card-header"><div class="card-title">Key Contacts</div></div>
                 <div class="card-body">
-                  <div class="ip"><div class="ip-lbl">Builder</div><div class="ip-val">SR Homes / Royston Homes<br><span style="font-size:10px;color:var(--text3)">1300 188 668 · ABN 16-643-554-590</span></div></div>
-                  <div class="ip"><div class="ip-lbl">Site contact</div><div class="ip-val">Sheri Hills · 8390 1000<br><span style="font-size:10px;color:var(--text3)">shills@sherridonhomes.com.au</span></div></div>
-                  <div class="ip"><div class="ip-lbl">Surveyor</div><div class="ip-val">Watershed Building Consultants<br><span style="font-size:10px;color:var(--text3)">CBS-U 65767 · 03 9791 3355</span></div></div>
-                  <div class="ip"><div class="ip-lbl">Struct. engineer</div><div class="ip-val">Matthew Borzillo · Intrax<br><span style="font-size:10px;color:var(--text3)">PE0003026</span></div></div>
-                  <div class="ip"><div class="ip-lbl">Buyers agent</div><div class="ip-val">PttB · Absolute Investments</div></div>
+                  <div class="ip"><div class="ip-lbl">Builder</div><div class="ip-val">SR Homes / Royston Homes<br><span style="font-size:10px;color:var(--text3)">1300 188 668   ABN 16-643-554-590</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Site contact</div><div class="ip-val">Sheri Hills   8390 1000<br><span style="font-size:10px;color:var(--text3)">shills@sherridonhomes.com.au</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Surveyor</div><div class="ip-val">Watershed Building Consultants<br><span style="font-size:10px;color:var(--text3)">CBS-U 65767   03 9791 3355</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Struct. engineer</div><div class="ip-val">Matthew Borzillo   Intrax<br><span style="font-size:10px;color:var(--text3)">PE0003026</span></div></div>
+                  <div class="ip"><div class="ip-lbl">Buyers agent</div><div class="ip-val">PttB   Absolute Investments</div></div>
                   <div class="ip"><div class="ip-lbl">Council</div><div class="ip-val">Greater Shepparton City Council</div></div>
                 </div>
               </div>
@@ -962,7 +962,7 @@ function pgProperty(){
   `;
 }
 
-// ═══ SUPER PAGE ═══
+// ------ SUPER PAGE ------
 function pgSuper(){
   const salon=getSalonData();
   const xeroPayroll=salon?.xeroSnapshot?.ytdPayroll||75049.06;
@@ -986,7 +986,7 @@ function pgSuper(){
       <button class="btn btn-primary" onclick="om('mSuper')">+ Add Fund</button>
     </div>
 
-    ${!D.superFunds.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🏦</div><p>No super funds added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mSuper')">Add Super Fund</button></div></div>`:''}
+    ${!D.superFunds.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">  </div><p>No super funds added</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mSuper')">Add Super Fund</button></div></div>`:''}
 
     <!-- Combined progress bar -->
     ${D.superFunds.length>=2?`<div class="card" style="margin-bottom:16px">
@@ -1007,7 +1007,7 @@ function pgSuper(){
                 <div class="pbar" style="height:8px"><div class="pbar-fill" style="width:${pct}%;background:${col}"></div></div>
                 <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px">
                   <span>${pct.toFixed(0)}% of target ${fmoney(f.target)}</span>
-                  <span>${f.age} yrs old · retire at ${f.retAge}</span>
+                  <span>${f.age} yrs old   retire at ${f.retAge}</span>
                 </div>
               </div>`;
             }).join('')}
@@ -1020,7 +1020,7 @@ function pgSuper(){
               <span style="font-size:12px;color:var(--text2)">Combined projected</span>
               <span style="font-size:15px;font-weight:700;color:var(--green)">${fmoney(totalProjected)}</span>
             </div>
-            ${totalProjected>=totalTarget?`<span class="badge b-green" style="margin-top:8px">Combined on track ✓</span>`:`<div style="margin-top:8px"><span class="badge b-amber">Combined gap: ${fmoney(totalTarget-totalProjected)}</span></div>`}
+            ${totalProjected>=totalTarget?`<span class="badge b-green" style="margin-top:8px">Combined on track  </span>`:`<div style="margin-top:8px"><span class="badge b-amber">Combined gap: ${fmoney(totalTarget-totalProjected)}</span></div>`}
           </div>
           <div style="text-align:center">
             <!-- Dual ring chart -->
@@ -1076,11 +1076,11 @@ function pgSuper(){
               <div class="card-title">${f.owner||f.fund} -- ${f.fund}</div>
               ${isIvana?`<span class="badge b-green">Xero linked</span>`:''}
             </div>
-            <div style="font-size:11px;color:var(--text3);margin-top:2px">Member #${f.member||'--'} · ${f.option||'Balanced'} · Age ${age} → retire ${retAge} (${years} yrs)</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">Member #${f.member||'--'}   ${f.option||'Balanced'}   Age ${age}   retire ${retAge} (${years} yrs)</div>
           </div>
           <div style="display:flex;gap:6px">
             <button class="btn btn-outline btn-sm" onclick="editSuper('${f.id}')">Edit</button>
-            <button class="btn btn-danger btn-sm" onclick="delSuper('${f.id}')">×</button>
+            <button class="btn btn-danger btn-sm" onclick="delSuper('${f.id}')"> </button>
           </div>
         </div>
         <div class="card-body">
@@ -1112,7 +1112,7 @@ function pgSuper(){
                 </div>
                 <div class="pbar"><div class="pbar-fill" style="width:${projPct}%;background:var(--green);opacity:.5"></div></div>
               </div>
-              ${fv>=target?`<div class="alert alert-green" style="margin-top:10px">On track ✓ Projected ${fmoney(fv)} exceeds target ${fmoney(target)}</div>`:`<div class="alert alert-amber" style="margin-top:10px">Gap of ${fmoney(target-fv)} to reach target. Consider increasing contributions.</div>`}
+              ${fv>=target?`<div class="alert alert-green" style="margin-top:10px">On track   Projected ${fmoney(fv)} exceeds target ${fmoney(target)}</div>`:`<div class="alert alert-amber" style="margin-top:10px">Gap of ${fmoney(target-fv)} to reach target. Consider increasing contributions.</div>`}
               ${f.notes?`<div style="margin-top:10px;background:var(--bg3);padding:10px;border-radius:var(--radius-sm);font-size:11px;color:var(--text3)">${f.notes}</div>`:''}
             </div>
             <div>
@@ -1131,7 +1131,7 @@ function pgSuper(){
 }
 
 
-// ═══ BUDGET PAGE ═══
+// ------ BUDGET PAGE ------
 function pgBudget(){
   const inc=D.budgetTx.filter(t=>t.type==='income').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
   const exp=D.budgetTx.filter(t=>t.type==='expense').reduce((s,t)=>s+(parseFloat(t.amount)||0),0);
@@ -1149,7 +1149,7 @@ function pgBudget(){
         <div class="card-title">Bank Accounts</div>
         <div style="display:flex;align-items:center;gap:8px">
           ${lastSync?`<span style="font-size:11px;color:var(--text3)">Updated ${lastSync}</span>`:''}
-          <button class="btn btn-outline btn-sm" onclick="openSync()">⚡ Update</button>
+          <button class="btn btn-outline btn-sm" onclick="openSync()">  Update</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--border)">
@@ -1167,9 +1167,9 @@ function pgBudget(){
       </div>
     </div>`
     :`<div style="display:flex;align-items:center;gap:10px;background:rgba(19,181,234,.08);border:1px solid rgba(19,181,234,.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px">
-      <span style="font-size:16px">⚡</span>
+      <span style="font-size:16px"> </span>
       <span style="color:var(--text2)">Add your account balances for an accurate picture of your cash position</span>
-      <button class="btn btn-primary btn-sm" style="margin-left:auto;white-space:nowrap" onclick="openSync()">Add Accounts →</button>
+      <button class="btn btn-primary btn-sm" style="margin-left:auto;white-space:nowrap" onclick="openSync()">Add Accounts  </button>
     </div>`}
     <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="stat"><div class="stat-val" style="color:var(--green)">${fmoney(inc)}</div><div class="stat-lbl">Total Income</div></div>
@@ -1193,10 +1193,10 @@ function pgBudget(){
       <div class="card"><div class="card-header"><div class="card-title">Recent Transactions</div><button class="btn btn-primary btn-sm" onclick="om('mBudget')">+ Add</button></div>
         ${[...D.budgetTx].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10).map(t=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border)">
-            <div><div style="font-size:12px;font-weight:600;color:var(--text)">${t.description||t.category}</div><div style="font-size:10px;color:var(--text3)">${fds(t.date)} · ${t.category}</div></div>
+            <div><div style="font-size:12px;font-weight:600;color:var(--text)">${t.description||t.category}</div><div style="font-size:10px;color:var(--text3)">${fds(t.date)}   ${t.category}</div></div>
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-size:13px;font-weight:700;color:${t.type==='income'?'var(--green)':'var(--red)'}">${t.type==='income'?'+':'-'}${fmoney2(t.amount)}</span>
-              <button class="btn btn-ghost btn-sm btn-icon" onclick="delBudgetTx('${t.id}')">×</button>
+              <button class="btn btn-ghost btn-sm btn-icon" onclick="delBudgetTx('${t.id}')"> </button>
             </div>
           </div>`).join('')||'<div class="empty">No transactions yet</div>'}
       </div>
@@ -1204,7 +1204,7 @@ function pgBudget(){
   `;
 }
 
-// ═══ SHARES PAGE ═══
+// ------ SHARES PAGE ------
 function pgShares(){
   const totalVal=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.currentPrice||0)),0);
   const totalCost=D.shares.reduce((s,sh)=>s+(parseFloat(sh.units||0)*parseFloat(sh.buyPrice||0)),0);
@@ -1237,7 +1237,7 @@ function pgShares(){
               <td style="font-weight:700;color:${gain>=0?'var(--green)':'var(--red)'}">${gain>=0?'+':''}${fmoney(gain)}<br><span style="font-size:10px">${gainPct>=0?'+':''}${gainPct.toFixed(1)}%</span></td>
               <td style="color:var(--teal)">${sh.yield||0}%</td>
               <td style="font-size:11px;color:var(--text3)">${sh.platform||'--'}</td>
-              <td><button class="btn btn-ghost btn-sm btn-icon" onclick="delShare('${sh.id}')">×</button></td>
+              <td><button class="btn btn-ghost btn-sm btn-icon" onclick="delShare('${sh.id}')"> </button></td>
             </tr>`;
           }).join('')||`<tr><td colspan="10" class="empty" style="padding:2rem">No holdings yet -- add your first</td></tr>`}
           ${D.shares.length?`<tr class="tfoot"><td colspan="5">Totals</td><td>${fmoney(totalVal)}</td><td style="color:${totalGain>=0?'var(--green)':'var(--red)'}">${totalGain>=0?'+':''}${fmoney(totalGain)}</td><td>${fmoney(totalDivs)}/yr</td><td colspan="2"></td></tr>`:''}
@@ -1247,7 +1247,7 @@ function pgShares(){
   `;
 }
 
-// ═══ TAX PAGE ═══
+// ------ TAX PAGE ------
 function pgTax(){
   const salon=getSalonData();
   const xero=salon?.xeroSnapshot||{};
@@ -1278,7 +1278,7 @@ function pgTax(){
   const gstOwing=Math.max(0,gstCollected-gstPaid);
   const payg=xero.ytdPayroll?xero.ytdPayroll*0.19:0;
   return`
-    <div class="alert alert-amber" style="margin-bottom:16px">⚠ Estimated figures only -- always consult your accountant. Based on Xero data + your entered asset details.</div>
+    <div class="alert alert-amber" style="margin-bottom:16px">  Estimated figures only -- always consult your accountant. Based on Xero data + your entered asset details.</div>
     <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
       <div class="stat" style="--sc:var(--red)"><div class="stat-val" style="color:var(--red)">${fmoney(totalTax)}</div><div class="stat-lbl">Est. Income Tax</div></div>
       <div class="stat" style="--sc:var(--amber)"><div class="stat-val" style="color:var(--amber)">${fmoney(gstOwing)}</div><div class="stat-lbl">GST Owing</div></div>
@@ -1312,7 +1312,7 @@ function pgTax(){
   `;
 }
 
-// ═══ GOALS PAGE ═══
+// ------ GOALS PAGE ------
 function pgGoals(){
   const cats={Property:'var(--amber)',Retirement:'var(--purple)',Savings:'var(--green)',Investment:'var(--gold)',Business:'var(--teal)',Personal:'#ff6090',Education:'var(--blue)'};
   const completed=D.goals.filter(g=>parseFloat(g.progress||0)>=parseFloat(g.target||1));
@@ -1325,7 +1325,7 @@ function pgGoals(){
       <div class="stat" style="--sc:var(--amber)"><div class="stat-val" style="color:var(--amber)">${active.length}</div><div class="stat-lbl">In Progress</div></div>
       <div class="stat" style="--sc:var(--blue)"><div class="stat-val" style="color:var(--blue)">${fmoney(D.goals.reduce((s,g)=>s+(parseFloat(g.target||0)),0))}</div><div class="stat-lbl">Total Target</div></div>
     </div>
-    ${!D.goals.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">🎯</div><p>Set your first financial goal</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mGoal')">Add Goal</button></div></div>`:''}
+    ${!D.goals.length?`<div class="card"><div class="empty" style="padding:4rem"><div style="font-size:32px;margin-bottom:12px">  </div><p>Set your first financial goal</p><button class="btn btn-primary" style="margin-top:12px" onclick="om('mGoal')">Add Goal</button></div></div>`:''}
     ${active.map(g=>{
       const progress=parseFloat(g.progress||0);
       const target=parseFloat(g.target||1);
@@ -1336,12 +1336,12 @@ function pgGoals(){
         <div class="goal-header">
           <div>
             <div class="goal-name">${g.name}</div>
-            <div class="goal-meta">${g.category} · Priority: ${g.priority||'Medium'}${daysLeft!==null?` · ${daysLeft} days left`:''}</div>
+            <div class="goal-meta">${g.category}   Priority: ${g.priority||'Medium'}${daysLeft!==null?`   ${daysLeft} days left`:''}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="goal-pct" style="color:${color}">${pct.toFixed(0)}%</div>
             <button class="btn btn-outline btn-sm" onclick="editGoal('${g.id}')">Edit</button>
-            <button class="btn btn-ghost btn-sm btn-icon" onclick="delGoal('${g.id}')">×</button>
+            <button class="btn btn-ghost btn-sm btn-icon" onclick="delGoal('${g.id}')"> </button>
           </div>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
@@ -1353,12 +1353,12 @@ function pgGoals(){
     }).join('')}
     ${completed.length?`<div class="shead" style="margin-top:20px">Completed Goals</div>`:''}
     ${completed.map(g=>`<div class="goal-card" style="opacity:.6">
-      <div class="goal-header"><div><div class="goal-name">${g.name}</div><div class="goal-meta">${g.category}</div></div><span class="badge b-green">✓ Complete</span></div>
+      <div class="goal-header"><div><div class="goal-name">${g.name}</div><div class="goal-meta">${g.category}</div></div><span class="badge b-green">  Complete</span></div>
     </div>`).join('')}
   `;
 }
 
-// ═══ CRUD ═══
+// ------ CRUD ------
 // Properties
 function saveProp(){
   const data={address:document.getElementById('pr1').value,purchasePrice:document.getElementById('pr2').value,value:document.getElementById('pr3').value,loan:document.getElementById('pr4').value,rate:document.getElementById('pr5').value,rent:document.getElementById('pr6').value,expenses:document.getElementById('pr7').value,loanType:document.getElementById('pr8').value,purchaseDate:document.getElementById('pr9').value,type:document.getElementById('pr10').value,notes:document.getElementById('pr11').value};
@@ -1417,15 +1417,15 @@ function saveSettings(){
   D.fyStart=document.getElementById('st2').value;
   // Save Basiq key if entered
   const k=document.getElementById('st_basiq_key')?.value?.trim();
-  if(k&&k!=='••••••••••••••••'){D.basiqKey=k;}
+  if(k&&k!=='****************'){D.basiqKey=k;}
   save();cm('mSettings');toast('Settings saved','ok');
 }
 
-// ══════════════════════════════════════════════════
+// ----------------------------------------------------------------------------------------------------
 // BASIQ LIVE DATA INTEGRATION
 // Australian Open Banking (CDR) -- banks + super
 // API: https://au-api.basiq.io
-// ══════════════════════════════════════════════════
+// ----------------------------------------------------------------------------------------------------
 const BASIQ_KEY = 'MjdjMDYwNWYtOGE4NC00ZDIxLWExMTEtMWM4MjYxZGY5N2ZjOmU2MTEyYmQ5LTBjZmQtNDkxNi1hZThjLTUwZDkxNGY0M2Q1OQ==';
 const BASIQ = 'https://au-api.basiq.io';
 if(!D.basiqUserId) D.basiqUserId = '6080ba78-bc4e-406c-8e18-d919d22ed8f6';
@@ -1458,7 +1458,7 @@ async function basiqConnect(){
         if(saved.basiqAccounts?.length&&saved.basiqAccounts.length!==(D.basiqAccounts?.length||0)){
           clearInterval(poller);
           load(); // reload D from localStorage
-          toast('✓ '+D.basiqAccounts.length+' accounts connected!','ok');
+          toast('  '+D.basiqAccounts.length+' accounts connected!','ok');
           render();updateSidebar();
           return;
         }
@@ -1467,10 +1467,10 @@ async function basiqConnect(){
         clearInterval(poller);
         load();
         if(D.basiqAccounts?.length){
-          toast('✓ '+D.basiqAccounts.length+' accounts connected!','ok');
+          toast('  '+D.basiqAccounts.length+' accounts connected!','ok');
           render();updateSidebar();
         } else {
-          toast('In the popup: connect your bank then click 💾 Save','info');
+          toast('In the popup: connect your bank then click    Save','info');
         }
       }
     },2000);
@@ -1478,7 +1478,7 @@ async function basiqConnect(){
   }
 
   // Running from https:// -- use proxy directly
-  setStatus('⏳ Getting secure link...','var(--amber)');
+  setStatus('  Getting secure link...','var(--amber)');
   try{
     const r=await fetch(BASIQ_PROXY+'?action=connect',{
       method:'POST',headers:{'Content-Type':'application/json'},
@@ -1487,7 +1487,7 @@ async function basiqConnect(){
     const d=await r.json();
     if(!r.ok||d.error)throw new Error(d.error||'Connect failed');
     D.basiqUserId=d.userId;save();
-    setStatus('✓ Opening bank connection...','var(--green)');
+    setStatus('  Opening bank connection...','var(--green)');
     const w=window.open(d.connectUrl,'basiq_connect','width=500,height=720,left=200,top=80');
     let polls=0;
     const poller=setInterval(async()=>{
@@ -1496,13 +1496,13 @@ async function basiqConnect(){
         clearInterval(poller);
         try{
           await basiqSyncFromProxy();
-          toast('✓ Accounts linked!','ok');
+          toast('  Accounts linked!','ok');
           renderBasiqAccounts();render();updateSidebar();
         }catch(e){toast('Complete bank auth in the popup first','info');}
       }
     },3000);
   }catch(e){
-    setStatus('✗ '+e.message,'var(--red)');
+    setStatus('  '+e.message,'var(--red)');
     toast('Error: '+e.message,'err');
   }
 }
@@ -1512,7 +1512,7 @@ async function basiqSync(){
   toast('Syncing live data...','info');
   try{
     await basiqSyncFromProxy();
-    toast('✓ Live data synced!','ok');
+    toast('  Live data synced!','ok');
     render();updateSidebar();
   }catch(e){
     toast('Sync failed: '+e.message,'err');
@@ -1577,13 +1577,13 @@ function renderBasiqAccounts(){
   const totalBalance=D.basiqAccounts.reduce((s,a)=>s+a.balance,0);
   el.innerHTML=`
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px">
-      ${D.basiqAccounts.length} Linked Accounts · Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}
+      ${D.basiqAccounts.length} Linked Accounts   Last sync ${D.basiqLastSync?new Date(D.basiqLastSync).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'Never'}
     </div>
     ${D.basiqAccounts.map(a=>`
       <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:6px;border:1px solid var(--border)">
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--text)">${a.name}</div>
-          <div style="font-size:10px;color:var(--text3)">${a.number||''} · ${a.type}</div>
+          <div style="font-size:10px;color:var(--text3)">${a.number||''}   ${a.type}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:13px;font-weight:700;color:var(--green)">$${a.balance.toLocaleString('en-AU',{minimumFractionDigits:2})}</div>
@@ -1617,21 +1617,21 @@ function basiqStatusBadge(){
       <div style="width:8px;height:8px;border-radius:50%;background:#00e676;flex-shrink:0"></div>
       <div style="flex:1">
         <span style="color:#00e676;font-weight:600">${accts.length} accounts</span>
-        <span style="color:var(--text3);margin-left:6px">Total $${total.toLocaleString('en-AU',{minimumFractionDigits:2})} · Updated ${lastSync}</span>
+        <span style="color:var(--text3);margin-left:6px">Total $${total.toLocaleString('en-AU',{minimumFractionDigits:2})}   Updated ${lastSync}</span>
       </div>
-      <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openSync()">↻ Update</button>
+      <button class="btn btn-ghost btn-sm" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();openSync()">  Update</button>
     </div>`;
   }
   return `<div style="display:flex;align-items:center;gap:10px;background:rgba(19,181,234,.08);border:1px solid rgba(19,181,234,.3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:16px;font-size:12px">
-    <span style="font-size:16px">⚡</span>
+    <span style="font-size:16px"> </span>
     <div style="flex:1"><strong style="color:#13b5ea">Quick Balance Update</strong> <span style="color:var(--text3)">-- enter your account balances for an accurate net worth</span></div>
     <button class="btn btn-primary btn-sm" style="padding:5px 12px;font-size:12px;white-space:nowrap" onclick="openSync()">Update Now</button>
   </div>`;
 }
 
-// ══════════════════════════════════════════════════
+// ----------------------------------------------------------------------------------------------------
 // MANUAL ACCOUNT SYNC
-// ══════════════════════════════════════════════════
+// ----------------------------------------------------------------------------------------------------
 function openSync(){
   const fields = [];
 
@@ -1666,7 +1666,7 @@ function openSync(){
         </div>
       </div>`).join('')}
     <button onclick="addAccount()" style="background:none;border:1px dashed var(--border2);border-radius:6px;padding:6px 12px;color:var(--text3);font-size:11px;cursor:pointer;width:100%;margin-bottom:8px;font-family:'DM Sans',sans-serif">+ Add account</button>
-    <div style="font-size:11px;color:var(--text3);padding:8px;background:var(--bg3);border-radius:6px">💡 Update superannuation balances on the <strong style="color:var(--text)">Superannuation</strong> page</div>
+    <div style="font-size:11px;color:var(--text3);padding:8px;background:var(--bg3);border-radius:6px">   Update superannuation balances on the <strong style="color:var(--text)">Superannuation</strong> page</div>
   `;
   om('mSync');
 }
@@ -1697,7 +1697,7 @@ function saveSync(){
   D.manualSyncTime = new Date().toISOString();
   save();
   cm('mSync');
-  toast('✓ Balances updated!','ok');
+  toast('  Balances updated!','ok');
   render(); updateSidebar();
 }
 
@@ -1707,18 +1707,18 @@ function importData(){toast('Paste your backup JSON and I will restore it -- fea
 // Date display
 document.getElementById('tbDate').textContent=new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-// ── SEED DATA -- pre-load real data on first run ──
+// ---- SEED DATA -- pre-load real data on first run ----
 const SEED_KEY = 'lifedb_seeded_v8';
 function seedRealData(){
   if(localStorage.getItem(SEED_KEY)) return;
 
-  // ── Pre-load Basiq API key ──
+  // ---- Pre-load Basiq API key ----
   D.basiqKey = 'MjdjMDYwNWYtOGE4NC00ZDIxLWExMTEtMWM4MjYxZGY5N2ZjOmU2MTEyYmQ5LTBjZmQtNDkxNi1hZThjLTUwZDkxNGY0M2Q1OQ==';
 
-  // ══════════════════════════════════════════════════════
+  // ------------------------------------------------------------------------------------------------------------
   // SHEPPARTON INVESTMENT PROPERTY -- Lot 215, 82 Warrumbungle Drive, Shepparton North VIC 3631
   // Sources: Building Permit, Occupancy Permit, SR Homes invoices/receipts, Google Sheet, Excel tracker
-  // ══════════════════════════════════════════════════════
+  // ------------------------------------------------------------------------------------------------------------
   D.properties.push({
     id: 'prop_shep1',
     address: '82 Warrumbungle Drive, Shepparton North VIC 3631',
@@ -1730,9 +1730,9 @@ function seedRealData(){
     volume: '12622',
     folio: '718',
     type: 'House',
-    description: 'Single storey dwelling and garage · 184m² · New build',
+    description: 'Single storey dwelling and garage   184m    New build',
 
-    // ── Financials ──
+    // ---- Financials ----
     landPrice: '280000',
     buildPrice: '414574',
     buildPriceApproved: '417074',   // after $2,500 colourboard variation
@@ -1745,7 +1745,7 @@ function seedRealData(){
     lvr: '88',
     deposit: '82800',               // 12% deposit
 
-    // ── Total cash invested (from Excel tracker) ──
+    // ---- Total cash invested (from Excel tracker) ----
     totalCashRequired: '22740',     // from Excel row total
     pttbRetainer: '3000',           // 12 Feb 2025
     pttbCommission: '10000',        // 24 Feb 2025
@@ -1756,34 +1756,34 @@ function seedRealData(){
     legalFees: '900',
     totalOutstanding: '672585',     // from Excel
 
-    // ── SR Homes Build Contract (Contract No. 350136) ──
+    // ---- SR Homes Build Contract (Contract No. 350136) ----
     builder: 'SR Homes Pty Ltd (Royston Homes)',
     builderABN: '16-643-554-590',
     builderContact: '1300 188 668',
     buildPermitNo: '3983618599490',
     buildPermitIssued: '2025-08-20',
     buildPermitExpiry: '2027-08-20',
-    buildSurveyor: 'Watershed Building Consultants · M D Curtain BS-U 1590',
-    structuralEngineer: 'Matthew Borzillo · Intrax Consulting Engineers PE0003026',
-    insurance: 'Bovill Risk & Insurance Consultants P/L · Policy C951289',
+    buildSurveyor: 'Watershed Building Consultants   M D Curtain BS-U 1590',
+    structuralEngineer: 'Matthew Borzillo   Intrax Consulting Engineers PE0003026',
+    insurance: 'Bovill Risk & Insurance Consultants P/L   Policy C951289',
     occupancyPermit: '3983618599490',
     occupancyIssued: '2026-03-24',
     finalInspection: '2026-03-24',
 
-    // ── Payment schedule (from SR Homes receipts & Excel) ──
-    // Stage 0 -- Deposit: $20,728.70 · Paid 11-Mar-25
-    // Stage 1 -- Base (slab): $62,186.10 · Paid 25-Sep-25
-    // Stage 2 -- Frame: $103,643.50 · Paid 13-Oct-25
-    // Stage 3 -- Lockup: $103,643.50 · Paid 05-Dec-25
-    // Stage 4 -- Fix: $82,914.80 · Paid 05-Dec-25
-    // Variation PCV3 -- Colourboard: $2,500.00 · Paid 15-Dec-25
-    // Stage 5 -- Final: $41,457.40 · OUTSTANDING
+    // ---- Payment schedule (from SR Homes receipts & Excel) ----
+    // Stage 0 -- Deposit: $20,728.70   Paid 11-Mar-25
+    // Stage 1 -- Base (slab): $62,186.10   Paid 25-Sep-25
+    // Stage 2 -- Frame: $103,643.50   Paid 13-Oct-25
+    // Stage 3 -- Lockup: $103,643.50   Paid 05-Dec-25
+    // Stage 4 -- Fix: $82,914.80   Paid 05-Dec-25
+    // Variation PCV3 -- Colourboard: $2,500.00   Paid 15-Dec-25
+    // Stage 5 -- Final: $41,457.40   OUTSTANDING
     paidToDate: '375616.60',
     finalPaymentDue: '41457.40',
     balanceOfContract: '41457.40',
     contractComplete: false,
 
-    // ── Rental projections (from Google Sheet 1 Lease tab) ──
+    // ---- Rental projections (from Google Sheet 1 Lease tab) ----
     rent: '625',
     grossAnnualRent: '32500',
     adjustedIncome: '31192.50',
@@ -1803,12 +1803,12 @@ function seedRealData(){
     contractDate: '2026-05-28',
     settledDate: '2026-03-24',
 
-    notes: 'Builder: SR Homes (Royston Homes) · Contract 350136 · Job 25/02478\nOccupancy Permit issued 24 March 2026 -- COMPLETE ✓\nBuild cost $414,574 + Variation $2,500 = $417,074 approved\nPaid to date: $375,617 · Final payment outstanding: $41,457\n\nPttB (Absolute Investments) sourced property · Retainer $3,000 + Commission $10,000\nNegatively geared: -$259/wk · -$13,477/yr\nContact: davidshobday@gmail.com · 0405 654 099'
+    notes: 'Builder: SR Homes (Royston Homes)   Contract 350136   Job 25/02478\nOccupancy Permit issued 24 March 2026 -- COMPLETE  \nBuild cost $414,574 + Variation $2,500 = $417,074 approved\nPaid to date: $375,617   Final payment outstanding: $41,457\n\nPttB (Absolute Investments) sourced property   Retainer $3,000 + Commission $10,000\nNegatively geared: -$259/wk   -$13,477/yr\nContact: davidshobday@gmail.com   0405 654 099'
   });
 
-  // ══════════════════════════════════════════════════════
+  // ------------------------------------------------------------------------------------------------------------
   // GOALS -- seeded from known commitments
-  // ══════════════════════════════════════════════════════
+  // ------------------------------------------------------------------------------------------------------------
   D.goals.push({
     id: 'goal_final_payment',
     name: 'Pay Shepparton Final Stage Payment',
@@ -1846,7 +1846,7 @@ function seedRealData(){
   localStorage.setItem(SEED_KEY,'1');
 }
 
-// ── INIT ──
+// ---- INIT ----
 load();
 seedRealData();
 render();

@@ -598,6 +598,7 @@ function logout(){
 
 // ═══ NAVIGATION ═══
 function nav(p){
+  const _cu = S.currentUser;
   page=p;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.getAttribute('onclick')?.includes(`'${p}'`)));
   const titles={dashboard:'Dashboard',calendar:'Calendar',clients:'Clients',pos:'Point of Sale',bookkeeping:'Bookkeeping',payroll:'Payroll',reports:'Reports',marketing:'SMS Marketing',employees:'Employees',services:'Services',settings:'Settings'};

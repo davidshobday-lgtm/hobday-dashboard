@@ -417,27 +417,24 @@ function save(){
 const CLOUD_URL='https://hobday-dashboard-mnx7tfk7.netlify.app/.netlify/functions/data';
 const CLOUD_TOKEN='hobday2026';
 let _cloudSaving=false;
-async async function cloudSave(){
+function cloudSave(){
   if(_cloudSaving)return;_cloudSaving=true;
-  try{
-    const _t=window._ghToken;if(!_t){_cloudSaving=false;return;}
-    const _cr=await fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{headers:{'Authorization':'token '+_t,'Accept':'application/vnd.github.v3+json'}});
-    const _cm=await _cr.json();
-    const _payload={life:D,savedAt:new Date().toISOString()};
-    await fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{method:'PUT',headers:{'Authorization':'token '+_t,'Content-Type':'application/json'},body:JSON.stringify({message:'Auto-save',content:btoa(unescape(encodeURIComponent(JSON.stringify(_payload)))),sha:_cm.sha})});
-  }catch(e){}
-  _cloudSaving=false;
+  fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/cfg.json?t='+Date.now())
+    .then(r=>r.ok?r.json():{t:''}).then(cfg=>{
+      if(!cfg.t){_cloudSaving=false;return;}
+      return fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{headers:{'Authorization':'token '+cfg.t,'Accept':'application/vnd.github.v3+json'}})
+        .then(r=>r.json()).then(cm=>{
+          const body=JSON.stringify({message:'save',content:btoa(unescape(encodeURIComponent(JSON.stringify({life:D,savedAt:new Date().toISOString()})))),sha:cm.sha});
+          return fetch('https://api.github.com/repos/davidshobday-lgtm/hobday-dashboard/contents/data.json',{method:'PUT',headers:{'Authorization':'token '+cfg.t,'Content-Type':'application/json'},body});
+        });
+    }).catch(()=>{}).then(()=>{_cloudSaving=false;});
 }
-async function cloudLoad(){
-  try{
-    const cr=await fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/cfg.json?t='+Date.now());
-    if(cr.ok){const cfg=await cr.json();window._ghToken=cfg.t;}
-    const r=await fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/data.json?t='+Date.now());
-    if(!r.ok) return false;
-    const d=await r.json();
-    if(d.life){D=Object.assign({},D,d.life);try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){} return true;}
-  }catch(e){console.log('cloudLoad err:',e.message);}
-  return false;
+function cloudLoad(){
+  return fetch('https://raw.githubusercontent.com/davidshobday-lgtm/hobday-dashboard/main/data.json?t='+Date.now())
+    .then(r=>r.ok?r.json():null).then(d=>{
+      if(d&&d.life){D=Object.assign({},D,d.life);try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}return true;}
+      return false;
+    }).catch(()=>false);
 }
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
 function tod(){return new Date().toISOString().split('T')[0]}
@@ -454,7 +451,7 @@ function om(id){
     const n=document.getElementById('st1');if(n)n.value=D.name||'';
     const f=document.getElementById('st2');if(f)f.value=D.fyStart||'07';
     const k=document.getElementById('st_basiq_key');
-    if(k)k.value=D.basiqKey?'••••••••••••••••':'';
+    if(k)k.value=D.basiqKey?'••••••••••••���•••':'';
     const s=document.getElementById('basiq_status');
     if(s){
       if(D.basiqKey){

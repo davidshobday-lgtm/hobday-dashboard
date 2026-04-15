@@ -1837,8 +1837,8 @@ function seedRealData(){
   // Data loaded from GitHub
   
   // Data loaded from GitHub
-  D.superFunds.push({id:'super_david',owner:'David',fund:'Australian Super',member:'',balance:'0',option:'Balanced',empContrib:'0',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'1000000',notes:'Update from MyGov or Australian Super app'});
-  D.superFunds.push({id:'super_ivana',owner:'Ivana',fund:'Australian Super',member:'',balance:'0',option:'Balanced',empContrib:'8631',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'800000',notes:'Contributions from Xero payroll 11.5pct of 75049'});
+  D.superFunds.push({id:'super_david',owner:'David',fund:'Australian Super',member:'',balance:'214081',option:'Balanced',empContrib:'0',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'1000000',notes:'Update from MyGov or Australian Super app'});
+  D.superFunds.push({id:'super_ivana',owner:'Ivana',fund:'Australian Super',member:'',balance:'150000',option:'Balanced',empContrib:'8631',persContrib:'0',returnRate:'8.5',retAge:'65',age:'40',target:'800000',notes:'Contributions from Xero payroll 11.5pct of 75049'});
   save();
   localStorage.setItem(SEED_KEY,'1');
 }
@@ -1851,7 +1851,7 @@ updateSidebar();
 
 // Pull latest cloud data then re-render
 cloudLoad().then(loaded => {
-  if(loaded){ seedRealData(); render(); updateSidebar(); }
+  if(loaded){ render(); updateSidebar(); }
 });
 
 // Auto-sync Basiq on load via proxy

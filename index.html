@@ -179,6 +179,7 @@ select option{background:var(--bg3)}
 .mod-shares{--mc:var(--gold)}
 .mod-tax{--mc:var(--red)}
 .mod-goals{--mc:#ff6090}
+.mod-bank{--mc:#06b6d4}
 </style>
 </head>
 <body>
@@ -214,6 +215,8 @@ select option{background:var(--bg3)}
       <div class="dot" style="background:#ff6090"></div>Goals</button>
 
     <div class="sb-section">Apps</div>
+    <button class="nav-btn mod-bank" onclick="nav('bank')">
+      <div class="dot" style="background:#06b6d4"></div>Bank Accounts<span class="nav-val" id="sb-bank"></span></button>
     <button class="nav-btn" onclick="window.open('salon.html','_blank')">
       <div class="dot" style="background:var(--green)"></div>Open Salon App </button>
   </div>
@@ -1873,6 +1876,443 @@ if(D.basiqUserId){
 }
 </script>
 
+
+// ===== BANK MODULE RENDERING =====
+function fmtCurrency(n) {
+  const abs = Math.abs(n).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return (n < 0 ? '-
+// ===== Hobday Bank Sync via Chrome Extension =====
+const BANK_PROXY = 'https://hobday-basiq-proxy.hobday2026.workers.dev';
+const BANK_SYNC_INTERVAL = 5 * 60 * 1000; // 5 mins
+
+async function fetchBankBalances() {
+  try {
+    const r = await fetch(BANK_PROXY + '?action=get_balances', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
+    });
+    const data = await r.json();
+    if (!data || Object.keys(data).length === 0) return null;
+
+    // Flatten all accounts across all banks
+    let total = 0;
+    const bankList = [];
+    for (const [bank, info] of Object.entries(data)) {
+      const bankName = {cba:'CommBank',anz:'ANZ',nab:'NAB'}[bank] || bank.toUpperCase();
+      for (const acc of (info.accounts || [])) {
+        total += acc.balance || 0;
+        bankList.push({bank: bankName, name: acc.name, balance: acc.balance, updatedAt: info.updatedAt});
+      }
+    }
+    return {total, accounts: bankList, raw: data};
+  } catch(e) {
+    console.log('Bank sync error:', e.message);
+    return null;
+  }
+}
+
+function formatCurrency(n) {
+  return '$' + Math.abs(n).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function injectBankUI(data) {
+  // Remove existing bank widget if any
+  const existing = document.getElementById('bank-sync-widget');
+  if (existing) existing.remove();
+
+  const widget = document.createElement('div');
+  widget.id = 'bank-sync-widget';
+  widget.style.cssText = `
+    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 12px 16px; min-width: 220px; box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    font-family: -apple-system, sans-serif; font-size: 13px; color: #e2e8f0;
+    cursor: pointer; transition: all 0.2s;
+  `;
+
+  if (!data || !data.accounts || data.accounts.length === 0) {
+    widget.innerHTML = `
+      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
+      <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
+    `;
+  } else {
+    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
+    const oldestUpdate = data.accounts.reduce((oldest, a) => {
+      if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
+      return oldest;
+    }, null);
+
+    let rows = '';
+    for (const acc of data.accounts) {
+      rows += `<div style="display:flex;justify-content:space-between;padding:2px 0">
+        <span style="color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${acc.name}</span>
+        <span style="color:${acc.balance<0?'#f87171':'#34d399'};font-weight:600;margin-left:8px">${formatCurrency(acc.balance)}</span>
+      </div>`;
+    }
+
+    widget.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
+        <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
+      </div>
+      ${rows}
+      <div style="border-top:1px solid #334155;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
+        <span style="color:#64748b">Total</span>
+        <span style="color:#34d399;font-weight:700">${formatCurrency(data.total)}</span>
+      </div>
+    `;
+
+    // Also update any existing bank balance fields in the dashboard
+    updateDashboardBalances(data);
+  }
+
+  // Click to refresh
+  widget.addEventListener('click', () => syncBanks());
+  document.body.appendChild(widget);
+}
+
+function updateDashboardBalances(data) {
+  // Try to find and update savings/cash fields in the dashboard
+  const totalBankBalance = data.total;
+
+  // Look for input fields or display elements with 'savings', 'cash', 'bank' labels
+  document.querySelectorAll('input[data-field], [data-category]').forEach(el => {
+    const field = (el.getAttribute('data-field') || el.getAttribute('data-category') || '').toLowerCase();
+    if (field.includes('saving') || field.includes('cash') || field.includes('bank')) {
+      if (el.tagName === 'INPUT') {
+        el.value = totalBankBalance.toFixed(2);
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+    }
+  });
+
+  // Dispatch a custom event so the dashboard can react
+  window.dispatchEvent(new CustomEvent('bankSyncUpdate', {detail: data}));
+}
+
+async // Patch nav to handle bank module
+const _navOrig = typeof nav !== 'undefined' ? nav : null;
+function navWithBank(page) {
+  // Hide all mod panels
+  document.querySelectorAll('.mod-panel').forEach(p => p.style.display = 'none');
+  // Show bank panel if selected
+  if (page === 'bank') {
+    const panel = document.getElementById('mod-bank');
+    if (panel) panel.style.display = 'block';
+    syncBankNow();
+    // Update active nav
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    const bankBtn = document.querySelector('.mod-bank');
+    if (bankBtn) bankBtn.classList.add('active');
+    return;
+  }
+  if (_navOrig) _navOrig(page);
+}
+// Override nav after DOM ready
+setTimeout(() => { if (typeof nav === 'function') window.nav = navWithBank; }, 100);
+
+function syncBanks() {
+  // Show loading state
+  const widget = document.getElementById('bank-sync-widget');
+  if (widget) {
+    const indicator = widget.querySelector('.sync-status');
+    if (indicator) indicator.textContent = 'Syncing...';
+  }
+
+  const data = await fetchBankBalances();
+  injectBankUI(data);
+  return data;
+}
+
+// Start syncing
+window.hobdayBankSync = syncBanks;
+syncBanks();
+setInterval(syncBanks, BANK_SYNC_INTERVAL);
+</script>
+
+<!-- BANK ACCOUNTS MODULE -->
+<div id="mod-bank" class="mod-panel" style="display:none">
+  <div class="mod-header">
+    <h1>Bank Accounts</h1>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div class="card" id="bank-total-assets-card">
+      <div class="card-label">TOTAL CASH & SAVINGS</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+    </div>
+    <div class="card" id="bank-total-liabilities-card">
+      <div class="card-label">TOTAL LOANS</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+    </div>
+  </div>
+
+  <div id="bank-accounts-list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+</body>
+</html>
+ : '
+// ===== Hobday Bank Sync via Chrome Extension =====
+const BANK_PROXY = 'https://hobday-basiq-proxy.hobday2026.workers.dev';
+const BANK_SYNC_INTERVAL = 5 * 60 * 1000; // 5 mins
+
+async function fetchBankBalances() {
+  try {
+    const r = await fetch(BANK_PROXY + '?action=get_balances', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
+    });
+    const data = await r.json();
+    if (!data || Object.keys(data).length === 0) return null;
+
+    // Flatten all accounts across all banks
+    let total = 0;
+    const bankList = [];
+    for (const [bank, info] of Object.entries(data)) {
+      const bankName = {cba:'CommBank',anz:'ANZ',nab:'NAB'}[bank] || bank.toUpperCase();
+      for (const acc of (info.accounts || [])) {
+        total += acc.balance || 0;
+        bankList.push({bank: bankName, name: acc.name, balance: acc.balance, updatedAt: info.updatedAt});
+      }
+    }
+    return {total, accounts: bankList, raw: data};
+  } catch(e) {
+    console.log('Bank sync error:', e.message);
+    return null;
+  }
+}
+
+function formatCurrency(n) {
+  return '$' + Math.abs(n).toLocaleString('en-AU', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const diff = (Date.now() - new Date(iso)) / 1000;
+  if (diff < 60) return 'just now';
+  if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function injectBankUI(data) {
+  // Remove existing bank widget if any
+  const existing = document.getElementById('bank-sync-widget');
+  if (existing) existing.remove();
+
+  const widget = document.createElement('div');
+  widget.id = 'bank-sync-widget';
+  widget.style.cssText = `
+    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 12px 16px; min-width: 220px; box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    font-family: -apple-system, sans-serif; font-size: 13px; color: #e2e8f0;
+    cursor: pointer; transition: all 0.2s;
+  `;
+
+  if (!data || !data.accounts || data.accounts.length === 0) {
+    widget.innerHTML = `
+      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
+      <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
+    `;
+  } else {
+    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
+    const oldestUpdate = data.accounts.reduce((oldest, a) => {
+      if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
+      return oldest;
+    }, null);
+
+    let rows = '';
+    for (const acc of data.accounts) {
+      rows += `<div style="display:flex;justify-content:space-between;padding:2px 0">
+        <span style="color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${acc.name}</span>
+        <span style="color:${acc.balance<0?'#f87171':'#34d399'};font-weight:600;margin-left:8px">${formatCurrency(acc.balance)}</span>
+      </div>`;
+    }
+
+    widget.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
+        <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
+      </div>
+      ${rows}
+      <div style="border-top:1px solid #334155;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
+        <span style="color:#64748b">Total</span>
+        <span style="color:#34d399;font-weight:700">${formatCurrency(data.total)}</span>
+      </div>
+    `;
+
+    // Also update any existing bank balance fields in the dashboard
+    updateDashboardBalances(data);
+  }
+
+  // Click to refresh
+  widget.addEventListener('click', () => syncBanks());
+  document.body.appendChild(widget);
+}
+
+function updateDashboardBalances(data) {
+  // Try to find and update savings/cash fields in the dashboard
+  const totalBankBalance = data.total;
+
+  // Look for input fields or display elements with 'savings', 'cash', 'bank' labels
+  document.querySelectorAll('input[data-field], [data-category]').forEach(el => {
+    const field = (el.getAttribute('data-field') || el.getAttribute('data-category') || '').toLowerCase();
+    if (field.includes('saving') || field.includes('cash') || field.includes('bank')) {
+      if (el.tagName === 'INPUT') {
+        el.value = totalBankBalance.toFixed(2);
+        el.dispatchEvent(new Event('input', {bubbles: true}));
+        el.dispatchEvent(new Event('change', {bubbles: true}));
+      }
+    }
+  });
+
+  // Dispatch a custom event so the dashboard can react
+  window.dispatchEvent(new CustomEvent('bankSyncUpdate', {detail: data}));
+}
+
+async function syncBanks() {
+  // Show loading state
+  const widget = document.getElementById('bank-sync-widget');
+  if (widget) {
+    const indicator = widget.querySelector('.sync-status');
+    if (indicator) indicator.textContent = 'Syncing...';
+  }
+
+  const data = await fetchBankBalances();
+  injectBankUI(data);
+  return data;
+}
+
+// Start syncing
+window.hobdayBankSync = syncBanks;
+syncBanks();
+setInterval(syncBanks, BANK_SYNC_INTERVAL);
+</script>
+
+<!-- BANK ACCOUNTS MODULE -->
+<div id="mod-bank" class="mod-panel" style="display:none">
+  <div class="mod-header">
+    <h1>Bank Accounts</h1>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div class="card" id="bank-total-assets-card">
+      <div class="card-label">TOTAL CASH & SAVINGS</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+    </div>
+    <div class="card" id="bank-total-liabilities-card">
+      <div class="card-label">TOTAL LOANS</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+    </div>
+  </div>
+
+  <div id="bank-accounts-list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+</body>
+</html>
+) + abs;
+}
+
+function renderBankModule(data) {
+  if (!data || Object.keys(data).length === 0) return;
+
+  let totalAssets = 0, totalLoans = 0;
+  const allAccounts = [];
+
+  for (const [bank, info] of Object.entries(data)) {
+    const bankName = {cba:'CommBank', anz:'ANZ', nab:'NAB'}[bank] || bank.toUpperCase();
+    for (const acc of (info.accounts || [])) {
+      allAccounts.push({...acc, bank: bankName, updatedAt: info.updatedAt});
+      if (acc.balance >= 0) totalAssets += acc.balance;
+      else totalLoans += acc.balance;
+    }
+  }
+
+  // Update sidebar value
+  const netBank = totalAssets + totalLoans;
+  const sbEl = document.getElementById('sb-bank');
+  if (sbEl) sbEl.textContent = fmtCurrency(netBank);
+
+  // Update totals cards
+  const assetsEl = document.getElementById('bank-total-assets');
+  if (assetsEl) assetsEl.textContent = fmtCurrency(totalAssets);
+  const liabEl = document.getElementById('bank-total-liabilities');
+  if (liabEl) liabEl.textContent = fmtCurrency(Math.abs(totalLoans));
+
+  // Update last synced
+  const latestUpdate = allAccounts.reduce((latest, a) => {
+    if (!latest || new Date(a.updatedAt) > new Date(latest)) return a.updatedAt;
+    return latest;
+  }, null);
+  const updEl = document.getElementById('bank-last-updated');
+  if (updEl && latestUpdate) {
+    const diff = Math.floor((Date.now() - new Date(latestUpdate)) / 60000);
+    updEl.textContent = diff < 2 ? 'Updated just now' : 'Updated ' + diff + 'm ago';
+  }
+
+  // Group by bank and render account rows
+  const list = document.getElementById('bank-accounts-list');
+  if (!list) return;
+
+  // Group accounts by bank
+  const byBank = {};
+  allAccounts.forEach(a => {
+    if (!byBank[a.bank]) byBank[a.bank] = [];
+    byBank[a.bank].push(a);
+  });
+
+  list.innerHTML = Object.entries(byBank).map(([bankName, accs]) => {
+    const rows = accs.map(acc => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border)">
+        <span style="color:var(--text-dim)">${acc.name}</span>
+        <span style="font-weight:600;color:${acc.balance<0?'var(--red)':'var(--green)'}">${fmtCurrency(acc.balance)}</span>
+      </div>`).join('');
+    const bankTotal = accs.reduce((s, a) => s + a.balance, 0);
+    return `
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surface2)">
+          <span style="font-weight:700;font-size:15px">${bankName}</span>
+          <span style="font-weight:700;color:${bankTotal<0?'var(--red)':'var(--green)'}">${fmtCurrency(bankTotal)}</span>
+        </div>
+        ${rows}
+      </div>`;
+  }).join('');
+
+  // Also update the old floating widget if it exists
+  syncBanks();
+}
+
+async function syncBankNow() {
+  const btn = document.querySelector('#mod-bank .btn-primary');
+  if (btn) btn.textContent = '↻ Syncing...';
+  const r = await fetch('https://hobday-basiq-proxy.hobday2026.workers.dev?action=get_balances', {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
+  });
+  const data = await r.json();
+  renderBankModule(data);
+  if (btn) btn.textContent = '↻ Refresh';
+}
+
+// Auto-load bank data when module is opened
+window._origNav = window._origNav || window.nav;
+
 <script id="hobday-bank-sync">
 // ===== Hobday Bank Sync via Chrome Extension =====
 const BANK_PROXY = 'https://hobday-basiq-proxy.hobday2026.workers.dev';
@@ -1933,11 +2373,11 @@ function injectBankUI(data) {
 
   if (!data || !data.accounts || data.accounts.length === 0) {
     widget.innerHTML = `
-      <div style="color:#64748b;font-size:11px;margin-bottom:4px">ð° BANK SYNC</div>
+      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
       <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
     `;
   } else {
-    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' Â· ');
+    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
     const oldestUpdate = data.accounts.reduce((oldest, a) => {
       if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
       return oldest;
@@ -1953,7 +2393,7 @@ function injectBankUI(data) {
 
     widget.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#64748b;font-size:11px">ð° BANK SYNC</span>
+        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
         <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
       </div>
       ${rows}
@@ -2010,5 +2450,29 @@ window.hobdayBankSync = syncBanks;
 syncBanks();
 setInterval(syncBanks, BANK_SYNC_INTERVAL);
 </script>
+
+<!-- BANK ACCOUNTS MODULE -->
+<div id="mod-bank" class="mod-panel" style="display:none">
+  <div class="mod-header">
+    <h1>Bank Accounts</h1>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div class="card" id="bank-total-assets-card">
+      <div class="card-label">TOTAL CASH & SAVINGS</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+    </div>
+    <div class="card" id="bank-total-liabilities-card">
+      <div class="card-label">TOTAL LOANS</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+    </div>
+  </div>
+
+  <div id="bank-accounts-list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
 </body>
 </html>

@@ -512,6 +512,11 @@ function currentUser(){return S.employees.find(e=>e.id===S.currentUserId)||{firs
 function isOwner(){const u=currentUser();return u.role==='owner'||u.id==='default'||!S.employees.length}
 
 function buildLoginScreen(){
+  // Auto-login from session
+  const _su=sessionStorage.getItem('sp_user');
+  const _sp=sessionStorage.getItem('sp_pin');
+  if(_su&&_sp){setTimeout(()=>{selectUser(_su);setTimeout(()=>{verifyPin(_sp);},50);},30);return;}
+
   document.getElementById('loginSalonName').textContent=S.salonName;
   const pills=document.getElementById('userPills');
   const users=[];
@@ -563,6 +568,8 @@ function verifyPin(pin){
   const correctPin=u?.pin||'0000';
   if(pin===correctPin){
     sessionStorage.setItem('salon_session_user', S.employees?.find?.(e=>e.pin===enteredPin)?.id||'');S.currentUserId=loginSelectedUser==='__owner__'?null:loginSelectedUser;
+  sessionStorage.setItem('sp_user', loginSelectedUser);
+  sessionStorage.setItem('sp_pin', pin);
     save();
     enterApp();
   } else {

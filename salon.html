@@ -740,7 +740,7 @@ function pgClients(){
           </div>
         </div>
         <div class="cl-list">
-          ${filt.map(c=>{const col=avc(c.first+c.last);const appts=S.appointments.filter(a=>a.clientId===c.id);const nxt=appts.filter(a=>isUp(a)&&a.status==='upcoming').sort((a,b)=>a.date.localeCompare(b.date))[0];return`<div class="cl-item ${c.id===selClient?'active':''}" onclick="selClient='${c.id}';render()"><div class="cl-av" style="background:${col[0]};color:${col[1]}">${ini(c.first,c.last)}</div><div style="min-width:0"><div class="cl-name">${c.first} ${c.last||''}</div><div class="cl-sub">${c.phone||c.email||'No contact'}${nxt?' · '+fd(nxt.date):''}</div></div></div>`;}).join('')}
+          ${filt.map(c=>{const col=avc(c.first+c.last);const appts=S.appointments.filter(a=>a.clientId===c.id);const nxt=appts.filter(a=>isUp(a)&&a.status==='upcoming').sort((a,b)=>a.date.localeCompare(b.date))[0];return`<div class="cl-item ${c.id===selClient?'active':''}" onclick="selClient='${c.id}';render()"><div class="cl-av" style="background:${col[0]};color:${col[1]}">${ini(c.first,c.last)}</div><div style="min-width:0"><div class="cl-name">${c.first} ${c.last||''}</div><div class="cl-sub">${c.phone||c.mobile||c.email||c.phone||c.mobile||c.email||'No contact'}${nxt?' · '+fd(nxt.date):''}</div></div></div>`;}).join('')}
           ${!filt.length?'<div class="empty" style="padding:2rem">No clients found</div>':''}
         </div>
         <div style="padding:10px 12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-secondary)">${filt.length} client${filt.length!==1?'s':''}</div>
@@ -791,7 +791,7 @@ function clientDetail(c){
       </div>
       <div id="t-hist" class="tpanel" style="padding:0">
         ${appts.length?`<div class="tw"><table><thead><tr><th>Date</th><th>Service</th>${isOwner()?'<th>Price</th>':''}<th>Status</th><th></th></tr></thead><tbody>
-          ${appts.map(a=>{const sc={upcoming:'b-blue',confirmed:'b-green',completed:'b-grey',cancelled:'b-red',noshow:'b-red'};return`<tr><td><div style="font-weight:600">${fds(a.date)}</div><div style="font-size:11px;color:var(--text-secondary)">${ft(a.time)}</div></td><td>${a.service||'—'}${a.notes?`<br><span style="font-size:11px;color:var(--text-secondary)">${a.notes.slice(0,40)}</span>`:''}</td>${isOwner()?`<td>${a.price?'$'+parseFloat(a.price).toFixed(2):'—'}</td>`:''}<td><span class="badge ${sc[a.status]||'b-grey'}">${a.status}</span>${a.reminderSent?'<span class="badge b-green" style="margin-left:4px">SMS</span>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="editAppt('${a.id}')">Edit</button></td></tr>`;}).join('')}
+          ${appts.map(a=>{const sc={upcoming:'b-blue',confirmed:'b-green',completed:'b-grey',cancelled:'b-red',noshow:'b-red'};return`<tr><td><div style="font-weight:600">${fds(a.date)}</div><div style="font-size:11px;color:var(--text-secondary)">${ft(a.time)}</div></td><td>${a.service||'—'}${a.notes?`<br><span style="font-size:11px;color:var(--text-secondary)">${a.notes.slice(0,40)}</span>`:''}</td>${isOwner()?`<td>${a.price?'$'+parseFloat(a.price).toFixed(2):'��'}</td>`:''}<td><span class="badge ${sc[a.status]||'b-grey'}">${a.status}</span>${a.reminderSent?'<span class="badge b-green" style="margin-left:4px">SMS</span>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="editAppt('${a.id}')">Edit</button></td></tr>`;}).join('')}
         </tbody></table></div>`:'<div class="empty">No history yet</div>'}
       </div>
       <div id="t-notes" class="tpanel" style="padding:16px">
@@ -1387,7 +1387,7 @@ function pgEmployees(){
         return`<div class="card">
           <div style="padding:16px;display:flex;align-items:center;gap:12px">
             <div class="av-lg" style="background:${col[0]};color:${col[1]};width:48px;height:48px;font-size:16px">${ini(e.first,e.last)}</div>
-            <div style="flex:1"><div style="font-size:15px;font-weight:700">${e.first} ${e.last||''}</div><div style="font-size:12px;color:var(--text-secondary)">${e.phone||e.email||'No contact'}</div></div>
+            <div style="flex:1"><div style="font-size:15px;font-weight:700">${e.first} ${e.last||''}</div><div style="font-size:12px;color:var(--text-secondary)">${e.phone||e.email||c.phone||c.mobile||c.email||'No contact'}</div></div>
             <button class="btn btn-ghost btn-sm" onclick="editEmployee('${e.id}')">Edit</button>
           </div>
           <div style="padding:0 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px">

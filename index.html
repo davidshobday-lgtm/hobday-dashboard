@@ -213,10 +213,10 @@ select option{background:var(--bg3)}
       <div class="dot" style="background:var(--red)"></div>Tax</button>
     <button class="nav-btn mod-goals" onclick="nav('goals')">
       <div class="dot" style="background:#ff6090"></div>Goals</button>
-
-    <div class="sb-section">Apps</div>
     <button class="nav-btn mod-bank" onclick="nav('bank')">
       <div class="dot" style="background:#06b6d4"></div>Bank Accounts<span class="nav-val" id="sb-bank"></span></button>
+
+    <div class="sb-section">Apps</div>
     <button class="nav-btn" onclick="window.open('salon.html','_blank')">
       <div class="dot" style="background:var(--green)"></div>Open Salon App </button>
   </div>
@@ -1923,61 +1923,7 @@ function timeAgo(iso) {
   return Math.floor(diff/86400) + 'd ago';
 }
 
-function injectBankUI(data) {
-  // Remove existing bank widget if any
-  const existing = document.getElementById('bank-sync-widget');
-  if (existing) existing.remove();
-
-  const widget = document.createElement('div');
-  widget.id = 'bank-sync-widget';
-  widget.style.cssText = `
-    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
-    padding: 12px 16px; min-width: 220px; box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    font-family: -apple-system, sans-serif; font-size: 13px; color: #e2e8f0;
-    cursor: pointer; transition: all 0.2s;
-  `;
-
-  if (!data || !data.accounts || data.accounts.length === 0) {
-    widget.innerHTML = `
-      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
-      <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
-    `;
-  } else {
-    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
-    const oldestUpdate = data.accounts.reduce((oldest, a) => {
-      if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
-      return oldest;
-    }, null);
-
-    let rows = '';
-    for (const acc of data.accounts) {
-      rows += `<div style="display:flex;justify-content:space-between;padding:2px 0">
-        <span style="color:#94a3b8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${acc.name}</span>
-        <span style="color:${acc.balance<0?'#f87171':'#34d399'};font-weight:600;margin-left:8px">${formatCurrency(acc.balance)}</span>
-      </div>`;
-    }
-
-    widget.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
-        <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
-      </div>
-      ${rows}
-      <div style="border-top:1px solid #334155;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">
-        <span style="color:#64748b">Total</span>
-        <span style="color:#34d399;font-weight:700">${formatCurrency(data.total)}</span>
-      </div>
-    `;
-
-    // Also update any existing bank balance fields in the dashboard
-    updateDashboardBalances(data);
-  }
-
-  // Click to refresh
-  widget.addEventListener('click', () => syncBanks());
-  document.body.appendChild(widget);
-}
+function injectBankUI(data) { renderBankModule(data); }
 
 function updateDashboardBalances(data) {
   // Try to find and update savings/cash fields in the dashboard
@@ -2045,18 +1991,18 @@ setInterval(syncBanks, BANK_SYNC_INTERVAL);
     <h1>Bank Accounts</h1>
     <div style="display:flex;gap:10px;align-items:center">
       <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
-      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">â» Refresh</button>
     </div>
   </div>
 
   <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
     <div class="card" id="bank-total-assets-card">
       <div class="card-label">TOTAL CASH & SAVINGS</div>
-      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">â</div>
     </div>
     <div class="card" id="bank-total-liabilities-card">
       <div class="card-label">TOTAL LOANS</div>
-      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">â</div>
     </div>
   </div>
 
@@ -2124,11 +2070,11 @@ function injectBankUI(data) {
 
   if (!data || !data.accounts || data.accounts.length === 0) {
     widget.innerHTML = `
-      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
+      <div style="color:#64748b;font-size:11px;margin-bottom:4px">ÃÂ°ÃÂÃÂÃÂ° BANK SYNC</div>
       <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
     `;
   } else {
-    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
+    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂÃÂ· ');
     const oldestUpdate = data.accounts.reduce((oldest, a) => {
       if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
       return oldest;
@@ -2144,7 +2090,7 @@ function injectBankUI(data) {
 
     widget.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
+        <span style="color:#64748b;font-size:11px">ÃÂ°ÃÂÃÂÃÂ° BANK SYNC</span>
         <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
       </div>
       ${rows}
@@ -2208,18 +2154,18 @@ setInterval(syncBanks, BANK_SYNC_INTERVAL);
     <h1>Bank Accounts</h1>
     <div style="display:flex;gap:10px;align-items:center">
       <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
-      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">â» Refresh</button>
     </div>
   </div>
 
   <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
     <div class="card" id="bank-total-assets-card">
       <div class="card-label">TOTAL CASH & SAVINGS</div>
-      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">â</div>
     </div>
     <div class="card" id="bank-total-liabilities-card">
       <div class="card-label">TOTAL LOANS</div>
-      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">â</div>
     </div>
   </div>
 
@@ -2301,13 +2247,13 @@ function renderBankModule(data) {
 
 async function syncBankNow() {
   const btn = document.querySelector('#mod-bank .btn-primary');
-  if (btn) btn.textContent = '↻ Syncing...';
+  if (btn) btn.textContent = 'â» Syncing...';
   const r = await fetch('https://hobday-basiq-proxy.hobday2026.workers.dev?action=get_balances', {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: '{}'
   });
   const data = await r.json();
   renderBankModule(data);
-  if (btn) btn.textContent = '↻ Refresh';
+  if (btn) btn.textContent = 'â» Refresh';
 }
 
 // Auto-load bank data when module is opened
@@ -2373,11 +2319,11 @@ function injectBankUI(data) {
 
   if (!data || !data.accounts || data.accounts.length === 0) {
     widget.innerHTML = `
-      <div style="color:#64748b;font-size:11px;margin-bottom:4px">Ã°ÂÂÂ° BANK SYNC</div>
+      <div style="color:#64748b;font-size:11px;margin-bottom:4px">ÃÂ°ÃÂÃÂÃÂ° BANK SYNC</div>
       <div style="color:#475569;font-size:12px">Install extension + open your banking tab to sync</div>
     `;
   } else {
-    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂ· ');
+    const bankNames = [...new Set(data.accounts.map(a => a.bank))].join(' ÃÂÃÂ· ');
     const oldestUpdate = data.accounts.reduce((oldest, a) => {
       if (!oldest || new Date(a.updatedAt) < new Date(oldest)) return a.updatedAt;
       return oldest;
@@ -2393,7 +2339,7 @@ function injectBankUI(data) {
 
     widget.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="color:#64748b;font-size:11px">Ã°ÂÂÂ° BANK SYNC</span>
+        <span style="color:#64748b;font-size:11px">ÃÂ°ÃÂÃÂÃÂ° BANK SYNC</span>
         <span style="color:#475569;font-size:10px">Updated ${timeAgo(oldestUpdate)}</span>
       </div>
       ${rows}
@@ -2457,18 +2403,18 @@ setInterval(syncBanks, BANK_SYNC_INTERVAL);
     <h1>Bank Accounts</h1>
     <div style="display:flex;gap:10px;align-items:center">
       <span id="bank-last-updated" style="color:var(--text-dim);font-size:13px"></span>
-      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">↻ Refresh</button>
+      <button onclick="syncBankNow()" class="btn-primary" style="font-size:13px;padding:6px 14px">â» Refresh</button>
     </div>
   </div>
 
   <div class="cards-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
     <div class="card" id="bank-total-assets-card">
       <div class="card-label">TOTAL CASH & SAVINGS</div>
-      <div class="card-value" id="bank-total-assets" style="color:var(--green)">—</div>
+      <div class="card-value" id="bank-total-assets" style="color:var(--green)">â</div>
     </div>
     <div class="card" id="bank-total-liabilities-card">
       <div class="card-label">TOTAL LOANS</div>
-      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">—</div>
+      <div class="card-value" id="bank-total-liabilities" style="color:var(--red)">â</div>
     </div>
   </div>
 

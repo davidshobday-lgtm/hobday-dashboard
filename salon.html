@@ -518,9 +518,7 @@ function buildLoginScreen(){
   // Always show Owner
   users.push({id:'__owner__',first:'Owner',last:'',role:'owner',pin:S.ownerPin||'0000'});
   S.employees.forEach(e=>users.push(e));
-  // Auto-login check
-  const _au=sessionStorage.getItem('sp_user'),_ap=sessionStorage.getItem('sp_pin');
-  if(_au&&_ap){setTimeout(()=>{const p=document.getElementById('pill_'+_au);if(p){p.click();setTimeout(()=>{verifyPin(_ap);},100);}},100);}
+  // Auto-login from session  
   pills.innerHTML=users.map(u=>{
     const col=avc(u.first+(u.last||''));
     return`<div class="user-pill" id="pill_${u.id}" onclick="selectUser('${u.id}')">
@@ -529,6 +527,13 @@ function buildLoginScreen(){
       <div style="margin-left:auto;font-size:18px;color:var(--border)">›</div>
     </div>`;
   }).join('');
+  // Auto-login if session exists
+  const _au=sessionStorage.getItem('sp_user'),_ap=sessionStorage.getItem('sp_pin');
+  if(_au&&_ap&&document.getElementById('pill_'+_au)){
+    loginSelectedUser=_au;
+    document.getElementById('pill_'+_au)?.classList.add('selected');
+    setTimeout(()=>verifyPin(_ap),150);
+  }
   document.getElementById('loginScreen').style.display='';
   document.getElementById('appShell').style.display='none';
 }

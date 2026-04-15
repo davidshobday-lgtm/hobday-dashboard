@@ -598,7 +598,8 @@ function logout(){
 
 // ═══ NAVIGATION ═══
 function nav(p){
-  const _cu = S.currentUser;
+  // Save current user before re-render
+  if(S&&S.currentUserId) window._lastUserId=S.currentUserId;
   page=p;
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.getAttribute('onclick')?.includes(`'${p}'`)));
   const titles={dashboard:'Dashboard',calendar:'Calendar',clients:'Clients',pos:'Point of Sale',bookkeeping:'Bookkeeping',payroll:'Payroll',reports:'Reports',marketing:'SMS Marketing',employees:'Employees',services:'Services',settings:'Settings'};
@@ -607,6 +608,7 @@ function nav(p){
 }
 
 function render(){
+  if(window._lastUserId && S && !S.currentUserId) S.currentUserId=window._lastUserId;
   const pages={dashboard:pgDashboard,calendar:pgCalendar,clients:pgClients,pos:pgPOS,bookkeeping:pgBookkeeping,payroll:pgPayroll,reports:pgReports,marketing:pgMarketing,employees:pgEmployees,services:pgServices,settings:pgSettings};
   document.getElementById('mainContent').innerHTML=(pages[page]||pgDashboard)();
   postRender();

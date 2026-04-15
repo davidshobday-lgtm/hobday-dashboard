@@ -243,7 +243,7 @@ tr:last-child td{border-bottom:none}
         <div style="font-size:14px;font-weight:600;margin-bottom:6px">Enter your PIN</div>
         <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px" id="loginForUser"></div>
         <div class="pin-input">
-          <input class="pin-digit" type="password" maxlength="1" id="p0" oninput="pinInput(0)">
+          <input class="pin-digit" type="password" maxlength="1" id="p0" oninput="pinInput(0)" onload="checkAutoSession()">
           <input class="pin-digit" type="password" maxlength="1" id="p1" oninput="pinInput(1)">
           <input class="pin-digit" type="password" maxlength="1" id="p2" oninput="pinInput(2)">
           <input class="pin-digit" type="password" maxlength="1" id="p3" oninput="pinInput(3)">
@@ -562,7 +562,7 @@ function verifyPin(pin){
   const u=users.find(x=>x.id===loginSelectedUser);
   const correctPin=u?.pin||'0000';
   if(pin===correctPin){
-    S.currentUserId=loginSelectedUser==='__owner__'?null:loginSelectedUser;
+    sessionStorage.setItem('salon_session_user', S.employees?.find?.(e=>e.pin===enteredPin)?.id||'');S.currentUserId=loginSelectedUser==='__owner__'?null:loginSelectedUser;
     save();
     enterApp();
   } else {
@@ -598,6 +598,8 @@ function logout(){
 
 // ═══ NAVIGATION ═══
 function nav(p){
+  // Save session user for auto-login
+  if(S&&S.currentUserId) sessionStorage.setItem('salonSessionUser', S.currentUserId);
   // Save current user before re-render
   if(S&&S.currentUserId) window._lastUserId=S.currentUserId;
   page=p;
@@ -608,6 +610,9 @@ function nav(p){
 }
 
 function render(){
+  // Restore session user
+  const sessUser = sessionStorage.getItem('salonSessionUser');
+  if(sessUser && S && !S.currentUserId) { S.currentUserId = sessUser; saveData(S); }
   if(window._lastUserId && S && !S.currentUserId) S.currentUserId=window._lastUserId;
   const pages={dashboard:pgDashboard,calendar:pgCalendar,clients:pgClients,pos:pgPOS,bookkeeping:pgBookkeeping,payroll:pgPayroll,reports:pgReports,marketing:pgMarketing,employees:pgEmployees,services:pgServices,settings:pgSettings};
   document.getElementById('mainContent').innerHTML=(pages[page]||pgDashboard)();
